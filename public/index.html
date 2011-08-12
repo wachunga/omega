@@ -26,7 +26,7 @@
 	<li>{{= user}} says: {{= msg}}</li>
 </script>
 <script type="text/x-jquery-tmpl" id="issueItemTemplate">
-	<li data-bind="css: { closed: closed }">Ω{{= id}} <span class="assignee" data-bind="text: assignee() ? '(@' + assignee() + ')' : ''"></span> {{= description}}</li>
+	<li data-bind="css: { closed: closed }">Ω{{= id}} <span class="assignee" data-bind="text: assignee() != 'nobody' ? '(@' + assignee() + ')' : ''"></span> {{= description}}</li>
 </script>
 
 <script type="text/javascript">

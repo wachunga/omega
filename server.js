@@ -17,6 +17,8 @@ console.log('Server running at http://127.0.0.1:' + PORT);
 var io = sio.listen(server);
 var nicknames = {};
 var issues = [];
+var UNASSIGNED = "nobody";
+var CURRENT_USER = "me";
 
 io.sockets.on('connection', function(socket) {
 	
@@ -31,16 +33,20 @@ io.sockets.on('connection', function(socket) {
 			id: issues.length,
 			description: desc,
 			creator: socket.nickname,
-			assignee: null,
+			assignee: UNASSIGNED,
 			closed: false
 		};
 		issues.push(newIssue);
 		io.sockets.emit('issue created', newIssue);
 	});
 	
-	socket.on('assign issue', function(id, assignee) {
-		issues[id].assignee = assignee || socket.nickname;
-		io.sockets.emit('issue assigned', socket.nickname, id, issues[id].assignee);
+	socket.on('assign issue', function(id, specifiedAssignee) {
+		var assignee = specifiedAssignee;
+		if (!specifiedAssignee || specifiedAssignee === CURRENT_USER) {
+			assignee = socket.nickname;
+		}
+		issues[id].assignee = assignee; 
+		io.sockets.emit('issue assigned', socket.nickname, id, assignee);
 	});
 	
 	socket.on('close issue', function(id) {

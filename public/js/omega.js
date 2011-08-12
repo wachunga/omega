@@ -64,7 +64,7 @@ var OmegaIssueTracker = {};
 		this.socket.on('issue created', function (issue) {
 			that.handleMessage("Ω", issue.creator + " created " + issue.id + ".");
 			issue.closed = ko.observable(issue.closed);
-			issue.assignee = ko.observable(null);
+			issue.assignee = ko.observable(issue.assignee);
 			that.issues.push(issue);
 		});	
 		
@@ -94,7 +94,6 @@ var OmegaIssueTracker = {};
 	];
 	function notifyOfBadCommand() {
 		var rand = Math.floor(Math.random() * (badNotifications.length));
-		console.log(rand);
 		alert(badNotifications[rand]); // TODO: style
 	}
 	
@@ -122,11 +121,16 @@ var OmegaIssueTracker = {};
 				case "resolved":
 					this.closeIssue(parseInt(rest));
 					break;
+				case "unassign":
+					var id = rest.split(" ")[0];
+					this.assignIssue(parseInt(id), "nobody");
+					break;
 				case "assign":
 				case "@":
 					var id = rest.split(" ")[0];
 					var assignee = rest.substring(1 + id.length);
 					this.assignIssue(parseInt(id), assignee);
+					break;
 				default:
 					notifyOfBadCommand();
 					break;

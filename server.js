@@ -10,7 +10,7 @@ var server = http.createServer(function (request, response) {
         fileServer.serve(request, response);
     });
 });
-server.listen(PORT, "127.0.0.1");
+server.listen(PORT);
 
 console.log('Server running at http://127.0.0.1:' + PORT);
 
@@ -26,11 +26,6 @@ io.sockets.on('connection', function(socket) {
 		io.sockets.emit('user message', socket.nickname, msg);
 	});
 	
-	socket.on('close issue', function(id) {
-		issues[id].closed = true;
-		io.sockets.emit('issue closed', socket.nickname, id);
-	});
-	
 	socket.on('new issue', function(desc) {
 		var newIssue = {
 			id: issues.length,
@@ -41,6 +36,11 @@ io.sockets.on('connection', function(socket) {
 		};
 		issues.push(newIssue);
 		io.sockets.emit('issue created', newIssue);
+	});
+	
+	socket.on('close issue', function(id) {
+		issues[id].closed = true;
+		io.sockets.emit('issue closed', socket.nickname, id);
 	});
 
 	socket.on('nickname', function(nick, fn) {

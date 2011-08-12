@@ -46,6 +46,7 @@ var OmegaIssueTracker = {};
 		this.socket.on('issues', function (issues) {
 			_.each(issues, function (issue) {
 				issue.closed = ko.observable(issue.closed);
+				issue.assignee = ko.observable(issue.assignee);
 			});
 			that.issues(issues);
 		});
@@ -63,6 +64,7 @@ var OmegaIssueTracker = {};
 		this.socket.on('issue created', function (issue) {
 			that.handleMessage("Ω", issue.creator + " created " + issue.id + ".");
 			issue.closed = ko.observable(issue.closed);
+			issue.assignee = ko.observable(null);
 			that.issues.push(issue);
 		});	
 		
@@ -72,6 +74,15 @@ var OmegaIssueTracker = {};
 				return issue.id === id;
 			});
 			issue.closed(true);
+		});	
+		
+		this.socket.on('issue assigned', function (assigner, id, assignee) {
+			that.handleMessage("Ω", assigner + " assigned " + id + " to " + assignee + ".");
+			var issue = _.find(that.issues(), function (issue) {
+				console.log(issue.id, id, assignee);
+				return issue.id === id;
+			});
+			issue.assignee(assignee);
 		});	
 		
 	};
@@ -100,6 +111,11 @@ var OmegaIssueTracker = {};
 				case "resolved":
 					this.closeIssue(parseInt(rest));
 					break;
+				case "assign":
+				case "@":
+					var id = rest.split(" ")[0];
+					var assignee = rest.substring(1 + id.length);
+					this.assignIssue(parseInt(id), assignee);
 				default:
 					break;
 			}
@@ -112,6 +128,10 @@ var OmegaIssueTracker = {};
 		socket.emit("new issue", desc);
 	};
 	
+	OIT.Tracker.prototype.assignIssue = function (id, assignee) {
+		socket.emit("assign issue", id, assignee);
+	};
+	
 	OIT.Tracker.prototype.closeIssue = function (id) {
 		socket.emit("close issue", id);
 	};
@@ -122,14 +142,10 @@ var OmegaIssueTracker = {};
 		socket.emit("user message", message);
 	};
 	
-	function scrollToBottom(el) {
-		el.scrollTop = el.scrollHeight;
-	}
-	
 	OIT.Tracker.prototype.handleMessage = function (user, msg) {
 		//console.log("socket message received", user, msg);
 		this.messages.push({user: user, msg: msg});
-		// FIXME: constant element id
-		scrollToBottom(document.getElementById('messages'));
+		//var objDiv = document.getElementById('msgs');
+		//objDiv.scrollTop = objDiv.scrollHeight;
 	};
 }(OmegaIssueTracker));

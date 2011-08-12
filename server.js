@@ -38,6 +38,11 @@ io.sockets.on('connection', function(socket) {
 		io.sockets.emit('issue created', newIssue);
 	});
 	
+	socket.on('assign issue', function(id, assignee) {
+		issues[id].assignee = assignee || socket.nickname;
+		io.sockets.emit('issue assigned', socket.nickname, id, issues[id].assignee);
+	});
+	
 	socket.on('close issue', function(id) {
 		issues[id].closed = true;
 		io.sockets.emit('issue closed', socket.nickname, id);

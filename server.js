@@ -1,21 +1,66 @@
 var http = require('http'),
-	io = require('socket.io');
-    //_ = require('underscore');
+	sio = require('socket.io'),
+	static = require('node-static');
 
-var PORT = 1337;
+var PORT = process.argv[2];
 
+var fileServer = new static.Server('./public');
 var server = http.createServer(function (request, response) {
-	response.writeHead(200, {'Content-Type': 'text/plain'});
-	response.end('Ω online\n');
+    request.addListener('end', function () {
+        fileServer.serve(request, response);
+    });
 });
 server.listen(PORT, "127.0.0.1");
 
 console.log('Server running at http://127.0.0.1:' + PORT);
-var socket = io.listen(server);
-socket.on('connection', function (client) {
-	client.on('message', function (data) {
-		console.log(new Date() + " - Message: " + JSON.stringify(data));
-		socket.broadcast(data);
+
+var io = sio.listen(server);
+var nicknames = {};
+var issues = [];
+
+io.sockets.on('connection', function(socket) {
+	
+	io.sockets.emit('issues', issues);
+	
+	socket.on('user message', function(msg) {
+		io.sockets.emit('user message', socket.nickname, msg);
 	});
-	client.on('disconnect', function() {});
+	
+	socket.on('close issue', function(id) {
+		issues[id].closed = true;
+		io.sockets.emit('issue closed', socket.nickname, id);
+	});
+	
+	socket.on('new issue', function(desc) {
+		var newIssue = {
+			id: issues.length,
+			description: desc,
+			creator: socket.nickname,
+			assignee: null,
+			closed: false
+		};
+		issues.push(newIssue);
+		io.sockets.emit('issue created', newIssue);
+	});
+
+	socket.on('nickname', function(nick, fn) {
+		if (nicknames[nick]) {
+			fn(true);
+		} else {
+			fn(false);
+			nicknames[nick] = socket.nickname = nick;
+			socket.broadcast.emit('announcement', nick + ' connected');
+			io.sockets.emit('nicknames', nicknames);
+		}
+	});
+
+	socket.on('disconnect', function() {
+		if (!socket.nickname) {
+			return;
+		}
+
+		delete nicknames[socket.nickname];
+		socket.broadcast.emit('announcement', socket.nickname + ' disconnected');
+		socket.broadcast.emit('nicknames', nicknames);
+	});
 });

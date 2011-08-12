@@ -86,6 +86,18 @@ var OmegaIssueTracker = {};
 		
 	};
 	
+	var badNotifications = [
+		"Try again, Sherlock.",
+		"You fail the Turing test.",
+		"The least you could do is be grammatical.",
+		"Ω does not like your tone."
+	];
+	function notifyOfBadCommand() {
+		var rand = Math.floor(Math.random() * (badNotifications.length));
+		console.log(rand);
+		alert(badNotifications[rand]); // TODO: style
+	}
+	
 	OIT.Tracker.prototype.handleInput = function () {
 		var input = this.$inputBox.val();
 		this.$inputBox.val("");
@@ -116,6 +128,7 @@ var OmegaIssueTracker = {};
 					var assignee = rest.substring(1 + id.length);
 					this.assignIssue(parseInt(id), assignee);
 				default:
+					notifyOfBadCommand();
 					break;
 			}
 		} else {

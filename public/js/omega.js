@@ -52,12 +52,12 @@ var OmegaIssueTracker = {};
 		});
 		
 		this.socket.on('user message', function (user, msg) {
-			console.log("um", user, msg);
+			//console.log("um", user, msg);
 			that.handleMessage(user, msg);
 		});
 		
 		this.socket.on('announcement', function (msg) {
-			console.log("ann", msg);
+			//console.log("ann", msg);
 			that.handleMessage("Ω", msg);
 		});	
 		
@@ -79,7 +79,6 @@ var OmegaIssueTracker = {};
 		this.socket.on('issue assigned', function (assigner, id, assignee) {
 			that.handleMessage("Ω", assigner + " assigned " + id + " to " + assignee + ".");
 			var issue = _.find(that.issues(), function (issue) {
-				console.log(issue.id, id, assignee);
 				return issue.id === id;
 			});
 			issue.assignee(assignee);

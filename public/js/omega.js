@@ -5,42 +5,40 @@ var OmegaIssueTracker = {};
 		return ostart + Math.round((ostop - ostart) * ((num - istart) / (istop - istart)));
 	}
 	
-	var sampleUser = {
-		id: 1,
-		name: window.location.hash.substring(1) || "anonymous",
-		getColour: function () {
-			var hexes = _.map(this.name.split(''), function (c) {
-				var mapped = Math.abs(mapRange(c.charCodeAt(0), 33, 128, 0, 255));
-				return mapped.toString(16).substr(0,2);
-			});
-			while (hexes.length < 3) {
-				hexes.push("00");
-			}
-			return '#' + hexes.slice(0,3).join('');
+	function colorForName(name) {
+		var hexes = _.map(name.split(''), function (c) {
+			var mapped = Math.abs(mapRange(c.charCodeAt(0), 33, 128, 0, 255));
+			return mapped.toString(16).substr(0,2);
+		});
+		while (hexes.length < 3) {
+			hexes.push("00");
 		}
-	};
+		return '#' + hexes.slice(0,3).join('');
+	}
 	
 	OIT.Tracker = function ($inputBox, $form, socket) {
+		var that = this;
+
 		this.$inputBox = $inputBox;
 		$inputBox.focus();
 		
-		this.user = ko.observable(sampleUser);
+		this.socket = socket;
+		this.connected = ko.observable(false);
+		
+		this.user = ko.observable(window.location.hash.substring(1) || "anonymous");
 		
 		this.messages = ko.observableArray();
 		this.issues = ko.observableArray();
+		
 		ko.applyBindings(this);
 		
-		var that = this;
 		$form.submit(function(e) {
 			e.preventDefault();
 			that.handleInput();
 		});
 		
-		this.socket = socket;
-		socket.emit('nickname', sampleUser.name, function (alreadyTaken) {
-			if (alreadyTaken) {
-				throw "That nickname is taken.";
-			}
+		this.socket.on('connect', function () {
+			that.login();
 		});
 		
 		this.socket.on('issues', function (issues) {
@@ -96,8 +94,23 @@ var OmegaIssueTracker = {};
 		var rand = Math.floor(Math.random() * (badNotifications.length));
 		alert(badNotifications[rand]); // TODO: style
 	}
+
+	OIT.Tracker.prototype.login = function () {
+		var that = this;
+		this.connected(false);
+		this.socket.emit('nickname', this.user(), function (alreadyTaken) {
+			if (alreadyTaken) {
+				that.user(that.user() + Math.round(Math.random() * -1e9));
+				that.login();
+			}
+			that.connected(!alreadyTaken);
+		});
+	};
 	
 	OIT.Tracker.prototype.handleInput = function () {
+		if (!this.connected()) {
+			return;
+		}
 		var input = this.$inputBox.val();
 		this.$inputBox.val("");
 		// check for invalid commands etc

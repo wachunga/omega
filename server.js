@@ -30,7 +30,7 @@ io.sockets.on('connection', function(socket) {
 	
 	socket.on('new issue', function(desc) {
 		var newIssue = {
-			id: issues.length,
+			id: issues.length+1,
 			description: desc,
 			creator: socket.nickname,
 			assignee: UNASSIGNED,
@@ -45,12 +45,12 @@ io.sockets.on('connection', function(socket) {
 		if (!specifiedAssignee || specifiedAssignee === CURRENT_USER) {
 			assignee = socket.nickname;
 		}
-		issues[id].assignee = assignee; 
+		issues[id-1].assignee = assignee; 
 		io.sockets.emit('issue assigned', socket.nickname, id, assignee);
 	});
 	
 	socket.on('close issue', function(id) {
-		issues[id].closed = true;
+		issues[id-1].closed = true;
 		io.sockets.emit('issue closed', socket.nickname, id);
 	});
 

@@ -142,10 +142,14 @@ var OmegaIssueTracker = {};
 		socket.emit("user message", message);
 	};
 	
+	function scrollToBottom(el) {
+		el.scrollTop = el.scrollHeight;
+	}
+	
 	OIT.Tracker.prototype.handleMessage = function (user, msg) {
 		//console.log("socket message received", user, msg);
 		this.messages.push({user: user, msg: msg});
-		//var objDiv = document.getElementById('msgs');
-		//objDiv.scrollTop = objDiv.scrollHeight;
+		// FIXME: constant element id
+		scrollToBottom(document.getElementById('messages'));
 	};
 }(OmegaIssueTracker));

@@ -32,10 +32,6 @@
 <script type="text/javascript">
 var socket = io.connect();
 
-socket.on("connect", function () {
-	console.log("socket connected");
-});
-
 var tracker;
 $(function () {
 	tracker = new OmegaIssueTracker.Tracker($("#input"), $("#form"), socket);

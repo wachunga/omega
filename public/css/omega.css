@@ -2,7 +2,6 @@ body {
 	margin: 3em;
 }
 #messages {
-	width: 100%;
 	border: 1px solid grey;
 	height: 20em;
 	list-style-type: none;
@@ -14,7 +13,6 @@ body {
 	padding: 0.3em;
 }
 #form {
-	width: 100%;
 }
 #input {
 	width: 100%;

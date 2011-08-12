@@ -7,6 +7,7 @@ body {
 	height: 20em;
 	list-style-type: none;
 	padding: 0.3em;
+	overflow: auto;
 }
 #issues {
 	list-style-type: none;

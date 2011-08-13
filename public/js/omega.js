@@ -16,6 +16,15 @@ var OmegaIssueTracker = {};
 		return '#' + hexes.slice(0,3).join('');
 	}
 	
+	OIT.Issue = function (id, props) {
+		this.id = id; // id should never change
+		_.each(props, function (value, key) {
+			if (key !== 'id') {
+				this[key] = ko.observable(value);
+			};
+		}, this);
+	};
+	
 	OIT.Tracker = function ($inputBox, $form, socket) {
 		var that = this;
 
@@ -42,11 +51,9 @@ var OmegaIssueTracker = {};
 		});
 		
 		this.socket.on('issues', function (issues) {
-			_.each(issues, function (issue) {
-				issue.closed = ko.observable(issue.closed);
-				issue.assignee = ko.observable(issue.assignee);
-			});
-			that.issues(issues);
+			that.issues(_.map(issues, function (issue) {
+				return new OIT.Issue(issue.id, issue);
+			}));
 		});
 		
 		this.socket.on('user message', function (user, msg) {
@@ -61,9 +68,7 @@ var OmegaIssueTracker = {};
 		
 		this.socket.on('issue created', function (issue) {
 			that.handleMessage("Ω", issue.creator + " created " + issue.id + ".");
-			issue.closed = ko.observable(issue.closed);
-			issue.assignee = ko.observable(issue.assignee);
-			that.issues.push(issue);
+			that.issues.push(new OIT.Issue(issue.id, issue));
 		});	
 		
 		this.socket.on('issue closed', function (closer, id) {
@@ -80,7 +85,21 @@ var OmegaIssueTracker = {};
 				return issue.id === id;
 			});
 			issue.assignee(assignee);
-		});	
+		});
+		
+		this.socket.on('issue updated', function (updater, id, props) {
+			that.handleMessage("Ω", updater + " updated " + id + ".");
+			var issue = _.find(that.issues(), function (issue) {
+				return issue.id === id;
+			});
+			_.each(props, function (value, key) {
+				if (ko.isObservable(issue[key])) {
+					issue[key](value);
+				} else {
+					issue[key] = value;
+				}
+			});
+		});
 		
 	};
 	
@@ -135,14 +154,19 @@ var OmegaIssueTracker = {};
 					this.closeIssue(parseInt(rest));
 					break;
 				case "unassign":
-					var id = rest.split(" ")[0];
-					this.assignIssue(parseInt(id), "nobody");
+					this.assignIssue(parseInt(rest), "nobody");
 					break;
 				case "assign":
 				case "@":
 					var id = rest.split(" ")[0];
 					var assignee = rest.substring(1 + id.length);
 					this.assignIssue(parseInt(id), assignee);
+					break;
+				case "edit":
+					// only allow editing the description
+					var id = rest.split(" ")[0];
+					var desc = rest.substring(1 + id.length);
+					this.updateIssue(parseInt(id), { description: desc });
 					break;
 				default:
 					notifyOfBadCommand();
@@ -163,6 +187,10 @@ var OmegaIssueTracker = {};
 	
 	OIT.Tracker.prototype.closeIssue = function (id) {
 		socket.emit("close issue", id);
+	};
+	
+	OIT.Tracker.prototype.updateIssue = function (id, props) {
+		socket.emit("update issue", id, props);
 	};
 	
 	OIT.Tracker.prototype.send = function (message) {

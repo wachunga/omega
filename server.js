@@ -53,6 +53,15 @@ io.sockets.on('connection', function(socket) {
 		issues[id-1].closed = true;
 		io.sockets.emit('issue closed', socket.nickname, id);
 	});
+	
+	socket.on('update issue', function(id, props) {
+		var issue = issues[id-1];
+		delete props['id'];
+		for (key in props) {
+			issue[key] = props[key];
+		}
+		io.sockets.emit('issue updated', socket.nickname, id, props);
+	});
 
 	socket.on('nickname', function(nick, fn) {
 		if (nicknames[nick]) {

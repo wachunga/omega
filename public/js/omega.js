@@ -126,22 +126,26 @@ var OmegaIssueTracker = {};
 		});
 	};
 	
+	function isCommand(input) {
+		return _.include([":", "/"], input.charAt(0))
+	}
+	
 	OIT.Tracker.prototype.handleInput = function () {
 		if (!this.connected()) {
 			return;
 		}
 		var input = this.$inputBox.val();
 		this.$inputBox.val("");
-		// check for invalid commands etc
+		
 		if (!input || input.length < 1) {
 			return;
 		}
 			
-		// check for command
-		if (input.charAt(0) === ":") {
+		if (isCommand(input)) {
 			var cmd = input.substring(1).split(" ")[0];
 			var rest = input.substring(2 + cmd.length);
 			switch (cmd) {
+				case "add":
 				case "create":
 				case "nouveau":
 				case "new":

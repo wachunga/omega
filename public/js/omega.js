@@ -1,21 +1,6 @@
 /* global $, ko, socket */
 var OmegaIssueTracker = {};
 (function (OIT) {
-	function mapRange (num, istart, istop, ostart, ostop) {
-		return ostart + Math.round((ostop - ostart) * ((num - istart) / (istop - istart)));
-	}
-	
-	function colorForName(name) {
-		var hexes = _.map(name.split(''), function (c) {
-			var mapped = Math.abs(mapRange(c.charCodeAt(0), 33, 128, 0, 255));
-			return mapped.toString(16).substr(0,2);
-		});
-		while (hexes.length < 3) {
-			hexes.push("00");
-		}
-		return '#' + hexes.slice(0,3).join('');
-	}
-	
 	OIT.Issue = function (id, props) {
 		this.id = id; // id should never change
 		_.each(props, function (value, key) {
@@ -57,12 +42,10 @@ var OmegaIssueTracker = {};
 		});
 		
 		this.socket.on('user message', function (user, msg) {
-			//console.log("um", user, msg);
 			that.handleMessage(user, msg);
 		});
 		
 		this.socket.on('announcement', function (msg) {
-			//console.log("ann", msg);
 			that.handleMessage("Ω", msg);
 		});	
 		
@@ -199,7 +182,6 @@ var OmegaIssueTracker = {};
 	
 	OIT.Tracker.prototype.send = function (message) {
 		var msg = { command: message };
-		console.log("sending", msg);
 		socket.emit("user message", message);
 	};
 	
@@ -208,7 +190,6 @@ var OmegaIssueTracker = {};
 	}
 	
 	OIT.Tracker.prototype.handleMessage = function (user, msg) {
-		//console.log("socket message received", user, msg);
 		this.messages.push({user: user, msg: msg});
 		// FIXME: constant element id
 		scrollToBottom(document.getElementById('messages'));

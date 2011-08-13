@@ -130,7 +130,7 @@ var OmegaIssueTracker = {};
 		}
 		
 		if (isCommand(input)) {
-			var matches = input.match(/[:\/]([\S]+)\s+(.*)/); 
+			var matches = input.match(/[:\/]([\S]+)(?:\s+(.*))?/); 
 			var cmd = matches[1];
 			var rest = matches[2];
 			switch (cmd.toLowerCase()) {
@@ -157,7 +157,6 @@ var OmegaIssueTracker = {};
 				case "@":
 					var id = parseInt(getArgument(rest, 1));
 					var assignee = getArgument(rest, 2);
-					console.log(id, assignee);
 					this.assignIssue(id, assignee);
 					break;
 				case "edit":

@@ -16,6 +16,12 @@ body {
 	padding: 0.3em;
 	overflow: auto;
 }
+#messages .speaker {
+	font-weight: bold;
+}
+#messages .system {
+	font-style: italic;
+}
 #input {
 	width: 100%;
 	-moz-box-sizing: border-box;

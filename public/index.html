@@ -36,7 +36,7 @@
 </div>
 
 <script type="text/x-jquery-tmpl" id="messageItemTemplate">
-	<li>{{= user}} says: {{= msg}}</li>
+	<li data-bind="css: {system: !user}"><span class="speaker" data-bind="text: user ? user + ': ' : ''"></span>{{= msg}}</li>
 </script>
 <script type="text/x-jquery-tmpl" id="issueItemTemplate">
 	<li data-bind="visible: !($item.hideClosed() && closed()), css: { closed: closed }">Ω{{= id}} <span class="assignee" data-bind="text: assignee() != 'nobody' ? '(@' + assignee() + ')' : ''"></span> {{= description}}</li>

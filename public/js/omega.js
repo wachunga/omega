@@ -10,6 +10,16 @@ var OmegaIssueTracker = {};
 		}, this);
 	};
 	
+	var flavour = [
+		"You, sir, are a genius.", "Die issues, die!", "*golf clap*",
+		"Ω &hearts; you.", "You deserve a break.",
+		"Not bad, not bad at all.", "FTW!"
+	];
+	function addFlavour(text) {
+		var rand = Math.floor(Math.random() * flavour.length);
+		return text + " " + flavour[rand];
+	}
+	
 	OIT.Tracker = function ($messagesList, $inputBox, $form, socket) {
 		var that = this;
 
@@ -42,39 +52,33 @@ var OmegaIssueTracker = {};
 		});
 		
 		this.socket.on('user message', function (user, msg) {
-			that.handleMessage(user, msg);
+			that.handleMessage(msg, user);
 		});
 		
 		this.socket.on('announcement', function (msg) {
-			that.handleMessage("Ω", msg);
+			that.handleMessage(msg);
 		});	
 		
 		this.socket.on('issue created', function (issue) {
-			that.handleMessage("Ω", issue.creator + " created " + issue.id + ".");
+			that.handleMessage(issue.creator + " created " + issue.id + ".");
 			that.issues.push(new OIT.Issue(issue.id, issue));
 		});	
 		
 		this.socket.on('issue closed', function (closer, id) {
-			that.handleMessage("Ω", closer + " closed " + id + ".");
-			var issue = _.find(that.issues(), function (issue) {
-				return issue.id === id;
-			});
+			that.handleMessage(addFlavour(closer + " closed " + id + "."));
+			var issue = that.findIssue(id);
 			issue.closed(true);
 		});	
 		
 		this.socket.on('issue assigned', function (assigner, id, assignee) {
-			that.handleMessage("Ω", assigner + " assigned " + id + " to " + assignee + ".");
-			var issue = _.find(that.issues(), function (issue) {
-				return issue.id === id;
-			});
+			that.handleMessage(assigner + " assigned " + id + " to " + assignee + ".");
+			var issue = that.findIssue(id);
 			issue.assignee(assignee);
 		});
 		
 		this.socket.on('issue updated', function (updater, id, props) {
-			that.handleMessage("Ω", updater + " updated " + id + ".");
-			var issue = _.find(that.issues(), function (issue) {
-				return issue.id === id;
-			});
+			that.handleMessage(updater + " updated " + id + ".");
+			var issue = that.findIssue(id);
 			_.each(props, function (value, key) {
 				if (ko.isObservable(issue[key])) {
 					issue[key](value);
@@ -83,17 +87,21 @@ var OmegaIssueTracker = {};
 				}
 			});
 		});
-		
+	};
+	
+	OIT.Tracker.prototype.findIssue = function (id) {
+		return _.find(this.issues(), function (issue) {
+			return issue.id === id;
+		});
 	};
 	
 	var badNotifications = [
-		"Oops.",
-		"You fail the Turing test.",
+		"Oops.", "You fail the Turing test.",
 		"The least you could do is be grammatical.",
 		"Ω does not like your tone."
 	];
 	function notifyOfBadCommand() {
-		var rand = Math.floor(Math.random() * (badNotifications.length));
+		var rand = Math.floor(Math.random() * badNotifications.length);
 		alert(badNotifications[rand] + " Try /help."); // TODO: style
 	}
 
@@ -183,6 +191,9 @@ var OmegaIssueTracker = {};
 	};
 	
 	OIT.Tracker.prototype.closeIssue = function (id) {
+		if (this.findIssue(id).closed()) {
+			return;
+		}
 		socket.emit("close issue", id);
 	};
 	
@@ -198,8 +209,7 @@ var OmegaIssueTracker = {};
 		el.scrollTop = el.scrollHeight;
 	}
 	
-	// TODO: "Ω says" is kind of lame
-	OIT.Tracker.prototype.handleMessage = function (user, msg) {
+	OIT.Tracker.prototype.handleMessage = function (msg, user) {
 		this.messages.push({user: user, msg: msg});
 		scrollToBottom(this.$messagesList.get(0));
 	};

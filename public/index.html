@@ -46,7 +46,7 @@
 var socket = io.connect();
 var tracker; // for debugging
 $(function () {
-	tracker = new OmegaIssueTracker.Tracker($("#input"), $("#form"), socket);
+	tracker = new OmegaIssueTracker.Tracker($("#messages"), $("#input"), $("#form"), socket);
 });
 </script>
 </body>

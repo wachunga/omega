@@ -10,9 +10,10 @@ var OmegaIssueTracker = {};
 		}, this);
 	};
 	
-	OIT.Tracker = function ($inputBox, $form, socket) {
+	OIT.Tracker = function ($messagesList, $inputBox, $form, socket) {
 		var that = this;
 
+		this.$messagesList = $messagesList;
 		this.$inputBox = $inputBox;
 		this.socket = socket;
 		this.connected = ko.observable(false);
@@ -86,14 +87,14 @@ var OmegaIssueTracker = {};
 	};
 	
 	var badNotifications = [
-		"Try again, Sherlock.",
+		"Oops.",
 		"You fail the Turing test.",
 		"The least you could do is be grammatical.",
 		"Ω does not like your tone."
 	];
 	function notifyOfBadCommand() {
 		var rand = Math.floor(Math.random() * (badNotifications.length));
-		alert(badNotifications[rand]); // TODO: style
+		alert(badNotifications[rand] + " Try /help."); // TODO: style
 	}
 
 	OIT.Tracker.prototype.login = function () {
@@ -191,7 +192,6 @@ var OmegaIssueTracker = {};
 	};
 	
 	OIT.Tracker.prototype.send = function (message) {
-		var msg = { command: message };
 		socket.emit("user message", message);
 	};
 	
@@ -199,10 +199,10 @@ var OmegaIssueTracker = {};
 		el.scrollTop = el.scrollHeight;
 	}
 	
+	// TODO: "Ω says" is kind of lame
 	OIT.Tracker.prototype.handleMessage = function (user, msg) {
 		this.messages.push({user: user, msg: msg});
-		// FIXME: constant element id
-		scrollToBottom(document.getElementById('messages'));
+		scrollToBottom(this.$messagesList.get(0));
 	};
 	
 }(OmegaIssueTracker));

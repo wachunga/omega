@@ -55,3 +55,10 @@ body {
 #issuesList .closed {
 	text-decoration: line-through;
 }
+/* darken placeholder text */
+input::-webkit-input-placeholder {
+    color: #333;
+}
+input:-moz-placeholder {
+    color: #333;
+}

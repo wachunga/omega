@@ -18,8 +18,15 @@
 <ul id="messages" data-bind="template: {name: 'messageItemTemplate', foreach: messages}">
 </ul>
 <form id="form" action="">
-	<input id="input" type="text" name="text" placeholder="Type commands or just chat it up"/>
+	<input id="input" type="text" name="text" placeholder="Type commands (like '/help') or just chat it up"/>
 </form>
+<dl id="commandList" data-bind="visible: helpOpen, click: function() { helpOpen(false); $inputBox.focus(); }">
+	<dt>/create &lt;description&gt;</dt>
+	<dt>/assign &lt;id&gt; [&lt;user&gt;]</dt>
+	<dt>/unassign &lt;id&gt;</dt>
+	<dt>/edit &lt;id&gt; &lt;description&gt;</dt>
+	<dt>/close &lt;id&gt;</dt>
+</dl>
 
 <div id="issuesContainer">
 	<label class="hideIssues"><input type="checkbox" data-bind="checked: hideClosed"/> Hide closed</label>

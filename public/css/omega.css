@@ -1,12 +1,34 @@
 body {
 	margin: 3em;
 }
+#header h1 {
+	display: inline;
+	margin: 0;
+}
+#loggedInUser {
+	float: right;
+	line-height: 3em;
+}
 #messages {
 	border: 1px solid grey;
-	height: 20em;
+	height: 15em;
 	list-style-type: none;
 	padding: 0.3em;
 	overflow: auto;
+}
+#input {
+	width: 100%;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+#commandList {
+	padding: 0.3em;
+	background-color: #eee;
+	margin: 0;
+}
+#commandList dt {
+	font-family: monospace;
+	font-size: 0.9em;
 }
 #issuesContainer {
 	margin-top: 1em;
@@ -24,19 +46,6 @@ body {
 	padding: 0;
 	margin: 0.5em 0 0 0;
 }
-#form {
-}
-#input {
-	width: 100%;
-}
-#header h1 {
-	display: inline;
-	margin: 0;
-}
-#loggedInUser {
-	float: right;
-	line-height: 3em;
-}
-.closed {
-	background-color: grey;
+#issuesList .closed {
+	text-decoration: line-through;
 }

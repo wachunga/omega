@@ -14,13 +14,12 @@ var OmegaIssueTracker = {};
 		var that = this;
 
 		this.$inputBox = $inputBox;
-		$inputBox.focus();
-		
 		this.socket = socket;
 		this.connected = ko.observable(false);
 		
 		this.user = ko.observable(window.location.hash.substring(1) || "anonymous");
 		this.hideClosed = ko.observable(false);
+		this.helpOpen = ko.observable(false);
 		this.messages = ko.observableArray();
 		this.issues = ko.observableArray();
 		
@@ -110,7 +109,7 @@ var OmegaIssueTracker = {};
 	};
 	
 	function isCommand(input) {
-		return _.include([":", "/"], input.charAt(0))
+		return _.include([":", "/"], input.charAt(0));
 	}
 	
 	OIT.Tracker.prototype.handleInput = function () {
@@ -123,11 +122,14 @@ var OmegaIssueTracker = {};
 		if (!input || input.length < 1) {
 			return;
 		}
-			
+		
 		if (isCommand(input)) {
 			var cmd = input.substring(1).split(" ")[0];
 			var rest = input.substring(2 + cmd.length);
-			switch (cmd) {
+			switch (cmd.toLowerCase()) {
+				case "help":
+					this.helpOpen(!this.helpOpen());
+					break;
 				case "add":
 				case "create":
 				case "nouveau":

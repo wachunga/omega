@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Ω</title>
-<link rel="stylesheet" href="css/omega.css">
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.js"></script>
-<script src="/socket.io/socket.io.js"></script>
-<script src="js/jquery.tmpl.js"></script>
-<script src="js/knockout-1.2.1.js"></script>
-<script src="js/underscore-1.1.7.js"></script>
-<script src="js/omega.js"></script>
+	<title>Ω: Omega Issue Tracker</title>
+	<link rel="stylesheet" href="css/omega.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
+	<script src="js/jquery.tmpl.js"></script>
+	<script src="js/knockout-1.2.1.js"></script>
+	<script src="js/underscore-1.1.7.js"></script>
+	<script src="js/omega.js"></script>
 </head>
 <body>
 <div id="header">
@@ -19,14 +19,19 @@
 <form id="form" action="">
 	<input id="input" type="text" name="text" placeholder="Type commands or just chat it up"/>
 </form>
-<ul id="issues" data-bind="template: {name: 'issueItemTemplate', foreach: issues}">
-</ul>
+
+<div id="issuesContainer">
+	<label class="hideIssues"><input type="checkbox" data-bind="checked: hideClosed"/> Hide closed</label>
+	<h2>Issues</h2>
+	<ul id="issuesList" data-bind="template: {name: 'issueItemTemplate', foreach: issues, templateOptions: { hideClosed: hideClosed }}">
+	</ul>
+</div>
 
 <script type="text/x-jquery-tmpl" id="messageItemTemplate">
 	<li>{{= user}} says: {{= msg}}</li>
 </script>
 <script type="text/x-jquery-tmpl" id="issueItemTemplate">
-	<li data-bind="css: { closed: closed }">Ω{{= id}} <span class="assignee" data-bind="text: assignee() != 'nobody' ? '(@' + assignee() + ')' : ''"></span> {{= description}}</li>
+	<li data-bind="visible: !($item.hideClosed() && closed()), css: { closed: closed }">Ω{{= id}} <span class="assignee" data-bind="text: assignee() != 'nobody' ? '(@' + assignee() + ')' : ''"></span> {{= description}}</li>
 </script>
 
 <script type="text/javascript">

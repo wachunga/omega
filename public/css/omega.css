@@ -1,5 +1,6 @@
 body {
 	margin: 3em;
+	font-family: 'Helvetica Neue', 'Segoe UI', sans-serif;
 }
 #messages {
 	border: 1px solid grey;
@@ -8,9 +9,21 @@ body {
 	padding: 0.3em;
 	overflow: auto;
 }
-#issues {
+#issuesContainer {
+	margin-top: 1em;
+}
+#issuesContainer h2 {
+	margin-bottom: 0;
+	border-bottom: 1px solid #ccc;
+}
+#issuesContainer .hideIssues {
+	float: right;
+	line-height: 1.9em;
+}
+#issuesList {
 	list-style-type: none;
-	padding: 0.3em;
+	padding: 0;
+	margin: 0.5em 0 0 0;
 }
 #form {
 }

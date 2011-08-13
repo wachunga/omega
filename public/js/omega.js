@@ -35,7 +35,7 @@ var OmegaIssueTracker = {};
 		this.connected = ko.observable(false);
 		
 		this.user = ko.observable(window.location.hash.substring(1) || "anonymous");
-		
+		this.hideClosed = ko.observable(false);
 		this.messages = ko.observableArray();
 		this.issues = ko.observableArray();
 		
@@ -209,4 +209,5 @@ var OmegaIssueTracker = {};
 		// FIXME: constant element id
 		scrollToBottom(document.getElementById('messages'));
 	};
+	
 }(OmegaIssueTracker));

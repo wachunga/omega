@@ -112,6 +112,11 @@ var OmegaIssueTracker = {};
 		return _.include([":", "/"], input.charAt(0));
 	}
 	
+	function getArgument(string, argToReturn) {
+		var match = string.match(/([\d+])(?:\s+(.+))?/);
+		return match ? match[argToReturn] : null;
+	}
+	
 	OIT.Tracker.prototype.handleInput = function () {
 		if (!this.connected()) {
 			return;
@@ -124,10 +129,12 @@ var OmegaIssueTracker = {};
 		}
 		
 		if (isCommand(input)) {
-			var cmd = input.substring(1).split(" ")[0];
-			var rest = input.substring(2 + cmd.length);
+			var matches = input.match(/[:\/]([\S]+)\s+(.*)/); 
+			var cmd = matches[1];
+			var rest = matches[2];
 			switch (cmd.toLowerCase()) {
 				case "help":
+				case "?":
 					this.helpOpen(!this.helpOpen());
 					break;
 				case "add":
@@ -147,15 +154,16 @@ var OmegaIssueTracker = {};
 					break;
 				case "assign":
 				case "@":
-					var id = rest.split(" ")[0];
-					var assignee = rest.substring(1 + id.length);
-					this.assignIssue(parseInt(id), assignee);
+					var id = parseInt(getArgument(rest, 1));
+					var assignee = getArgument(rest, 2);
+					console.log(id, assignee);
+					this.assignIssue(id, assignee);
 					break;
 				case "edit":
 					// only allow editing the description
-					var id = rest.split(" ")[0];
-					var desc = rest.substring(1 + id.length);
-					this.updateIssue(parseInt(id), { description: desc });
+					var id = parseInt(getArgument(rest, 1));
+					var desc = getArgument(rest, 2);
+					this.updateIssue(id, { description: desc });
 					break;
 				default:
 					notifyOfBadCommand();

@@ -1,4 +1,4 @@
-/* global $, ko, socket */
+/* global $, ko, socket, _, window, alert */
 var OmegaIssueTracker = {};
 (function (OIT) {
 	OIT.Issue = function (id, props) {
@@ -6,7 +6,7 @@ var OmegaIssueTracker = {};
 		_.each(props, function (value, key) {
 			if (key !== 'id') {
 				this[key] = ko.observable(value);
-			};
+			}
 		}, this);
 	};
 	
@@ -36,7 +36,7 @@ var OmegaIssueTracker = {};
 		
 		ko.applyBindings(this);
 		
-		$form.submit(function(e) {
+		$form.submit(function (e) {
 			e.preventDefault();
 			that.handleInput();
 		});
@@ -156,20 +156,20 @@ var OmegaIssueTracker = {};
 				case "close":
 				case "resolve":
 				case "resolved":
-					this.closeIssue(parseInt(rest));
+					this.closeIssue(parseInt(rest, 10));
 					break;
 				case "unassign":
-					this.assignIssue(parseInt(rest), "nobody");
+					this.assignIssue(parseInt(rest, 10), "nobody");
 					break;
 				case "assign":
 				case "@":
-					var id = parseInt(getArgument(rest, 1));
+					var id = parseInt(getArgument(rest, 1), 10);
 					var assignee = getArgument(rest, 2);
 					this.assignIssue(id, assignee);
 					break;
 				case "edit":
 					// only allow editing the description
-					var id = parseInt(getArgument(rest, 1));
+					var id = parseInt(getArgument(rest, 1), 10);
 					var desc = getArgument(rest, 2);
 					this.updateIssue(id, { description: desc });
 					break;

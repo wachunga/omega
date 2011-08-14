@@ -46,7 +46,8 @@ io.sockets.on('connection', function(socket) {
 			description: desc,
 			creator: socket.nickname,
 			assignee: UNASSIGNED,
-			closed: false
+			closed: false,
+			createdDate: new Date()
 		};
 		issues.push(newIssue);
 		io.sockets.emit('issue created', newIssue);

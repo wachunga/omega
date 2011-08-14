@@ -13,15 +13,17 @@
 </head>
 <body>
 <div id="header">
-	<h1>Ω</h1><div id="loggedInUser" data-bind="text: user"></div>
+	<h1>Ω</h1><div id="loggedInUser" data-bind="text: 'welcome, ' + user()"></div>
 </div>
-<ul id="messages" data-bind="template: {name: 'messageItemTemplate', foreach: messages}">
+<ul id="messages" data-bind="template: {name: 'messageItemTemplate', foreach: messages, beforeRemove: function(elem) { $(elem).fadeOut() }, afterAdd: function(elem) { $(elem).hide().fadeIn('fast') }}">
 </ul>
-<div id="onlineUsers">Online: <span data-bind="text: onlineUsers().join(', ')"></span></div>
+<div id="onlineUsers">
+	online: <span data-bind="text: onlineUsers().join(', ')"></span>
+</div>
 <form id="form">
 	<input id="input" type="text" name="text" placeholder="Type commands (like '/help') or just chat it up"/>
 </form>
-<dl id="commandList" data-bind="visible: helpOpen, click: function() { helpOpen(false); $inputBox.focus(); }">
+<dl id="commandList" data-bind="fadeVisible: helpOpen, click: function() { helpOpen(false); $inputBox.focus(); }">
 	<dt>/create &lt;description&gt;</dt>
 	<dt>/assign &lt;id&gt; [&lt;user&gt;]</dt>
 	<dt>/unassign &lt;id&gt;</dt>
@@ -30,9 +32,9 @@
 </dl>
 
 <div id="issuesContainer">
-	<label class="hideIssues"><input type="checkbox" data-bind="checked: hideClosed"/> Hide closed</label>
+	<label class="hideIssues"><input type="checkbox" data-bind="checked: hideClosed"/> hide closed</label>
 	<h2>Issues</h2>
-	<ul id="issuesList" data-bind="template: {name: 'issueItemTemplate', foreach: issues, templateOptions: { hideClosed: hideClosed }}">
+	<ul id="issuesList" data-bind="template: {name: 'issueItemTemplate', foreach: issues, templateOptions: { hideClosed: hideClosed }, beforeRemove: function(elem) { $(elem).fadeOut() }, afterAdd: function(elem) { $(elem).hide().fadeIn('slow') }}">
 	</ul>
 </div>
 
@@ -40,15 +42,27 @@
 	<li data-bind="css: {system: !user}"><span class="speaker" data-bind="text: user ? user + ': ' : ''"></span>{{= msg}}</li>
 </script>
 <script type="text/x-jquery-tmpl" id="issueItemTemplate">
-	<li data-bind="visible: !($item.hideClosed() && closed()), css: { closed: closed }">Ω{{= id}} <span class="assignee" data-bind="text: assignee() != 'nobody' ? '(@' + assignee() + ')' : ''"></span> {{= description}}</li>
+	<li data-bind="fadeVisible: !($item.hideClosed() && closed()), css: { closed: closed }">Ω{{= id}} <span class="assignee" data-bind="text: assignee() != 'nobody' ? '(@' + assignee() + ')' : ''"></span> {{= description}}</li>
 </script>
 
 <script type="text/javascript">
 var socket = io.connect();
+
 var tracker; // for debugging
 $(function () {
 	tracker = new OmegaIssueTracker.Tracker($("#messages"), $("#input"), $("#form"), socket);
 });
+
+ko.bindingHandlers.fadeVisible = {
+	init: function(element, valueAccessor) {
+		var value = valueAccessor();
+		$(element).toggle(ko.utils.unwrapObservable(value));
+	},
+	update: function(element, valueAccessor) {
+		var value = valueAccessor();
+		ko.utils.unwrapObservable(value) ? $(element).fadeIn('fast') : $(element).fadeOut('fast');
+	}
+};
 </script>
 </body>
 </html>

@@ -1,13 +1,18 @@
 body {
 	margin: 3em;
 }
+#header {
+	position: relative;	
+}
 #header h1 {
 	display: inline;
 	margin: 0;
 }
 #loggedInUser {
-	float: right;
-	line-height: 3em;
+	position: absolute;
+	right: 0;
+	bottom: 0;
+	line-height: 2em;
 }
 #messages {
 	border: 1px solid grey;
@@ -15,7 +20,7 @@ body {
 	list-style-type: none;
 	padding: 0.3em;
 	overflow: auto;
-	margin-bottom: 0;
+	margin: 0.2em 0;
 }
 #messages .speaker {
 	font-weight: bold;
@@ -24,7 +29,7 @@ body {
 	font-style: italic;
 }
 #onlineUsers {
-	margin-bottom: 1em;
+	margin-bottom: 0.5em;
 	font-size: 0.9em;
 	text-align: right;
 }

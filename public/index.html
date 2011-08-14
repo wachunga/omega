@@ -3,7 +3,8 @@
 <head>
 	<meta charset="utf-8"/>
 	<title>Ω: Omega Issue Tracker</title>
-	<link rel="stylesheet" href="css/omega.css">
+	<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans" type="text/css">
+	<link rel="stylesheet" href="css/omega.css" type="text/css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.js"></script>
 	<script src="/socket.io/socket.io.js"></script>
 	<script src="js/jquery.tmpl.js"></script>
@@ -42,7 +43,7 @@
 	<li data-bind="css: {system: !user}"><span class="speaker" data-bind="text: user ? user + ': ' : ''"></span>{{= msg}}</li>
 </script>
 <script type="text/x-jquery-tmpl" id="issueItemTemplate">
-	<li data-bind="fadeVisible: !($item.hideClosed() && closed()), css: { closed: closed }">Ω{{= id}} <span class="assignee" data-bind="text: assignee() != 'nobody' ? '(@' + assignee() + ')' : ''"></span> {{= description}}</li>
+	<li data-bind="fadeVisible: !($item.hideClosed() && closed()), css: { closed: closed }">{{= id}}: <span class="assignee" data-bind="text: assignee() != 'nobody' ? '(@' + assignee() + ')' : ''"></span> {{= description}}</li>
 </script>
 
 <script type="text/javascript">

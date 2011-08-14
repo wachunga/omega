@@ -1,5 +1,6 @@
 body {
 	margin: 3em;
+	font-family: 'Open Sans', sans-serif;
 }
 #header {
 	position: relative;	
@@ -7,6 +8,10 @@ body {
 #header h1 {
 	display: inline;
 	margin: 0;
+	font-family: georgia, serif;
+	font-size: 5em;
+	text-shadow: #ddd 2px 0 2px;
+	line-height: 0;
 }
 #loggedInUser {
 	position: absolute;
@@ -15,12 +20,13 @@ body {
 	line-height: 2em;
 }
 #messages {
-	border: 1px solid grey;
 	height: 15em;
+	border: 1px solid grey;
 	list-style-type: none;
 	padding: 0.3em;
 	overflow: auto;
 	margin: 0.2em 0;
+	font-size: 0.9em;
 }
 #messages .speaker {
 	font-weight: bold;
@@ -29,7 +35,6 @@ body {
 	font-style: italic;
 }
 #onlineUsers {
-	margin-bottom: 0.5em;
 	font-size: 0.9em;
 	text-align: right;
 }

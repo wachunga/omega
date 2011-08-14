@@ -31,7 +31,7 @@ io.sockets.on('connection', function(socket) {
 		} else {
 			callback(false);
 			usernames[name] = socket.nickname = name;
-			socket.broadcast.emit('announcement', name + ' connected');
+			socket.broadcast.emit('announcement', name + ' connected.');
 			io.sockets.emit('usernames', usernames);
 		}
 	});
@@ -82,7 +82,7 @@ io.sockets.on('connection', function(socket) {
 		}
 
 		delete usernames[socket.nickname];
-		socket.broadcast.emit('announcement', socket.nickname + ' disconnected');
+		socket.broadcast.emit('announcement', socket.nickname + ' disconnected.');
 		socket.broadcast.emit('usernames', usernames);
 	});
 });

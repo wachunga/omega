@@ -32,6 +32,12 @@ var OmegaIssueTracker = {};
 		this.messages = ko.observableArray();
 		this.onlineUsers = ko.observableArray();
 		this.issues = ko.observableArray();
+		this.openIssuesCount = ko.dependentObservable(function () {
+			return _.select(this.issues(), function (issue) {
+				return !issue.closed();
+			}).length;
+		}, this);
+		
 		this.hideClosed = ko.observable(false);
 		this.helpOpen = ko.observable(false);
 		

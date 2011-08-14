@@ -27,6 +27,7 @@ body {
 	overflow: auto;
 	margin: 0.2em 0;
 	font-size: 0.9em;
+	resize: vertical;
 }
 #messages .speaker {
 	font-weight: bold;
@@ -58,6 +59,14 @@ body {
 #issuesContainer h2 {
 	margin-bottom: 0;
 	border-bottom: 1px solid #ccc;
+}
+#issuesContainer .issueCounts {
+	font-size: small;
+	font-weight: normal;
+	color: #666;
+}
+#issuesContainer var {
+	font-style: normal;
 }
 #issuesContainer .hideIssues {
 	float: right;

@@ -21,8 +21,8 @@
 <div id="onlineUsers">
 	online: <span data-bind="text: onlineUsers().join(', ')"></span>
 </div>
-<form id="form">
-	<input id="input" type="text" name="text" placeholder="Type commands (like '/help') or just chat it up"/>
+<form id="form" autocomplete="off">
+	<input id="input" type="text" name="text" tabindex="1" placeholder="Type commands (like '/help') or just chat it up"/>
 </form>
 <dl id="commandList" data-bind="fadeVisible: helpOpen, click: function() { helpOpen(false); $inputBox.focus(); }">
 	<dt>/create &lt;description&gt;</dt>
@@ -34,7 +34,7 @@
 
 <div id="issuesContainer">
 	<label class="hideIssues"><input type="checkbox" data-bind="checked: hideClosed"/> hide closed</label>
-	<h2>Issues</h2>
+	<h2>Issues <span data-bind="fadeVisible: issues().length >= 3" class="issueCounts">(<var data-bind="text: openIssuesCount"></var> open, <var data-bind="text: issues().length - openIssuesCount()"></var> closed)</span></h2>
 	<ul id="issuesList" data-bind="template: {name: 'issueItemTemplate', foreach: issues, templateOptions: { hideClosed: hideClosed }, beforeRemove: function(elem) { $(elem).fadeOut() }, afterAdd: function(elem) { $(elem).hide().fadeIn('slow') }}">
 	</ul>
 </div>

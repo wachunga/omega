@@ -14,15 +14,27 @@ server.listen(PORT);
 
 console.log('Server running at http://127.0.0.1:' + PORT);
 
-var io = sio.listen(server);
-var nicknames = {};
+var usernames = {};
 var issues = [];
 var UNASSIGNED = "nobody";
 var CURRENT_USER = "me";
 
+var io = sio.listen(server);
 io.sockets.on('connection', function(socket) {
 	
 	io.sockets.emit('issues', issues);
+	io.sockets.emit('usernames', usernames);
+
+	socket.on('login user', function(name, callback) {
+		if (usernames[name]) {
+			callback(true);
+		} else {
+			callback(false);
+			usernames[name] = socket.nickname = name;
+			socket.broadcast.emit('announcement', name + ' connected');
+			io.sockets.emit('usernames', usernames);
+		}
+	});
 	
 	socket.on('user message', function(msg) {
 		io.sockets.emit('user message', socket.nickname, msg);
@@ -63,24 +75,13 @@ io.sockets.on('connection', function(socket) {
 		io.sockets.emit('issue updated', socket.nickname, id, props);
 	});
 
-	socket.on('nickname', function(nick, fn) {
-		if (nicknames[nick]) {
-			fn(true);
-		} else {
-			fn(false);
-			nicknames[nick] = socket.nickname = nick;
-			socket.broadcast.emit('announcement', nick + ' connected');
-			io.sockets.emit('nicknames', nicknames);
-		}
-	});
-
 	socket.on('disconnect', function() {
 		if (!socket.nickname) {
 			return;
 		}
 
-		delete nicknames[socket.nickname];
+		delete usernames[socket.nickname];
 		socket.broadcast.emit('announcement', socket.nickname + ' disconnected');
-		socket.broadcast.emit('nicknames', nicknames);
+		socket.broadcast.emit('usernames', usernames);
 	});
 });

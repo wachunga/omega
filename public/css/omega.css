@@ -15,12 +15,18 @@ body {
 	list-style-type: none;
 	padding: 0.3em;
 	overflow: auto;
+	margin-bottom: 0;
 }
 #messages .speaker {
 	font-weight: bold;
 }
 #messages .system {
 	font-style: italic;
+}
+#onlineUsers {
+	margin-bottom: 1em;
+	font-size: 0.9em;
+	text-align: right;
 }
 #input {
 	width: 100%;

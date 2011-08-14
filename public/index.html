@@ -17,7 +17,8 @@
 </div>
 <ul id="messages" data-bind="template: {name: 'messageItemTemplate', foreach: messages}">
 </ul>
-<form id="form" action="">
+<div id="onlineUsers">Online: <span data-bind="text: onlineUsers().join(', ')"></span></div>
+<form id="form">
 	<input id="input" type="text" name="text" placeholder="Type commands (like '/help') or just chat it up"/>
 </form>
 <dl id="commandList" data-bind="visible: helpOpen, click: function() { helpOpen(false); $inputBox.focus(); }">

@@ -26,13 +26,14 @@ var OmegaIssueTracker = {};
 		this.$messagesList = $messagesList;
 		this.$inputBox = $inputBox;
 		this.socket = socket;
-		this.connected = ko.observable(false);
 		
+		this.connected = ko.observable(false);
 		this.user = ko.observable(window.location.hash.substring(1) || "anonymous");
+		this.messages = ko.observableArray();
+		this.onlineUsers = ko.observableArray();
+		this.issues = ko.observableArray();
 		this.hideClosed = ko.observable(false);
 		this.helpOpen = ko.observable(false);
-		this.messages = ko.observableArray();
-		this.issues = ko.observableArray();
 		
 		ko.applyBindings(this);
 		
@@ -51,13 +52,17 @@ var OmegaIssueTracker = {};
 			}));
 		});
 		
+		this.socket.on('usernames', function (users) {
+			that.onlineUsers(_.values(users));
+		});
+		
 		this.socket.on('user message', function (user, msg) {
 			that.handleMessage(msg, user);
 		});
 		
 		this.socket.on('announcement', function (msg) {
 			that.handleMessage(msg);
-		});	
+		});
 		
 		this.socket.on('issue created', function (issue) {
 			that.handleMessage(issue.creator + " created " + issue.id + ".");
@@ -108,7 +113,7 @@ var OmegaIssueTracker = {};
 	OIT.Tracker.prototype.login = function () {
 		var that = this;
 		this.connected(false);
-		this.socket.emit('nickname', this.user(), function (alreadyTaken) {
+		this.socket.emit('login user', this.user(), function (alreadyTaken) {
 			if (alreadyTaken) {
 				that.user(that.user() + Math.round(Math.random() * -1e9));
 				that.login();

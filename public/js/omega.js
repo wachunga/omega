@@ -1,4 +1,4 @@
-/* global $, ko, socket, _, window, alert */
+/* global $, ko, socket, _, window */
 var OmegaIssueTracker = {};
 (function (OIT) {
 	
@@ -168,7 +168,7 @@ var OmegaIssueTracker = {};
 	}
 	
 	function notifyOfBadCommand() {
-		alert(getRandomItem(BAD_COMMAND_RESPONSES) + ' Try /help.'); // TODO: style
+		window.alert(getRandomItem(BAD_COMMAND_RESPONSES) + ' Try /help.'); // TODO: style
 	}
 	
 	OIT.Tracker.prototype.handleInput = function () {
@@ -221,6 +221,9 @@ var OmegaIssueTracker = {};
 					var desc = getArgument(rest, 2);
 					this.updateIssue(id, { description: desc });
 					break;
+				case 'reset':
+					this.reset();
+					break;
 				default:
 					notifyOfBadCommand();
 					break;
@@ -247,6 +250,14 @@ var OmegaIssueTracker = {};
 	
 	OIT.Tracker.prototype.updateIssue = function (id, props) {
 		socket.emit('update issue', id, props);
+	};
+	
+	OIT.Tracker.prototype.reset = function () {
+		if (window.confirm('Warning: this will completely delete all issues from the server.')) {
+			if (window.confirm('I have a bad feeling about this. Are you absolutely sure?')) {
+				socket.emit('reset issues');
+			}
+		}
 	};
 	
 	OIT.Tracker.prototype.send = function (message) {

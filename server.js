@@ -75,6 +75,11 @@ io.sockets.on('connection', function(socket) {
 		}
 		io.sockets.emit('issue updated', socket.nickname, id, props);
 	});
+	
+	socket.on('reset issues', function() {
+		issues = [];
+		io.sockets.emit('issues', issues);
+	});
 
 	socket.on('disconnect', function() {
 		if (!socket.nickname) {

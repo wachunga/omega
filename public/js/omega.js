@@ -200,8 +200,10 @@ var OmegaIssueTracker = {};
 					break;
 				case 'close':
 				case 'resolve':
-				case 'resolved':
 					this.closeIssue(parseInt(rest, 10));
+					break;
+				case 'reopen':
+					this.updateIssue(parseInt(rest, 10), { closed: false });
 					break;
 				case 'unassign':
 					this.assignIssue(parseInt(rest, 10), 'nobody');
@@ -213,6 +215,7 @@ var OmegaIssueTracker = {};
 					this.assignIssue(id, assignee);
 					break;
 				case 'edit':
+				case 'update':
 					// only allow editing the description
 					var id = parseInt(getArgument(rest, 1), 10);
 					var desc = getArgument(rest, 2);

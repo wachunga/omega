@@ -1,6 +1,7 @@
 /* global $, ko, socket, _, window, alert */
 var OmegaIssueTracker = {};
 (function (OIT) {
+	
 	OIT.Issue = function (id, props) {
 		this.id = id; // id should never change
 		_.each(props, function (value, key) {
@@ -10,25 +11,39 @@ var OmegaIssueTracker = {};
 		}, this);
 	};
 	
-	var flavour = [
-		"You, sir, are a genius.", "Die issues, die!", "*golf clap*",
-		"Ω &hearts; you.", "You deserve a break.",
-		"Not bad, not bad at all.", "FTW!"
-	];
-	function addFlavour(text) {
-		var rand = Math.floor(Math.random() * flavour.length);
-		return text + " " + flavour[rand];
+	function getRandomItem(array) {
+		return array[Math.floor(Math.random() * array.length)];
 	}
 	
-	OIT.Tracker = function ($messagesList, $inputBox, $form, socket) {
+	var USERNAME_KEY = 'OmegaIssueTracker.username';
+	var NAMES = [
+		'Captain Hammer', 'Release Llama', 'Chuck Norris',
+		'Snozzcumber', 'Hurley', 'Inigo Montoya', 'Leeroy Jenkins'
+	];
+	var FLAVOUR = [
+		'You, sir, are a genius.', 'Die issues, die!', '*golf clap*',
+		'Ω &hearts; you.', 'You deserve a break.',
+		'Not bad, not bad at all.', 'FTW!'
+	];
+	var BAD_COMMAND_RESPONSES = [
+		'Oops.', 'This is not a Turing test.',
+		'The least you could do is be grammatical.',
+		'That does not compute.',
+		'I can haz parser.',
+		'These are not the droids you\'re looking for'
+	];
+	
+	OIT.Tracker = function ($messagesList, $nameInput, $messageInput, $form, socket) {
 		var that = this;
 
 		this.$messagesList = $messagesList;
-		this.$inputBox = $inputBox;
+		this.$nameInput = $nameInput;
+		this.namePlaceholder = getRandomItem(NAMES);
+		this.$messageInput = $messageInput;
 		this.socket = socket;
 		
 		this.connected = ko.observable(false);
-		this.user = ko.observable(window.location.hash.substring(1) || "anonymous");
+		this.user = ko.observable(window.localStorage[USERNAME_KEY]);
 		this.messages = ko.observableArray();
 		this.onlineUsers = ko.observableArray();
 		this.issues = ko.observableArray();
@@ -45,11 +60,23 @@ var OmegaIssueTracker = {};
 		
 		$form.submit(function (e) {
 			e.preventDefault();
-			that.handleInput();
+			if (!that.user()) {
+				that.user(that.$nameInput.val());
+				that.$nameInput.val('');
+				that.login();
+			} else {
+				that.handleInput();
+			}
 		});
 		
 		this.socket.on('connect', function () {
-			that.login();
+			if (that.user()) {
+				that.login();				
+			}
+		});
+		
+		this.socket.on('disconnect', function () {
+			that.socket.socket.reconnect(); // TODO: socket.io should do this automatically
 		});
 		
 		this.socket.on('issues', function (issues) {
@@ -71,24 +98,28 @@ var OmegaIssueTracker = {};
 		});
 		
 		this.socket.on('issue created', function (issue) {
-			that.handleMessage(issue.creator + " created " + issue.id + ".");
+			that.handleMessage(issue.creator + ' created ' + issue.id + '.');
 			that.issues.push(new OIT.Issue(issue.id, issue));
 		});	
 		
+		function addFlavour(text) {
+			return text + ' ' + getRandomItem(FLAVOUR);
+		}
+		
 		this.socket.on('issue closed', function (closer, id) {
-			that.handleMessage(addFlavour(closer + " closed " + id + "."));
+			that.handleMessage(addFlavour(closer + ' closed ' + id + '.'));
 			var issue = that.findIssue(id);
 			issue.closed(true);
 		});	
 		
 		this.socket.on('issue assigned', function (assigner, id, assignee) {
-			that.handleMessage(assigner + " assigned " + id + " to " + assignee + ".");
+			that.handleMessage(assigner + ' assigned ' + id + ' to ' + assignee + '.');
 			var issue = that.findIssue(id);
 			issue.assignee(assignee);
 		});
 		
 		this.socket.on('issue updated', function (updater, id, props) {
-			that.handleMessage(updater + " updated " + id + ".");
+			that.handleMessage(updater + ' updated ' + id + '.');
 			var issue = that.findIssue(id);
 			_.each(props, function (value, key) {
 				if (ko.isObservable(issue[key])) {
@@ -105,17 +136,14 @@ var OmegaIssueTracker = {};
 			return issue.id === id;
 		});
 	};
-	
-	var badNotifications = [
-		"Oops.", "You fail the Turing test.",
-		"The least you could do is be grammatical.",
-		"Ω does not like your tone."
-	];
-	function notifyOfBadCommand() {
-		var rand = Math.floor(Math.random() * badNotifications.length);
-		alert(badNotifications[rand] + " Try /help."); // TODO: style
-	}
 
+	OIT.Tracker.prototype.signOut = function () {
+		this.socket.disconnect();
+		delete window.localStorage[USERNAME_KEY];
+		this.user(undefined);
+		this.$nameInput.focus();
+	};
+	
 	OIT.Tracker.prototype.login = function () {
 		var that = this;
 		this.connected(false);
@@ -123,13 +151,15 @@ var OmegaIssueTracker = {};
 			if (alreadyTaken) {
 				that.user(that.user() + Math.round(Math.random() * -1e9));
 				that.login();
+			} else {
+				window.localStorage[USERNAME_KEY] = that.user();
 			}
 			that.connected(!alreadyTaken);
 		});
 	};
 	
 	function isCommand(input) {
-		return _.include([":", "/"], input.charAt(0));
+		return _.include([':', '/'], input.charAt(0));
 	}
 	
 	function getArgument(string, argToReturn) {
@@ -137,12 +167,16 @@ var OmegaIssueTracker = {};
 		return match ? match[argToReturn] : null;
 	}
 	
+	function notifyOfBadCommand() {
+		alert(getRandomItem(BAD_COMMAND_RESPONSES) + ' Try /help.'); // TODO: style
+	}
+	
 	OIT.Tracker.prototype.handleInput = function () {
 		if (!this.connected()) {
 			return;
 		}
-		var input = this.$inputBox.val();
-		this.$inputBox.val("");
+		var input = this.$messageInput.val();
+		this.$messageInput.val('');
 		
 		if (!input || input.length < 1) {
 			return;
@@ -153,32 +187,32 @@ var OmegaIssueTracker = {};
 			var cmd = matches[1];
 			var rest = matches[2];
 			switch (cmd.toLowerCase()) {
-				case "help":
-				case "?":
+				case 'help':
+				case '?':
 					this.helpOpen(!this.helpOpen());
 					break;
-				case "add":
-				case "create":
-				case "nouveau":
-				case "new":
-				case "open":
+				case 'add':
+				case 'create':
+				case 'nouveau':
+				case 'new':
+				case 'open':
 					this.createIssue(rest);
 					break;
-				case "close":
-				case "resolve":
-				case "resolved":
+				case 'close':
+				case 'resolve':
+				case 'resolved':
 					this.closeIssue(parseInt(rest, 10));
 					break;
-				case "unassign":
-					this.assignIssue(parseInt(rest, 10), "nobody");
+				case 'unassign':
+					this.assignIssue(parseInt(rest, 10), 'nobody');
 					break;
-				case "assign":
-				case "@":
+				case 'assign':
+				case '@':
 					var id = parseInt(getArgument(rest, 1), 10);
 					var assignee = getArgument(rest, 2);
 					this.assignIssue(id, assignee);
 					break;
-				case "edit":
+				case 'edit':
 					// only allow editing the description
 					var id = parseInt(getArgument(rest, 1), 10);
 					var desc = getArgument(rest, 2);
@@ -194,26 +228,26 @@ var OmegaIssueTracker = {};
 	};
 	
 	OIT.Tracker.prototype.createIssue = function (desc) {
-		socket.emit("new issue", desc);
+		socket.emit('new issue', desc);
 	};
 	
 	OIT.Tracker.prototype.assignIssue = function (id, assignee) {
-		socket.emit("assign issue", id, assignee);
+		socket.emit('assign issue', id, assignee);
 	};
 	
 	OIT.Tracker.prototype.closeIssue = function (id) {
 		if (this.findIssue(id).closed()) {
 			return;
 		}
-		socket.emit("close issue", id);
+		socket.emit('close issue', id);
 	};
 	
 	OIT.Tracker.prototype.updateIssue = function (id, props) {
-		socket.emit("update issue", id, props);
+		socket.emit('update issue', id, props);
 	};
 	
 	OIT.Tracker.prototype.send = function (message) {
-		socket.emit("user message", message);
+		socket.emit('user message', message);
 	};
 	
 	function scrollToBottom(el) {

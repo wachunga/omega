@@ -39,7 +39,13 @@ body {
 	font-size: 0.9em;
 	text-align: right;
 }
-#input {
+#form input[type='submit'] {
+	position: absolute;
+	left: -9999px;
+	width: 1px;
+	height: 1px;
+}
+#messageInput {
 	width: 100%;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;

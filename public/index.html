@@ -14,17 +14,19 @@
 </head>
 <body>
 <div id="header">
-	<h1>Ω</h1><div id="loggedInUser" data-bind="text: 'welcome, ' + user()"></div>
+	<h1>Ω</h1><div id="loggedInUser" data-bind="fadeVisible: !!user()"><span data-bind="html: 'welcome, <strong>' + user() + '</strong>'"></span> | <a href="#" data-bind="click: signOut">kthxbye</a></div>
 </div>
 <ul id="messages" data-bind="template: {name: 'messageItemTemplate', foreach: messages, beforeRemove: function(elem) { $(elem).fadeOut() }, afterAdd: function(elem) { $(elem).hide().fadeIn('fast') }}">
 </ul>
 <div id="onlineUsers">
-	online: <span data-bind="text: onlineUsers().join(', ')"></span>
+	online: <span data-bind="text: onlineUsers().length > 0 ? onlineUsers().join(', ') : 'nobody'"></span>
 </div>
 <form id="form" autocomplete="off">
-	<input id="input" type="text" name="text" tabindex="1" placeholder="Type commands (like '/help') or just chat it up"/>
+	<label data-bind="visible: !user()">You're not signed in. Who are you? <input id="nameInput" type="text" data-bind="attr: { placeholder: namePlaceholder }" /></label>
+	<input id="messageInput" type="text" data-bind="visible: user()" tabindex="1" placeholder="Type commands (like '/help') or just chat it up"/>
+	<input type="submit" />
 </form>
-<dl id="commandList" data-bind="fadeVisible: helpOpen, click: function() { helpOpen(false); $inputBox.focus(); }">
+<dl id="commandList" data-bind="fadeVisible: helpOpen, click: function() { helpOpen(false); $messageInput.focus(); }">
 	<dt>/create &lt;description&gt;</dt>
 	<dt>/assign &lt;id&gt; [&lt;user&gt;]</dt>
 	<dt>/unassign &lt;id&gt;</dt>
@@ -51,8 +53,20 @@ var socket = io.connect();
 
 var tracker; // for debugging
 $(function () {
-	tracker = new OmegaIssueTracker.Tracker($("#messages"), $("#input"), $("#form"), socket);
+	if (!isLocalStorageSupported) {
+		alert("Your browser is very out of date. To use Ω, please use a newer browser.");
+		return;
+	}
+	tracker = new OmegaIssueTracker.Tracker($("#messages"), $("#nameInput"), $("#messageInput"), $("#form"), socket);
 });
+
+function isLocalStorageSupported() {
+	try {
+		return 'localStorage' in window && window['localStorage'] !== null;
+	} catch (e) {
+		return false;
+	}
+}
 
 ko.bindingHandlers.fadeVisible = {
 	init: function(element, valueAccessor) {

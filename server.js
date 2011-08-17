@@ -22,8 +22,8 @@ var CURRENT_USER = "me";
 var io = sio.listen(server);
 io.sockets.on('connection', function(socket) {
 	
-	io.sockets.emit('issues', issues);
-	io.sockets.emit('usernames', usernames);
+	socket.emit('issues', issues);
+	socket.emit('usernames', usernames);
 
 	socket.on('login user', function(name, callback) {
 		if (usernames[name]) {

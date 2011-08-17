@@ -39,7 +39,7 @@
 <div id="issuesContainer">
 	<label class="hideIssues"><input type="checkbox" data-bind="checked: hideClosed"/> hide closed</label>
 	<h2>Issues <span data-bind="fadeVisible: issues().length >= 3" class="issueCounts">(<var data-bind="text: openIssuesCount"></var> open, <var data-bind="text: issues().length - openIssuesCount()"></var> closed)</span></h2>
-	<ul id="issuesList" data-bind="template: {name: 'issueItemTemplate', foreach: issues, templateOptions: { hideClosed: hideClosed }, beforeRemove: function(elem) { $(elem).fadeOut() }, afterAdd: function(elem) { $(elem).hide().fadeIn('slow') }}">
+	<ul id="issuesList" data-bind="template: {name: 'issueItemTemplate', foreach: issues, templateOptions: { hideClosed: hideClosed } }">
 	</ul>
 </div>
 

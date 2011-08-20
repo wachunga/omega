@@ -45,10 +45,10 @@
 </div>
 
 <script type="text/x-jquery-tmpl" id="messageItemTemplate">
-	<li data-bind="css: {system: !user}"><span class="speaker" data-bind="text: user ? user + ': ' : ''"></span>{{= msg}}</li>
+	<li data-bind="css: {system: !user}"><span class="speaker" data-bind="text: user ? user + ': ' : ''"></span><span data-bind="html: addHtmlLinks(msg)"></span></li>
 </script>
 <script type="text/x-jquery-tmpl" id="issueItemTemplate">
-	<li data-bind="fadeVisible: !($item.hideClosed() && closed()), css: { closed: closed }">{{= id}}: <span class="assignee" data-bind="text: assignee() != 'nobody' ? '(@' + assignee() + ')' : ''"></span> {{= description}}</li>
+	<li data-bind="fadeVisible: !($item.hideClosed() && closed()), css: { closed: closed }">{{= id}}: <span class="assignee" data-bind="text: assignee() != 'nobody' ? '(@' + assignee() + ')' : ''"></span> <span data-bind="html: addHtmlLinks(description)"></span></li>
 </script>
 
 <script type="text/javascript">
@@ -80,6 +80,24 @@ ko.bindingHandlers.fadeVisible = {
 		var value = valueAccessor();
 		ko.utils.unwrapObservable(value) ? $(element).fadeIn('fast') : $(element).fadeOut('fast');
 	}
+};
+
+var URL_REGEX = /(\(?\bhttps?:\/\/[-A-Z0-9+&@#\/%?=~_()|!:,.;]*[-A-Z0-9+&@#\/%=~_()|])/ig;
+function addHtmlLinks(text) {
+	text = ko.utils.unwrapObservable(text);
+	return text.replace(URL_REGEX, function (url) {
+		var parens = false;
+		if (url.charAt(0) === '(' && url.charAt(url.length - 1) === ')') {
+			url = url.substring(1, url.length - 1);
+			parens = true;
+		}
+		var htmlLink = ['<a href="', url, '">', url, '</a>'];
+		if (parens) {
+			htmlLink.unshift('(');
+			htmlLink.push(')');
+		}
+		return htmlLink.join('');
+	});
 };
 </script>
 </body>

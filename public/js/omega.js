@@ -268,7 +268,7 @@ var OmegaIssueTracker = {};
 	function scrollToBottom(el) {
 		el.scrollTop = el.scrollHeight;
 	}
-	
+
 	OIT.Tracker.prototype.handleMessage = function (msg, user) {
 		this.messages.push({user: user, msg: msg});
 		scrollToBottom(this.$messagesList.get(0));

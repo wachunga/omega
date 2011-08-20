@@ -55,7 +55,7 @@ var OmegaIssueTracker = {};
 		
 		this.hideClosed = ko.observable(false);
 		this.helpOpen = ko.observable(false);
-		
+
 		ko.applyBindings(this);
 		
 		$form.submit(function (e) {
@@ -70,8 +70,9 @@ var OmegaIssueTracker = {};
 		});
 		
 		this.socket.on('connect', function () {
+			// NOTE-DH: reconnect bug with socket.io: https://github.com/LearnBoost/socket.io/issues/388
 			if (that.user()) {
-				that.login();				
+				that.login();
 			}
 		});
 		
@@ -138,10 +139,10 @@ var OmegaIssueTracker = {};
 	};
 
 	OIT.Tracker.prototype.signOut = function () {
-		this.socket.disconnect();
 		delete window.localStorage[USERNAME_KEY];
 		this.user(undefined);
 		this.$nameInput.focus();
+		this.socket.disconnect();
 	};
 	
 	OIT.Tracker.prototype.login = function () {

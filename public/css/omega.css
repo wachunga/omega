@@ -2,6 +2,9 @@ body {
 	margin: 3em;
 	font-family: 'Open Sans', sans-serif;
 }
+.subtle {
+    color: #666;
+}
 #header {
 	position: relative;	
 }
@@ -69,7 +72,6 @@ body {
 #issuesContainer .issueCounts {
 	font-size: small;
 	font-weight: normal;
-	color: #666;
 }
 #issuesContainer var {
 	font-style: normal;
@@ -78,10 +80,17 @@ body {
 	float: right;
 	line-height: 1.9em;
 }
-#issuesList {
+#issuesContainer .noneMessage {
+    position: absolute;
+    margin-top: 0;
+}
+#issuesContainer .noneMessage,
+#issuesContainer .issuesList {
+    margin: 0.5em 0 0 0;
+}
+#issuesContainer .issuesList {
 	list-style-type: none;
 	padding: 0;
-	margin: 0.5em 0 0 0;
 }
 #issuesList .closed {
 	text-decoration: line-through;

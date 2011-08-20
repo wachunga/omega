@@ -38,8 +38,9 @@
 
 <div id="issuesContainer">
 	<label class="hideIssues"><input type="checkbox" data-bind="checked: hideClosed"/> hide closed</label>
-	<h2>Issues <span data-bind="fadeVisible: issues().length >= 3" class="issueCounts">(<var data-bind="text: openIssuesCount"></var> open, <var data-bind="text: issues().length - openIssuesCount()"></var> closed)</span></h2>
-	<ul id="issuesList" data-bind="template: {name: 'issueItemTemplate', foreach: issues, templateOptions: { hideClosed: hideClosed } }">
+	<h2>Issues <span data-bind="fadeVisible: issues().length >= 3" class="issueCounts subtle">(<var data-bind="text: openIssuesCount"></var> open, <var data-bind="text: issues().length - openIssuesCount()"></var> closed)</span></h2>
+	<p class="noneMessage subtle" data-bind="fadeVisible: !issues().length || (hideClosed() && openIssuesCount() == 0)">No open issues. w00t!</p>
+	<ul class="issuesList" data-bind="template: {name: 'issueItemTemplate', foreach: issues, templateOptions: { hideClosed: hideClosed } }">
 	</ul>
 </div>
 

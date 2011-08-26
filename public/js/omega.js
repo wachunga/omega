@@ -42,7 +42,7 @@ var OmegaIssueTracker = {};
 		this.$messageInput = $messageInput;
 		this.socket = socket;
 		
-		this.connected = ko.observable(false);
+		this.loggedIn = ko.observable(false);
 		this.user = ko.observable(window.localStorage[USERNAME_KEY]);
 		this.messages = ko.observableArray();
 		this.onlineUsers = ko.observableArray();
@@ -60,24 +60,19 @@ var OmegaIssueTracker = {};
 		
 		$form.submit(function (e) {
 			e.preventDefault();
-			if (!that.user()) {
-				that.user(that.$nameInput.val());
-				that.$nameInput.val('');
-				that.login();
-			} else {
-				that.handleInput();
-			}
+			that.handleInput();
 		});
 		
 		this.socket.on('connect', function () {
-			// NOTE-DH: reconnect bug with socket.io: https://github.com/LearnBoost/socket.io/issues/388
 			if (that.user()) {
 				that.login();
 			}
 		});
 		
 		this.socket.on('disconnect', function () {
-			that.socket.socket.reconnect(); // TODO: socket.io should do this automatically
+			// NOTE-DH: reconnect bug with socket.io: https://github.com/LearnBoost/socket.io/issues/388
+			// manually reconnect as workaround
+			that.socket.socket.reconnect();
 		});
 		
 		this.socket.on('issues', function (issues) {
@@ -138,16 +133,16 @@ var OmegaIssueTracker = {};
 		});
 	};
 
-	OIT.Tracker.prototype.signOut = function () {
+	OIT.Tracker.prototype.logout = function () {
 		delete window.localStorage[USERNAME_KEY];
 		this.user(undefined);
 		this.$nameInput.focus();
-		this.socket.disconnect();
+		this.socket.emit('logout');
 	};
 	
 	OIT.Tracker.prototype.login = function () {
 		var that = this;
-		this.connected(false);
+		this.loggedIn(false);
 		this.socket.emit('login user', this.user(), function (alreadyTaken) {
 			if (alreadyTaken) {
 				that.user(that.user() + Math.round(Math.random() * -1e9));
@@ -155,7 +150,7 @@ var OmegaIssueTracker = {};
 			} else {
 				window.localStorage[USERNAME_KEY] = that.user();
 			}
-			that.connected(!alreadyTaken);
+			that.loggedIn(!alreadyTaken);
 		});
 	};
 	
@@ -171,9 +166,14 @@ var OmegaIssueTracker = {};
 	function notifyOfBadCommand() {
 		window.alert(getRandomItem(BAD_COMMAND_RESPONSES) + ' Try /help.'); // TODO: style
 	}
-	
+
 	OIT.Tracker.prototype.handleInput = function () {
-		if (!this.connected()) {
+		if (!this.user()) {
+			this.handleNameInput();
+			return;
+		}
+
+		if (!this.loggedIn()) {
 			return;
 		}
 		var input = this.$messageInput.val();
@@ -232,6 +232,17 @@ var OmegaIssueTracker = {};
 		} else {
 			this.send(input);
 		}
+	};
+
+	OIT.Tracker.prototype.handleNameInput = function () {
+		var name = this.$nameInput.val();
+		if (!name || name.length < 1) { // TODO: disallow other chars?
+			return;
+		}
+
+		this.user(name);
+		this.$nameInput.val('');
+		this.login();
 	};
 	
 	OIT.Tracker.prototype.createIssue = function (desc) {

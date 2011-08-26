@@ -31,7 +31,8 @@ io.sockets.on('connection', function(socket) {
 		} else {
 			callback(false);
 			usernames[name] = socket.nickname = name;
-			socket.broadcast.emit('announcement', name + ' connected.');
+			// no need to announce... can get spammy in chat
+			// socket.broadcast.emit('announcement', name + ' connected.');
 			io.sockets.emit('usernames', usernames);
 		}
 	});
@@ -81,13 +82,17 @@ io.sockets.on('connection', function(socket) {
 		io.sockets.emit('issues', issues);
 	});
 
-	socket.on('disconnect', function() {
+	function removeCurrentUser() {
 		if (!socket.nickname) {
 			return;
 		}
 
 		delete usernames[socket.nickname];
-		socket.broadcast.emit('announcement', socket.nickname + ' disconnected.');
-		socket.broadcast.emit('usernames', usernames);
-	});
+		// no need to announce... can get spammy in chat
+		// socket.broadcast.emit('announcement', socket.nickname + ' disconnected.');
+		io.sockets.emit('usernames', usernames);
+	}
+
+	socket.on('disconnect', removeCurrentUser);
+	socket.on('logout', removeCurrentUser);
 });

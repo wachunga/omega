@@ -92,7 +92,7 @@ body {
 	list-style-type: none;
 	padding: 0;
 }
-#issuesList .closed {
+#issuesContainer .closed {
 	text-decoration: line-through;
 }
 /* darken placeholder text */

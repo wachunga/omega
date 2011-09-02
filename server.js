@@ -1,8 +1,9 @@
 var http = require('http'),
 	sio = require('socket.io'),
-	static = require('node-static');
+	static = require('node-static'),
+	issueDb = require('lib/issueDb');
 
-var PORT = process.argv[2];
+var PORT = process.argv[2] || 1337;
 
 var fileServer = new static.Server('./public');
 var server = http.createServer(function (request, response) {
@@ -15,7 +16,7 @@ server.listen(PORT);
 console.log('Server running at http://127.0.0.1:' + PORT);
 
 var usernames = {};
-var issues = [];
+var issues = issueDb.load();
 var UNASSIGNED = "nobody";
 var CURRENT_USER = "me";
 
@@ -51,6 +52,7 @@ io.sockets.on('connection', function(socket) {
 			createdDate: new Date()
 		};
 		issues.push(newIssue);
+		issueDb.write(issues);
 		io.sockets.emit('issue created', newIssue);
 	});
 	
@@ -60,11 +62,13 @@ io.sockets.on('connection', function(socket) {
 			assignee = socket.nickname;
 		}
 		issues[id-1].assignee = assignee; 
+		issueDb.write(issues);
 		io.sockets.emit('issue assigned', socket.nickname, id, assignee);
 	});
 	
 	socket.on('close issue', function(id) {
 		issues[id-1].closed = true;
+		issueDb.write(issues);
 		io.sockets.emit('issue closed', socket.nickname, id);
 	});
 	
@@ -74,11 +78,13 @@ io.sockets.on('connection', function(socket) {
 		for (key in props) {
 			issue[key] = props[key];
 		}
+		issueDb.write(issues);
 		io.sockets.emit('issue updated', socket.nickname, id, props);
 	});
 	
 	socket.on('reset issues', function() {
 		issues = [];
+		issueDb.write(issues);
 		io.sockets.emit('issues', issues);
 	});
 

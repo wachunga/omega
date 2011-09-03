@@ -1,7 +1,7 @@
 var http = require('http'),
 	sio = require('socket.io'),
 	static = require('node-static'),
-	issueDb = require('lib/issueDb');
+	issueDb = require('./lib/issueDb');
 
 var PORT = process.argv[2] || 1337;
 

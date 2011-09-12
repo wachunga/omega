@@ -159,7 +159,7 @@ var OmegaIssueTracker = {};
 	}
 	
 	function getArgument(string, argToReturn) {
-		var match = string.match(/([\d+])(?:\s+(.+))?/);
+		var match = string.match(/(\d+)(?:\s+(.+))?/);
 		return match ? match[argToReturn] : null;
 	}
 	

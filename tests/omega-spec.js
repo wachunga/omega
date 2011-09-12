@@ -30,4 +30,30 @@ describe("omega", function () {
 			expect(addHtmlLinks(text)).toEqual('at foo.com, really?');
 		});
 	});
+
+	describe("parses arguments", function () {
+
+		it("can assign multi-digit issues", function () {
+			var sock = {
+					on: function () {},
+					emit: function () {}
+				},
+				messages = {},
+				name = {},
+				message = {
+					val: function () { return ":assign 50"; }
+				},
+				form = {
+					submit: function () {}
+				};
+
+			var tracker = new OmegaIssueTracker.Tracker(messages, name, message, form, sock);
+			tracker.user("elbow");
+			tracker.loggedIn(true);
+			
+			spyOn(tracker, 'assignIssue');
+			tracker.handleInput();
+			expect(tracker.assignIssue).toHaveBeenCalledWith(50, undefined);
+		});
+	});
 });

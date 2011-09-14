@@ -27,15 +27,13 @@ io.sockets.on('connection', function(socket) {
 	socket.emit('usernames', usernames);
 
 	socket.on('login user', function(name, callback) {
-		if (usernames[name]) {
-			callback(true);
-		} else {
-			callback(false);
-			usernames[name] = socket.nickname = name;
-			// no need to announce... can get spammy in chat
-			// socket.broadcast.emit('announcement', name + ' connected.');
-			io.sockets.emit('usernames', usernames);
-		}
+		callback(false);
+		socket.nickname = name;
+		// keep track of duplicate usernames
+		usernames[name] = (usernames[name] || 0) + 1;
+		// no need to announce... can get spammy in chat
+		// socket.broadcast.emit('announcement', name + ' connected.');
+		io.sockets.emit('usernames', usernames);
 	});
 	
 	socket.on('user message', function(msg) {
@@ -92,8 +90,11 @@ io.sockets.on('connection', function(socket) {
 		if (!socket.nickname) {
 			return;
 		}
-
-		delete usernames[socket.nickname];
+		if (usernames[socket.nickname] == 1) {
+			delete usernames[socket.nickname];
+		} else {
+			usernames[socket.nickname]--;
+		}
 		// no need to announce... can get spammy in chat
 		// socket.broadcast.emit('announcement', socket.nickname + ' disconnected.');
 		io.sockets.emit('usernames', usernames);

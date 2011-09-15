@@ -95,6 +95,7 @@ io.sockets.on('connection', function(socket) {
 		} else {
 			usernames[socket.nickname]--;
 		}
+		delete socket.nickname;
 		// no need to announce... can get spammy in chat
 		// socket.broadcast.emit('announcement', socket.nickname + ' disconnected.');
 		io.sockets.emit('usernames', usernames);

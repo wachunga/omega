@@ -42,6 +42,9 @@ body {
 	font-size: 0.9em;
 	text-align: right;
 }
+.onlineUser + .onlineUser:before {
+	content: ', ';
+}
 #form input[type='submit'] {
 	position: absolute;
 	left: -9999px;

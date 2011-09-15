@@ -82,7 +82,9 @@ var OmegaIssueTracker = {};
 		});
 		
 		this.socket.on('usernames', function (users) {
-			that.onlineUsers(_.keys(users));
+			that.onlineUsers(_.map(users, function (count, name) {
+				return { name: name, count: count };
+			}));
 		});
 		
 		this.socket.on('user message', function (user, msg) {

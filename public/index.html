@@ -20,7 +20,7 @@
 <ul id="messages" data-bind="template: {name: 'messageItemTemplate', foreach: messages, beforeRemove: function(elem) { $(elem).fadeOut() }, afterAdd: function(elem) { $(elem).hide().fadeIn('fast') }}">
 </ul>
 <div id="onlineUsers">
-	online: <span data-bind="text: onlineUsers().length > 0 ? onlineUsers().join(', ') : 'nobody'"></span>
+	online: <span data-bind="template: { name: 'onlineUsersTemplate', foreach: onlineUsers }"></span><span data-bind="visible: !onlineUsers().length" class="subtle">nobody</span>
 </div>
 <form id="form" autocomplete="off">
 	<label data-bind="visible: !user()">You're not signed in. Who are you? <input id="nameInput" type="text" data-bind="attr: { placeholder: namePlaceholder }" /></label>
@@ -45,6 +45,9 @@
 	</ul>
 </div>
 
+<script type="text/x-jquery-tmpl" id="onlineUsersTemplate">
+	<span class="onlineUser">{{if count > 1}}{{= name }} <span class="subtle">({{= count}})</span>{{else}}{{= name}}{{/if}}</span>
+</script>
 <script type="text/x-jquery-tmpl" id="messageItemTemplate">
 	<li data-bind="css: {system: !user}"><span class="speaker" data-bind="text: user ? user + ': ' : ''"></span><span data-bind="html: addHtmlLinks(msg)"></span></li>
 </script>

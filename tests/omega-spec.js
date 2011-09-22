@@ -25,7 +25,7 @@ describe("omega", function () {
 			var text = "at http://foo.com?id=bar#asdf, really?";
 			expect(addHtmlLinks(text)).toEqual('at <a href="http://foo.com?id=bar#asdf">http://foo.com?id=bar#asdf</a>, really?');
 		});
-		it("but must be preceeded by http", function () {
+		it("but must be preceded by http", function () {
 			var text = "at foo.com, really?";
 			expect(addHtmlLinks(text)).toEqual('at foo.com, really?');
 		});

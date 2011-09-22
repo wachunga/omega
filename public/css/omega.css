@@ -98,6 +98,9 @@ body {
 #issuesContainer .closed {
 	text-decoration: line-through;
 }
+#issuesContainer .critical {
+	color: Chocolate;
+}
 /* darken placeholder text */
 input::-webkit-input-placeholder {
     color: #333;

@@ -14,6 +14,19 @@ var OmegaIssueTracker = {};
 	function getRandomItem(array) {
 		return array[Math.floor(Math.random() * array.length)];
 	}
+
+	function issueSort(a, b) {
+		if (a.critical()) {
+			if (b.critical()) {
+				return a.id - b.id;
+			}
+			return -1;
+		}
+		if (b.critical()) {
+			return 1;
+		}
+		return a.id - b.id;
+	}
 	
 	var USERNAME_KEY = 'OmegaIssueTracker.username';
 	var NAMES = [
@@ -47,6 +60,10 @@ var OmegaIssueTracker = {};
 		this.messages = ko.observableArray();
 		this.onlineUsers = ko.observableArray();
 		this.issues = ko.observableArray();
+		this.sortedIssues = ko.dependentObservable(function () {
+			return this.issues().sort(issueSort);
+		}, this);
+
 		this.openIssuesCount = ko.dependentObservable(function () {
 			return _.select(this.issues(), function (issue) {
 				return !issue.closed();
@@ -118,17 +135,15 @@ var OmegaIssueTracker = {};
 		
 		this.socket.on('issue updated', function (updater, id, props) {
 			that.handleMessage(updater + ' updated ' + id + '.');
-			var issue = that.findIssue(id);
-			_.each(props, function (value, key) {
-				if (ko.isObservable(issue[key])) {
-					issue[key](value);
-				} else {
-					issue[key] = value;
-				}
-			});
+			that.refreshIssue(id, props);
+		});
+
+		this.socket.on('issue prioritized', function (updater, id, props) {
+			that.handleMessage(updater + ' marked ' + id + ' as critical.');
+			that.refreshIssue(id, props);
 		});
 	};
-	
+
 	OIT.Tracker.prototype.findIssue = function (id) {
 		return _.find(this.issues(), function (issue) {
 			return issue.id === id;
@@ -217,6 +232,14 @@ var OmegaIssueTracker = {};
 					var assignee = getArgument(rest, 2);
 					this.assignIssue(id, assignee);
 					break;
+				case 'critical':
+				case 'urgent':
+				case '!':
+				case '*':
+				case 'star':
+					var id = parseInt(getArgument(rest, 1), 10);
+					this.prioritizeIssue(id);
+					break;
 				case 'edit':
 				case 'update':
 					// only allow editing the description
@@ -265,7 +288,11 @@ var OmegaIssueTracker = {};
 	OIT.Tracker.prototype.updateIssue = function (id, props) {
 		socket.emit('update issue', id, props);
 	};
-	
+
+	OIT.Tracker.prototype.prioritizeIssue = function (id) {
+		socket.emit('prioritize issue', id);
+	};
+
 	OIT.Tracker.prototype.reset = function () {
 		if (window.confirm('Warning: this will completely delete all issues from the server.')) {
 			if (window.confirm('I have a bad feeling about this. Are you absolutely sure?')) {
@@ -285,6 +312,17 @@ var OmegaIssueTracker = {};
 	OIT.Tracker.prototype.handleMessage = function (msg, user) {
 		this.messages.push({user: user, msg: msg});
 		scrollToBottom(this.$messagesList.get(0));
+	};
+
+	OIT.Tracker.prototype.refreshIssue = function (id, props) {
+		var issue = this.findIssue(id);
+		_.each(props, function (value, key) {
+			if (ko.isObservable(issue[key])) {
+				issue[key](value);
+			} else {
+				issue[key] = value;
+			}
+		});
 	};
 	
 }(OmegaIssueTracker));

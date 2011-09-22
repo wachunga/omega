@@ -29,6 +29,7 @@
 </form>
 <dl id="commandList" data-bind="fadeVisible: helpOpen, click: function() { helpOpen(false); $messageInput.focus(); }">
 	<dt>/create &lt;description&gt;</dt>
+	<dt>/critical &lt;id&gt;</dt>
 	<dt>/assign &lt;id&gt; [&lt;user&gt;]</dt>
 	<dt>/unassign &lt;id&gt;</dt>
 	<dt>/edit &lt;id&gt; &lt;description&gt;</dt>
@@ -41,7 +42,7 @@
 	<label class="hideIssues"><input type="checkbox" data-bind="checked: hideClosed"/> hide closed</label>
 	<h2>Issues <span data-bind="fadeVisible: issues().length >= 3" class="issueCounts subtle">(<var data-bind="text: openIssuesCount"></var> open, <var data-bind="text: issues().length - openIssuesCount()"></var> closed)</span></h2>
 	<p class="noneMessage subtle" data-bind="fadeVisible: !issues().length || (hideClosed() && openIssuesCount() == 0)">No open issues. w00t!</p>
-	<ul class="issuesList" data-bind="template: {name: 'issueItemTemplate', foreach: issues, templateOptions: { hideClosed: hideClosed } }">
+	<ul class="issuesList" data-bind="template: {name: 'issueItemTemplate', foreach: sortedIssues, templateOptions: { hideClosed: hideClosed } }">
 	</ul>
 </div>
 
@@ -52,7 +53,7 @@
 	<li data-bind="css: {system: !user}"><span class="speaker" data-bind="text: user ? user + ': ' : ''"></span><span data-bind="html: addHtmlLinks(msg)"></span></li>
 </script>
 <script type="text/x-jquery-tmpl" id="issueItemTemplate">
-	<li data-bind="fadeVisible: !($item.hideClosed() && closed()), css: { closed: closed }">{{= id}}: <span class="assignee" data-bind="text: assignee() != 'nobody' ? '(@' + assignee() + ')' : ''"></span> <span data-bind="html: addHtmlLinks(description)"></span></li>
+	<li data-bind="fadeVisible: !($item.hideClosed() && closed()), css: { closed: closed }">{{= id}}: <span class="critical" data-bind="text: critical() ? '★ ' : ''"></span><span class="assignee" data-bind="text: assignee() != 'nobody' ? '(@' + assignee() + ')' : ''"></span> <span data-bind="html: addHtmlLinks(description)"></span></li>
 </script>
 
 <script type="text/javascript">

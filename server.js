@@ -1,5 +1,6 @@
 var http = require('http'),
 	sio = require('socket.io'),
+	_ = require('underscore'),
 	static = require('node-static'),
 	issueDb = require('./lib/issueDb');
 
@@ -22,7 +23,8 @@ var CURRENT_USER = "me";
 
 var io = sio.listen(server);
 io.sockets.on('connection', function(socket) {
-	
+
+	applyIssueDefaults();
 	socket.emit('issues', issues);
 	socket.emit('usernames', usernames);
 
@@ -44,6 +46,7 @@ io.sockets.on('connection', function(socket) {
 		var newIssue = {
 			id: issues.length+1,
 			description: desc,
+			critical: false,
 			creator: socket.nickname,
 			assignee: UNASSIGNED,
 			closed: false,
@@ -53,7 +56,7 @@ io.sockets.on('connection', function(socket) {
 		issueDb.write(issues);
 		io.sockets.emit('issue created', newIssue);
 	});
-	
+
 	socket.on('assign issue', function(id, specifiedAssignee) {
 		var assignee = specifiedAssignee;
 		if (!specifiedAssignee || specifiedAssignee === CURRENT_USER) {
@@ -79,6 +82,12 @@ io.sockets.on('connection', function(socket) {
 		issueDb.write(issues);
 		io.sockets.emit('issue updated', socket.nickname, id, props);
 	});
+
+	socket.on('prioritize issue', function(id) {
+		issues[id-1].critical = true;
+		issueDb.write(issues);
+		io.sockets.emit('issue prioritized', socket.nickname, id, {critical: true});
+	});
 	
 	socket.on('reset issues', function() {
 		issues = [];
@@ -99,6 +108,12 @@ io.sockets.on('connection', function(socket) {
 		// no need to announce... can get spammy in chat
 		// socket.broadcast.emit('announcement', socket.nickname + ' disconnected.');
 		io.sockets.emit('usernames', usernames);
+	}
+
+	function applyIssueDefaults() {
+		_.each(issues, function (issue) {
+			_.defaults(issue, {critical: false});
+		});
 	}
 
 	socket.on('disconnect', removeCurrentUser);

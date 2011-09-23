@@ -139,7 +139,8 @@ var OmegaIssueTracker = {};
 		});
 
 		this.socket.on('issue prioritized', function (updater, id, props) {
-			that.handleMessage(updater + ' marked ' + id + ' as critical.');
+			var maybeNot = props.critical ? '' : ' not';
+			that.handleMessage(updater + ' marked ' + id + ' as' + maybeNot + ' critical.');
 			that.refreshIssue(id, props);
 		});
 	};

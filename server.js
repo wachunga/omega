@@ -84,9 +84,9 @@ io.sockets.on('connection', function(socket) {
 	});
 
 	socket.on('prioritize issue', function(id) {
-		issues[id-1].critical = true;
+		issues[id-1].critical = !issues[id-1].critical;
 		issueDb.write(issues);
-		io.sockets.emit('issue prioritized', socket.nickname, id, {critical: true});
+		io.sockets.emit('issue prioritized', socket.nickname, id, {critical: issues[id-1].critical});
 	});
 	
 	socket.on('reset issues', function() {

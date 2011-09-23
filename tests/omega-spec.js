@@ -1,3 +1,18 @@
+var sock = {
+	on: function () {},
+	emit: function () {}
+};
+var messages = {};
+var name = {};
+var message = {};
+var form = {
+	submit: function () {}
+};
+
+var tracker = new OmegaIssueTracker.Tracker(messages, name, message, form, sock);
+tracker.user("elbow");
+tracker.loggedIn(true);
+
 describe("omega", function () {
 
 	describe("displays html links", function () {
@@ -31,26 +46,20 @@ describe("omega", function () {
 		});
 	});
 
+	describe("prioritizes issues", function () {
+		it ("can prioritize", function () {
+			message.val = function () { return ":star 5"; };
+
+			spyOn(tracker, 'prioritizeIssue');
+			tracker.handleInput();
+			expect(tracker.prioritizeIssue).toHaveBeenCalledWith(5);
+		});
+	});
+
 	describe("parses arguments", function () {
-
 		it("can assign multi-digit issues", function () {
-			var sock = {
-					on: function () {},
-					emit: function () {}
-				},
-				messages = {},
-				name = {},
-				message = {
-					val: function () { return ":assign 50"; }
-				},
-				form = {
-					submit: function () {}
-				};
-
-			var tracker = new OmegaIssueTracker.Tracker(messages, name, message, form, sock);
-			tracker.user("elbow");
-			tracker.loggedIn(true);
-			
+			message.val = function () { return ":assign 50"; };
+		
 			spyOn(tracker, 'assignIssue');
 			tracker.handleInput();
 			expect(tracker.assignIssue).toHaveBeenCalledWith(50, undefined);

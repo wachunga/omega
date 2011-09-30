@@ -51,15 +51,29 @@ describe("omega", function () {
 	});
 
 	describe("parses commands", function () {
-		
+
+		it("can view help", function () {
+			message.val = function () { return "/help"; };
+
+			tracker.handleInput();
+			expect(tracker.helpOpen()).toEqual(true);
+		});
+		it("can reset", function () {
+			message.val = function () { return "/reset"; };
+
+			spyOn(tracker, 'reset');
+			tracker.handleInput();
+			expect(tracker.reset).toHaveBeenCalled();
+		});
+
 		it("can create issues", function () {
 			message.val = function () { return "/create new issue"; };
-		
+
 			spyOn(tracker, 'createIssue');
 			tracker.handleInput();
 			expect(tracker.createIssue).toHaveBeenCalledWith("new issue");
 		});
-		
+
 		it ("can prioritize issues", function () {
 			message.val = function () { return ":star 5"; };
 

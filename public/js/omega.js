@@ -226,8 +226,8 @@ var OmegaIssueTracker = {};
 		
 		try {
 			var matches = input.match(/[:\/]([\S]+)(?:\s+(.*))?/); 
-			var cmd = matches[1].trim();
-			var rest = matches[2].trim();
+			var cmd = matches[1] && matches[1].trim();
+			var rest = matches[2] && matches[2].trim();
 			switch (cmd.toLowerCase()) {
 				case 'help':
 				case '?':

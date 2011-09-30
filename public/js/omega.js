@@ -305,38 +305,38 @@ var OmegaIssueTracker = {};
 	};
 	
 	OIT.Tracker.prototype.createIssue = function (desc) {
-		socket.emit('new issue', desc);
+		this.socket.emit('new issue', desc);
 	};
 	
 	OIT.Tracker.prototype.assignIssue = function (id, assignee) {
-		socket.emit('assign issue', id, assignee);
+		this.socket.emit('assign issue', id, assignee);
 	};
 	
 	OIT.Tracker.prototype.closeIssue = function (id) {
 		if (this.findIssue(id).closed()) {
 			return;
 		}
-		socket.emit('close issue', id);
+		this.socket.emit('close issue', id);
 	};
 	
 	OIT.Tracker.prototype.updateIssue = function (id, props) {
-		socket.emit('update issue', id, props);
+		this.socket.emit('update issue', id, props);
 	};
 
 	OIT.Tracker.prototype.prioritizeIssue = function (id) {
-		socket.emit('prioritize issue', id);
+		this.socket.emit('prioritize issue', id);
 	};
 
 	OIT.Tracker.prototype.reset = function () {
 		if (window.confirm('Warning: this will completely delete all issues from the server.')) {
 			if (window.confirm('I have a bad feeling about this. Are you absolutely sure?')) {
-				socket.emit('reset issues');
+				this.socket.emit('reset issues');
 			}
 		}
 	};
 	
 	OIT.Tracker.prototype.send = function (message) {
-		socket.emit('user message', message);
+		this.socket.emit('user message', message);
 	};
 	
 	function scrollToBottom(el) {

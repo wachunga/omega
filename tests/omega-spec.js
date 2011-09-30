@@ -58,6 +58,15 @@ describe("omega", function () {
 			tracker.handleInput();
 			expect(tracker.helpOpen()).toEqual(true);
 		});
+
+		it("can chat", function () {
+			message.val = function () { return "hello peeps"; };
+
+			spyOn(socket, 'emit');
+			tracker.handleInput();
+			expect(socket.emit).toHaveBeenCalledWith('user message', 'hello peeps');
+		});
+
 		it("can reset", function () {
 			message.val = function () { return "/reset"; };
 
@@ -72,6 +81,14 @@ describe("omega", function () {
 			spyOn(tracker, 'createIssue');
 			tracker.handleInput();
 			expect(tracker.createIssue).toHaveBeenCalledWith("new issue");
+		});
+
+		it("mixed case and unicode works", function () {
+			message.val = function () { return "/CREATE Ω=aw3som#"; };
+
+			spyOn(tracker, 'createIssue');
+			tracker.handleInput();
+			expect(tracker.createIssue).toHaveBeenCalledWith("Ω=aw3som#");
 		});
 
 		it ("can prioritize issues", function () {
@@ -90,8 +107,16 @@ describe("omega", function () {
 			expect(tracker.assignIssue).toHaveBeenCalledWith(50, undefined);
 		});
 		
-		describe("handles invalid arguments", function () {
-			
+		describe("handles invalid input", function () {
+
+			it("bad command", function () {
+				message.val = function () { return "/fluffernutter"; };
+
+				spyOn(tracker, 'notifyOfBadCommand');
+				tracker.handleInput();
+				expect(tracker.notifyOfBadCommand).toHaveBeenCalled();
+			});
+
 			it("create no args", function () {
 				message.val = function () { return ":create"; };
 				

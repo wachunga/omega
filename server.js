@@ -22,6 +22,10 @@ var UNASSIGNED = "nobody";
 var CURRENT_USER = "me";
 
 var io = sio.listen(server);
+io.configure(function () {
+	// excluded websocket due to Chrome bug: https://github.com/LearnBoost/socket.io/issues/425
+	io.set('transports', ['htmlfile', 'xhr-polling', 'jsonp-polling']);
+});
 io.sockets.on('connection', function(socket) {
 
 	applyIssueDefaults();

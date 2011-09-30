@@ -73,8 +73,13 @@ var OmegaIssueTracker = {};
 		this.hideClosed = ko.observable(false);
 		this.helpOpen = ko.observable(false);
 		
-		this.initTimeago = function () {
-			$("time").timeago();
+		this.initTimeago = function (elements) {
+			_.each(elements, function (element) {
+				var $time = $(element).find("time");
+				if ($time && $time.length) {
+					$time.timeago();
+				}
+			});
 		};
 
 		ko.applyBindings(this);

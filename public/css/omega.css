@@ -95,7 +95,15 @@ body {
 	list-style-type: none;
 	padding: 0;
 }
-#issuesContainer .closed {
+#issuesContainer .issuesList .details {
+	display: none;
+	font-size: small;
+}
+#issuesContainer .issuesList li:hover .details {
+	display: inline;
+}
+#issuesContainer .closed .description,
+#issuesContainer .closed .assignee {
 	text-decoration: line-through;
 }
 #issuesContainer .critical {

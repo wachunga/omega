@@ -72,6 +72,10 @@ var OmegaIssueTracker = {};
 		
 		this.hideClosed = ko.observable(false);
 		this.helpOpen = ko.observable(false);
+		
+		this.initTimeago = function () {
+			$("time").timeago();
+		};
 
 		ko.applyBindings(this);
 		
@@ -179,7 +183,7 @@ var OmegaIssueTracker = {};
 	function requireArgument() {
 		_.each(arguments, function (arg) {
 			if (!arg) {
-				throw "Invalid argument.";	
+				throw "Invalid or missing argument.";	
 			}
 		});
 	}

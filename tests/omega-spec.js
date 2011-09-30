@@ -1,20 +1,24 @@
-var sock = {
-	on: function () {},
-	emit: function () {}
-};
-var messages = {};
-var name = {};
-var message = {};
-var form = {
-	submit: function () {}
-};
-
-var tracker = new OmegaIssueTracker.Tracker(messages, name, message, form, sock);
-tracker.user("elbow");
-tracker.loggedIn(true);
-
 describe("omega", function () {
 
+	var socket = {
+		on: function () {},
+		emit: function () {}
+	};
+	var messages = {};
+	var name = {};
+	var message = {};
+	var form = {
+		submit: function () {}
+	};
+	
+	var tracker;
+	
+	beforeEach(function () {
+		tracker = new OmegaIssueTracker.Tracker(messages, name, message, form, socket);
+		tracker.user("elbow");
+		tracker.loggedIn(true);
+	});
+	
 	describe("displays html links", function () {
 		it("for basic urls", function () {
 			var text = "http://www.foo.com";
@@ -46,17 +50,24 @@ describe("omega", function () {
 		});
 	});
 
-	describe("prioritizes issues", function () {
-		it ("can prioritize", function () {
+	describe("parses commands", function () {
+		
+		it("can create issues", function () {
+			message.val = function () { return "/create new issue"; };
+		
+			spyOn(tracker, 'createIssue');
+			tracker.handleInput();
+			expect(tracker.createIssue).toHaveBeenCalledWith("new issue");
+		});
+		
+		it ("can prioritize issues", function () {
 			message.val = function () { return ":star 5"; };
 
 			spyOn(tracker, 'prioritizeIssue');
 			tracker.handleInput();
 			expect(tracker.prioritizeIssue).toHaveBeenCalledWith(5);
 		});
-	});
-
-	describe("parses arguments", function () {
+		
 		it("can assign multi-digit issues", function () {
 			message.val = function () { return ":assign 50"; };
 		
@@ -64,5 +75,105 @@ describe("omega", function () {
 			tracker.handleInput();
 			expect(tracker.assignIssue).toHaveBeenCalledWith(50, undefined);
 		});
+		
+		describe("handles invalid arguments", function () {
+			
+			it("create no args", function () {
+				message.val = function () { return ":create"; };
+				
+				spyOn(tracker, 'notifyOfBadCommand');
+				tracker.handleInput();
+				expect(tracker.notifyOfBadCommand).toHaveBeenCalled();
+			});
+			
+			it("create whitespace only", function () {
+				message.val = function () { return ":create  "; };
+				
+				spyOn(tracker, 'notifyOfBadCommand');
+				tracker.handleInput();
+				expect(tracker.notifyOfBadCommand).toHaveBeenCalled();
+			});
+			
+			it("assign no args", function () {
+				message.val = function () { return ":assign"; };
+				
+				spyOn(tracker, 'notifyOfBadCommand');
+				tracker.handleInput();
+				expect(tracker.notifyOfBadCommand).toHaveBeenCalled();
+			});
+			
+			it("assign bad id", function () {
+				message.val = function () { return ":assign this is not an id"; };
+				
+				spyOn(tracker, 'notifyOfBadCommand');
+				tracker.handleInput();
+				expect(tracker.notifyOfBadCommand).toHaveBeenCalled();
+			});
+			
+			it("critical no args", function () {
+				message.val = function () { return ":critical"; };
+				
+				spyOn(tracker, 'notifyOfBadCommand');
+				tracker.handleInput();
+				expect(tracker.notifyOfBadCommand).toHaveBeenCalled();
+			});
+			
+			it("critical bad id", function () {
+				message.val = function () { return ":critical this is not an id"; };
+				
+				spyOn(tracker, 'notifyOfBadCommand');
+				tracker.handleInput();
+				expect(tracker.notifyOfBadCommand).toHaveBeenCalled();
+			});
+			
+			it("edit no args", function () {
+				message.val = function () { return ":edit"; };
+				
+				spyOn(tracker, 'notifyOfBadCommand');
+				tracker.handleInput();
+				expect(tracker.notifyOfBadCommand).toHaveBeenCalled();
+			});
+			
+			it("edit bad id", function () {
+				message.val = function () { return ":edit not an id"; };
+				
+				spyOn(tracker, 'notifyOfBadCommand');
+				tracker.handleInput();
+				expect(tracker.notifyOfBadCommand).toHaveBeenCalled();
+			});
+			
+			it("close no args", function () {
+				message.val = function () { return ":close"; };
+				
+				spyOn(tracker, 'notifyOfBadCommand');
+				tracker.handleInput();
+				expect(tracker.notifyOfBadCommand).toHaveBeenCalled();
+			});
+			
+			it("close bad id", function () {
+				message.val = function () { return ":close this is not an id"; };
+				
+				spyOn(tracker, 'notifyOfBadCommand');
+				tracker.handleInput();
+				expect(tracker.notifyOfBadCommand).toHaveBeenCalled();
+			});
+			
+			it("reopen no args", function () {
+				message.val = function () { return ":reopen"; };
+				
+				spyOn(tracker, 'notifyOfBadCommand');
+				tracker.handleInput();
+				expect(tracker.notifyOfBadCommand).toHaveBeenCalled();
+			});
+			
+			it("reopen bad id", function () {
+				message.val = function () { return ":reopen this is not an id"; };
+				
+				spyOn(tracker, 'notifyOfBadCommand');
+				tracker.handleInput();
+				expect(tracker.notifyOfBadCommand).toHaveBeenCalled();
+			});
+		});
 	});
+	
 });

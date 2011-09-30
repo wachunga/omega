@@ -43,7 +43,7 @@ var OmegaIssueTracker = {};
 		'The least you could do is be grammatical.',
 		'That does not compute.',
 		'I can haz parser.',
-		'These are not the droids you\'re looking for'
+		'These are not the droids you\'re looking for.'
 	];
 	
 	OIT.Tracker = function ($messagesList, $nameInput, $messageInput, $form, socket) {
@@ -173,7 +173,15 @@ var OmegaIssueTracker = {};
 	};
 	
 	function isCommand(input) {
-		return _.include([':', '/'], input.charAt(0));
+		return _.include([':', '/'], input.trim().charAt(0));
+	}
+	
+	function requireArgument() {
+		_.each(arguments, function (arg) {
+			if (!arg) {
+				throw "Invalid argument.";	
+			}
+		});
 	}
 	
 	function getArgument(string, argToReturn) {
@@ -181,9 +189,10 @@ var OmegaIssueTracker = {};
 		return match ? match[argToReturn] : null;
 	}
 	
-	function notifyOfBadCommand() {
+	// @VisibleForTesting
+	OIT.Tracker.prototype.notifyOfBadCommand = function () {
 		window.alert(getRandomItem(BAD_COMMAND_RESPONSES) + ' Try /help.'); // TODO: style
-	}
+	};
 
 	OIT.Tracker.prototype.handleInput = function () {
 		if (!this.user()) {
@@ -201,10 +210,15 @@ var OmegaIssueTracker = {};
 			return;
 		}
 		
-		if (isCommand(input)) {
+		if (!isCommand(input)) {
+			this.send(input); // assume chat message
+			return;
+		}
+		
+		try {
 			var matches = input.match(/[:\/]([\S]+)(?:\s+(.*))?/); 
-			var cmd = matches[1];
-			var rest = matches[2];
+			var cmd = matches[1].trim();
+			var rest = matches[2].trim();
 			switch (cmd.toLowerCase()) {
 				case 'help':
 				case '?':
@@ -215,22 +229,30 @@ var OmegaIssueTracker = {};
 				case 'nouveau':
 				case 'new':
 				case 'open':
+					requireArgument(rest);
 					this.createIssue(rest);
 					break;
 				case 'close':
 				case 'resolve':
-					this.closeIssue(parseInt(rest, 10));
+					var id = parseInt(rest, 10);
+					requireArgument(id);
+					this.closeIssue(id);
 					break;
 				case 'reopen':
-					this.updateIssue(parseInt(rest, 10), { closed: false });
+					var id = parseInt(rest, 10);
+					requireArgument(id);
+					this.updateIssue(id, { closed: false });
 					break;
 				case 'unassign':
-					this.assignIssue(parseInt(rest, 10), 'nobody');
+					var id = parseInt(rest, 10);
+					requireArgument(id);
+					this.assignIssue(id, 'nobody');
 					break;
 				case 'assign':
 				case '@':
 					var id = parseInt(getArgument(rest, 1), 10);
 					var assignee = getArgument(rest, 2);
+					requireArgument(id);
 					this.assignIssue(id, assignee);
 					break;
 				case 'critical':
@@ -239,6 +261,7 @@ var OmegaIssueTracker = {};
 				case '*':
 				case 'star':
 					var id = parseInt(getArgument(rest, 1), 10);
+					requireArgument(id);
 					this.prioritizeIssue(id);
 					break;
 				case 'edit':
@@ -246,17 +269,18 @@ var OmegaIssueTracker = {};
 					// only allow editing the description
 					var id = parseInt(getArgument(rest, 1), 10);
 					var desc = getArgument(rest, 2);
+					requireArgument(id, desc);
 					this.updateIssue(id, { description: desc });
 					break;
 				case 'reset':
 					this.reset();
 					break;
 				default:
-					notifyOfBadCommand();
+					this.notifyOfBadCommand();
 					break;
 			}
-		} else {
-			this.send(input);
+		} catch (e) {
+			this.notifyOfBadCommand();
 		}
 	};
 

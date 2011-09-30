@@ -34,3 +34,8 @@ function addHtmlLinks(text) {
 		return htmlLink.join('');
 	});
 }
+
+function escapeHtml(text) {
+	text = ko.utils.unwrapObservable(text);
+	return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}

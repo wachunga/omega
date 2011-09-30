@@ -57,7 +57,7 @@
 	<li data-bind="fadeVisible: !($item.hideClosed() && closed()), css: { closed: closed }"><span class="issueId">{{= id}}</span>:
 		&nbsp;<span class="critical" data-bind="text: critical() ? '★ ' : ''"></span>
 		<span class="assignee" data-bind="text: assignee() != 'nobody' ? '(@' + assignee() + ')' : ''"></span>
-		&nbsp;<span class="description" data-bind="html: addHtmlLinks(description)"></span>
+		&nbsp;<span class="description" data-bind="html: addHtmlLinks(escapeHtml(description))"></span>
 		&nbsp;<span class="details subtle">(created by {{= creator}} <time datetime="{{= createdDate}}"></time>)</span>
 	</li>
 </script>

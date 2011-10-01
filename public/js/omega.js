@@ -71,6 +71,7 @@ var OmegaIssueTracker = {};
 		}, this);
 		
 		this.hideClosed = ko.observable(false);
+		this.hideAssigned = ko.observable(false);
 		this.helpOpen = ko.observable(false);
 		
 		this.initTimeago = function (elements) {

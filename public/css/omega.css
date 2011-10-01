@@ -82,6 +82,7 @@ body {
 #issuesContainer .hideIssues {
 	float: right;
 	line-height: 1.9em;
+	margin-left: 1em;
 }
 #issuesContainer .noneMessage {
     position: absolute;

@@ -41,9 +41,10 @@
 
 <div id="issuesContainer">
 	<label class="hideIssues"><input type="checkbox" data-bind="checked: hideClosed"/> hide closed</label>
+	<label class="hideIssues"><input type="checkbox" data-bind="checked: hideAssigned"/> hide assigned</label>
 	<h2>Issues <span data-bind="fadeVisible: issues().length >= 3" class="issueCounts subtle">(<var data-bind="text: openIssuesCount"></var> open, <var data-bind="text: issues().length - openIssuesCount()"></var> closed)</span></h2>
 	<p class="noneMessage subtle" data-bind="fadeVisible: !issues().length || (hideClosed() && openIssuesCount() == 0)">No open issues. w00t!</p>
-	<ul class="issuesList" data-bind="template: {name: 'issueItemTemplate', foreach: sortedIssues, templateOptions: { hideClosed: hideClosed }, afterRender: initTimeago }">
+	<ul class="issuesList" data-bind="template: {name: 'issueItemTemplate', foreach: sortedIssues, templateOptions: { hideClosed: hideClosed, hideAssigned: hideAssigned }, afterRender: initTimeago }">
 	</ul>
 </div>
 
@@ -54,7 +55,7 @@
 	<li data-bind="css: {system: !user}"><span class="speaker" data-bind="text: user ? user + ': ' : ''"></span><span data-bind="html: addHtmlLinks(msg)"></span></li>
 </script>
 <script type="text/x-jquery-tmpl" id="issueItemTemplate">
-	<li data-bind="fadeVisible: !($item.hideClosed() && closed()), css: { closed: closed }"><span class="issueId">{{= id}}</span>:
+	<li data-bind="fadeVisible: !($item.hideClosed() && closed()) && !($item.hideAssigned() && assignee() != 'nobody'), css: { closed: closed }"><span class="issueId">{{= id}}</span>:
 		&nbsp;<span class="critical" data-bind="text: critical() ? '★ ' : ''"></span>
 		<span class="assignee" data-bind="text: assignee() != 'nobody' ? '(@' + assignee() + ')' : ''"></span>
 		&nbsp;<span class="description" data-bind="html: addHtmlLinks(escapeHtml(description))"></span>

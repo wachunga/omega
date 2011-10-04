@@ -2,6 +2,14 @@ body {
 	margin: 3em;
 	font-family: 'Open Sans', sans-serif;
 }
+a {
+	text-decoration: none;
+	color: darkcyan;
+}
+a:hover {
+	background-color: darkcyan;
+	color: white;
+}
 .subtle {
     color: #666;
 }
@@ -95,6 +103,11 @@ body {
 #issuesContainer .issuesList {
 	list-style-type: none;
 	padding: 0;
+}
+#issuesContainer .issuesList .highlighted {
+	background-color: #dee;
+	-webkit-transition: background-color 1s;
+	-firefox-transition: background-color 1s;	
 }
 #issuesContainer .issuesList .details {
 	display: none;

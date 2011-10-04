@@ -31,7 +31,8 @@ var OmegaIssueTracker = {};
 	var USERNAME_KEY = 'OmegaIssueTracker.username';
 	var NAMES = [
 		'Captain Hammer', 'Release Llama', 'Chuck Norris',
-		'Snozzcumber', 'Hurley', 'Inigo Montoya', 'Leeroy Jenkins'
+		'Snozzcumber', 'Hurley', 'Inigo Montoya', 'Leeroy Jenkins',
+		'Richard Castle'
 	];
 	var FLAVOUR = [
 		'You, sir, are a genius.', 'Die issues, die!', '*golf clap*',
@@ -48,7 +49,7 @@ var OmegaIssueTracker = {};
 	
 	OIT.Tracker = function ($messagesList, $nameInput, $messageInput, $form, socket) {
 		var that = this;
-
+		
 		this.$messagesList = $messagesList;
 		this.$nameInput = $nameInput;
 		this.namePlaceholder = getRandomItem(NAMES);
@@ -73,17 +74,11 @@ var OmegaIssueTracker = {};
 		this.hideClosed = ko.observable(false);
 		this.hideAssigned = ko.observable(false);
 		this.helpOpen = ko.observable(false);
-		
-		this.initTimeago = function (elements) {
-			_.each(elements, function (element) {
-				var $time = $(element).find("time");
-				if ($time && $time.length) {
-					$time.timeago();
-				}
-			});
-		};
+		this.highlightedIssue = ko.observable();
 
 		ko.applyBindings(this);
+		
+		$(window).bind('hashchange', _.bind(this.showBookmarkedIssue, this));
 		
 		$form.submit(function (e) {
 			e.preventDefault();
@@ -106,6 +101,7 @@ var OmegaIssueTracker = {};
 			that.issues(_.map(issues, function (issue) {
 				return new OIT.Issue(issue.id, issue);
 			}));
+			that.showBookmarkedIssue();
 		});
 		
 		this.socket.on('usernames', function (users) {
@@ -155,6 +151,25 @@ var OmegaIssueTracker = {};
 		});
 	};
 
+	// doesn't highlight if filtering issues, but not a big deal; no filtering present on load
+	OIT.Tracker.prototype.showBookmarkedIssue = function () {
+		var bookmarked = parseInt(window.location.hash.substring(1), 10);
+		var found = _.detect(this.issues(), function (issue) { 
+			return issue.id === bookmarked;
+		});
+		if (!found) {
+			return;
+		}
+		
+		this.highlightedIssue(found.id);
+		
+		var $target = $(window.location.hash);
+		if ($target.length) {
+			var pos = $target.offset();
+			window.scrollTo(pos.left, pos.top);
+		}
+	};
+	
 	OIT.Tracker.prototype.findIssue = function (id) {
 		return _.find(this.issues(), function (issue) {
 			return issue.id === id;
@@ -356,6 +371,15 @@ var OmegaIssueTracker = {};
 				issue[key](value);
 			} else {
 				issue[key] = value;
+			}
+		});
+	};
+	
+	OIT.Tracker.prototype.applyTimeago = function (elements) {
+		_.each(elements, function (element) {
+			var $time = $(element).find("time");
+			if ($time && $time.length) {
+				$time.timeago();
 			}
 		});
 	};

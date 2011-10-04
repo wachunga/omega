@@ -1,5 +1,5 @@
 body {
-	margin: 3em;
+	margin: 3em 3em 1em;
 	font-family: 'Open Sans', sans-serif;
 }
 a {
@@ -134,4 +134,10 @@ input::-webkit-input-placeholder {
 }
 input:-moz-placeholder {
     color: #333;
+}
+.footer {
+	font-size: small;
+	text-align: center;
+	margin-top: 4em;
+	color: #666;
 }

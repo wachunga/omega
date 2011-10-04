@@ -47,6 +47,7 @@
 	<ul class="issuesList" data-bind="template: {name: 'issueItemTemplate', foreach: sortedIssues, templateOptions: { user: user, hideClosed: hideClosed, hideAssigned: hideAssigned, highlightedIssue: highlightedIssue }, afterRender: applyTimeago }">
 	</ul>
 </div>
+<div class="footer">Powered by node.js. <a href="https://github.com/Wachunga/Omega-Issue-Tracker">Hosted</a> on GitHub.</div>
 
 <script type="text/x-jquery-tmpl" id="onlineUsersTemplate">
 	<span class="onlineUser">{{if count > 1}}{{= name }} <span class="subtle">({{= count}})</span>{{else}}{{= name}}{{/if}}</span>

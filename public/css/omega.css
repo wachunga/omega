@@ -104,6 +104,11 @@ a:hover {
 	list-style-type: none;
 	padding: 0;
 }
+#issuesContainer .issuesList .myself {
+	color: #fff;
+	background-color: #666;
+	padding: 0 0.3em;
+}
 #issuesContainer .issuesList .highlighted {
 	background-color: #dee;
 	-webkit-transition: background-color 1s;

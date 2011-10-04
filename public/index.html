@@ -44,7 +44,7 @@
 	<label class="hideIssues"><input type="checkbox" data-bind="checked: hideAssigned"/> hide assigned</label>
 	<h2>Issues <span data-bind="fadeVisible: issues().length >= 3" class="issueCounts subtle">(<var data-bind="text: openIssuesCount"></var> open, <var data-bind="text: issues().length - openIssuesCount()"></var> closed)</span></h2>
 	<p class="noneMessage subtle" data-bind="fadeVisible: !issues().length || (hideClosed() && openIssuesCount() == 0)">No open issues. w00t!</p>
-	<ul class="issuesList" data-bind="template: {name: 'issueItemTemplate', foreach: sortedIssues, templateOptions: { hideClosed: hideClosed, hideAssigned: hideAssigned, highlightedIssue: highlightedIssue }, afterRender: applyTimeago }">
+	<ul class="issuesList" data-bind="template: {name: 'issueItemTemplate', foreach: sortedIssues, templateOptions: { user: user, hideClosed: hideClosed, hideAssigned: hideAssigned, highlightedIssue: highlightedIssue }, afterRender: applyTimeago }">
 	</ul>
 </div>
 
@@ -56,7 +56,7 @@
 </script>
 <script type="text/x-jquery-tmpl" id="issueItemTemplate">
 	<li id="{{= id}}" data-bind="fadeVisible: !($item.hideClosed() && closed()) && !($item.hideAssigned() && assignee() != 'nobody'), css: { closed: closed, highlighted: id === $item.highlightedIssue() }"><a href="#{{= id}}" title="Permalink" class="issueId">{{= id}}</a>:&nbsp;<span class="critical" data-bind="text: critical() ? '★ ' : ''"></span>
-		<span class="assignee" data-bind="text: assignee() != 'nobody' ? '(@' + assignee() + ')' : ''"></span>
+		<span class="assignee" data-bind="css: { myself: assignee() === $item.user() }, text: assignee() != 'nobody' ? '(@' + assignee() + ')' : ''"></span>
 		&nbsp;<span class="description" data-bind="html: addHtmlLinks(escapeHtml(description))"></span>
 		&nbsp;<span class="details subtle">(created by {{= creator}} <time datetime="{{= createdDate}}"></time>)</span>
 	</li>

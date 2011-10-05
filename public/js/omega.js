@@ -55,7 +55,8 @@ var OmegaIssueTracker = {};
 		this.namePlaceholder = getRandomItem(NAMES);
 		this.$messageInput = $messageInput;
 		this.socket = socket;
-		
+
+		this.disconnected = ko.observable();
 		this.loggedIn = ko.observable(false);
 		this.user = ko.observable(window.localStorage[USERNAME_KEY]);
 		this.messages = ko.observableArray();
@@ -86,15 +87,14 @@ var OmegaIssueTracker = {};
 		});
 		
 		this.socket.on('connect', function () {
+			that.disconnected(false);
 			if (that.user()) {
 				that.login();
 			}
 		});
-		
+
 		this.socket.on('disconnect', function () {
-			// NOTE-DH: reconnect bug with socket.io: https://github.com/LearnBoost/socket.io/issues/388
-			// manually reconnect as workaround
-			that.socket.socket.reconnect();
+			that.disconnected(true);
 		});
 		
 		this.socket.on('issues', function (issues) {

@@ -3,15 +3,23 @@ body {
 	font-family: 'Open Sans', sans-serif;
 }
 a {
-	text-decoration: none;
-	color: darkcyan;
+	text-decoration: underline;
+	color: #7A6A53;
 }
 a:hover {
-	background-color: darkcyan;
+	background-color: #7A6A53;
+	text-decoration: none;
 	color: white;
 }
 .subtle {
     color: #666;
+}
+.loud {
+	color: #899FA4;
+}
+.warningMessage {
+	margin: 0;
+	font-size: 1em;
 }
 #header {
 	position: relative;	
@@ -87,6 +95,9 @@ a:hover {
 #issuesContainer var {
 	font-style: normal;
 }
+#issuesContainer a {
+	text-decoration: none;
+}
 #issuesContainer .hideIssues {
 	float: right;
 	line-height: 1.9em;
@@ -110,7 +121,7 @@ a:hover {
 	padding: 0 0.3em;
 }
 #issuesContainer .issuesList .highlighted {
-	background-color: #dee;
+	background-color: #E2E9E5;
 	-webkit-transition: background-color 1s;
 	-firefox-transition: background-color 1s;	
 }
@@ -125,9 +136,6 @@ a:hover {
 #issuesContainer .closed .assignee {
 	text-decoration: line-through;
 }
-#issuesContainer .critical {
-	color: Chocolate;
-}
 /* darken placeholder text */
 input::-webkit-input-placeholder {
     color: #333;
@@ -139,5 +147,4 @@ input:-moz-placeholder {
 	font-size: small;
 	text-align: center;
 	margin-top: 4em;
-	color: #666;
 }

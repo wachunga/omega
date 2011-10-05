@@ -23,7 +23,8 @@
 <div id="onlineUsers">
 	online: <span data-bind="template: { name: 'onlineUsersTemplate', foreach: onlineUsers }"></span><span data-bind="visible: !onlineUsers().length" class="subtle">nobody</span>
 </div>
-<form id="form" autocomplete="off">
+<h3 class="warningMessage loud" data-bind="visible: disconnected()">Warning: disconnected from server. Attempting to reconnect...</h3>
+<form id="form" autocomplete="off" data-bind="visible: !disconnected()">
 	<label data-bind="visible: !user()">You're not signed in. Who are you? <input id="nameInput" type="text" data-bind="attr: { placeholder: namePlaceholder }" /></label>
 	<input id="messageInput" type="text" data-bind="visible: user()" tabindex="1" placeholder="Type commands (like '/help') or just chat it up"/>
 	<input type="submit" />
@@ -47,7 +48,7 @@
 	<ul class="issuesList" data-bind="template: {name: 'issueItemTemplate', foreach: sortedIssues, templateOptions: { user: user, hideClosed: hideClosed, hideAssigned: hideAssigned, highlightedIssue: highlightedIssue }, afterRender: applyTimeago }">
 	</ul>
 </div>
-<div class="footer">Powered by node.js. <a href="https://github.com/Wachunga/Omega-Issue-Tracker">Hosted</a> on GitHub.</div>
+<div class="footer subtle">Powered by node.js. <a href="https://github.com/Wachunga/Omega-Issue-Tracker">Hosted</a> on GitHub.</div>
 
 <script type="text/x-jquery-tmpl" id="onlineUsersTemplate">
 	<span class="onlineUser">{{if count > 1}}{{= name }} <span class="subtle">({{= count}})</span>{{else}}{{= name}}{{/if}}</span>
@@ -56,7 +57,7 @@
 	<li data-bind="css: {system: !user}"><span class="speaker" data-bind="text: user ? user + ': ' : ''"></span><span data-bind="html: addHtmlLinks(msg)"></span></li>
 </script>
 <script type="text/x-jquery-tmpl" id="issueItemTemplate">
-	<li id="{{= id}}" data-bind="fadeVisible: !($item.hideClosed() && closed()) && !($item.hideAssigned() && assignee() != 'nobody'), css: { closed: closed, highlighted: id === $item.highlightedIssue() }"><a href="#{{= id}}" title="Permalink" class="issueId">{{= id}}</a>:&nbsp;<span class="critical" data-bind="text: critical() ? '★ ' : ''"></span>
+	<li id="{{= id}}" data-bind="fadeVisible: !($item.hideClosed() && closed()) && !($item.hideAssigned() && assignee() != 'nobody'), css: { closed: closed, highlighted: id === $item.highlightedIssue() }"><a href="#{{= id}}" title="Permalink" class="issueId">{{= id}}</a>:&nbsp;<span class="loud" data-bind="text: critical() ? '★ ' : ''"></span>
 		<span class="assignee" data-bind="css: { myself: assignee() === $item.user() }, text: assignee() != 'nobody' ? '(@' + assignee() + ')' : ''"></span>
 		&nbsp;<span class="description" data-bind="html: addHtmlLinks(escapeHtml(description))"></span>
 		&nbsp;<span class="details subtle">(created by {{= creator}} <time datetime="{{= createdDate}}"></time>)</span>
@@ -64,7 +65,7 @@
 </script>
 
 <script type="text/javascript">
-var socket = io.connect(null, { reconnect: false });
+var socket = io.connect();
 
 var tracker; // for debugging
 $(function () {

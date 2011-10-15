@@ -4,7 +4,7 @@ var http = require('http'),
 	static = require('node-static'),
 	issueDb = require('./lib/issueDb');
 
-var PORT = process.argv[2] || 1337;
+var PORT = process.argv[2] || process.env['app_port'] || 1337;
 
 var fileServer = new static.Server('./public');
 var server = http.createServer(function (request, response) {

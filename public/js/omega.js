@@ -72,7 +72,7 @@ var OmegaIssueTracker = {};
 			}).length;
 		}, this);
 		
-		this.hideClosed = ko.observable(false);
+		this.hideClosed = ko.observable(true);
 		this.hideAssigned = ko.observable(false);
 		this.helpOpen = ko.observable(false);
 		this.highlightedIssue = ko.observable();

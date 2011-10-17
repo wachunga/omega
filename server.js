@@ -6,7 +6,7 @@ var http = require('http'),
 
 var PORT = process.argv[2] || process.env['app_port'] || 1337;
 
-var fileServer = new static.Server('./public');
+var fileServer = new static.Server(__dirname + '/public');
 var server = http.createServer(function (request, response) {
     request.addListener('end', function () {
         fileServer.serve(request, response);

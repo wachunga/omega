@@ -46,7 +46,7 @@ var OmegaIssueTracker = {};
 		'I can haz parser.',
 		'These are not the droids you\'re looking for.'
 	];
-	
+
 	OIT.Tracker = function ($messagesList, $nameInput, $messageInput, $form, socket) {
 		var that = this;
 		
@@ -58,6 +58,7 @@ var OmegaIssueTracker = {};
 
 		this.disconnected = ko.observable();
 		this.loggedIn = ko.observable(false);
+		this.invalidName = ko.observable(false);
 		this.user = ko.observable(window.localStorage[USERNAME_KEY]);
 		this.messages = ko.observableArray();
 		this.onlineUsers = ko.observableArray();
@@ -89,7 +90,7 @@ var OmegaIssueTracker = {};
 		this.socket.on('connect', function () {
 			that.disconnected(false);
 			if (that.user()) {
-				that.login();
+				that.login(that.user());
 			}
 		});
 
@@ -151,7 +152,7 @@ var OmegaIssueTracker = {};
 		});
 	};
 
-	// doesn't highlight if filtering issues, but not a big deal; no filtering present on load
+	// doesn't highlight if filtering issues, but not a big deal
 	OIT.Tracker.prototype.showBookmarkedIssue = function () {
 		var bookmarked = parseInt(window.location.hash.substring(1), 10);
 		var found = _.detect(this.issues(), function (issue) { 
@@ -183,17 +184,17 @@ var OmegaIssueTracker = {};
 		this.socket.emit('logout');
 	};
 	
-	OIT.Tracker.prototype.login = function () {
+	OIT.Tracker.prototype.login = function (name) {
 		var that = this;
 		this.loggedIn(false);
-		this.socket.emit('login user', this.user(), function (alreadyTaken) {
-			if (alreadyTaken) {
-				that.user(that.user() + Math.round(Math.random() * -1e9));
-				that.login();
-			} else {
-				window.localStorage[USERNAME_KEY] = that.user();
+		this.socket.emit('login user', name, function (invalidName) {
+			if (!invalidName) {
+				window.localStorage[USERNAME_KEY] = name;
+				that.$nameInput.val('');
+				that.user(name);
 			}
-			that.loggedIn(!alreadyTaken);
+			that.loggedIn(!invalidName);
+			that.invalidName(invalidName);
 		});
 	};
 	
@@ -310,14 +311,14 @@ var OmegaIssueTracker = {};
 	};
 
 	OIT.Tracker.prototype.handleNameInput = function () {
+		this.invalidName(false);
 		var name = this.$nameInput.val();
-		if (!name || name.length < 1) { // TODO: disallow other chars?
+		if (!name || name.trim().length < 3) { // TODO: disallow other chars?
+			this.invalidName(true);
 			return;
 		}
 
-		this.user(name);
-		this.$nameInput.val('');
-		this.login();
+		this.login(name);
 	};
 	
 	OIT.Tracker.prototype.createIssue = function (desc) {

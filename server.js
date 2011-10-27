@@ -20,6 +20,7 @@ var usernames = {};
 var issues = issueDb.load();
 var UNASSIGNED = "nobody";
 var CURRENT_USER = "me";
+var RESERVED_USERNAMES = [UNASSIGNED, CURRENT_USER];
 
 var io = sio.listen(server);
 io.configure(function () {
@@ -33,6 +34,10 @@ io.sockets.on('connection', function(socket) {
 	socket.emit('usernames', usernames);
 
 	socket.on('login user', function(name, callback) {
+		if (_.include(RESERVED_USERNAMES, name.toLowerCase())) {
+			callback(true);
+			return;
+		}
 		callback(false);
 		socket.nickname = name;
 		// keep track of duplicate usernames

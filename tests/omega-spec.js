@@ -15,8 +15,51 @@ describe("omega", function () {
 	
 	beforeEach(function () {
 		tracker = new OmegaIssueTracker.Tracker(messages, name, message, form, socket);
-		tracker.user("elbow");
+		tracker.user("norris");
 		tracker.loggedIn(true);
+	});
+
+	describe("handles login", function () {
+		it("accepts valid names", function () {
+			name.val = function () { return "norris"; };
+			tracker.user(undefined);
+
+			spyOn(socket, 'emit');
+			tracker.handleInput();
+			expect(socket.emit).toHaveBeenCalled();
+			expect(socket.emit.mostRecentCall.args[0]).toBe('login user');
+			expect(socket.emit.mostRecentCall.args[1]).toBe('norris');
+		});
+		it("rejects empty name", function () {
+			name.val = function () { return ""; };
+			tracker.user(undefined);
+
+			spyOn(socket, 'emit');
+			tracker.handleInput();
+			expect(socket.emit).wasNotCalled();
+			expect(tracker.invalidName()).toBe(true);
+		});
+		it("rejects short names", function () {
+			name.val = function () { return "yo"; };
+			tracker.user(undefined);
+
+			spyOn(socket, 'emit');
+			tracker.handleInput();
+			expect(socket.emit).wasNotCalled();
+			expect(tracker.invalidName()).toBe(true);
+		});
+		it("rejects reserved names", function () {
+			name.val = function () { return "nobody"; };
+			tracker.user(undefined);
+
+			spyOn(socket, 'emit');
+			tracker.handleInput();
+			expect(socket.emit).toHaveBeenCalled();
+			var callback = socket.emit.mostRecentCall.args[2];
+			expect(tracker.invalidName()).toBe(false);
+			callback(true); // server says invalid
+			expect(tracker.invalidName()).toBe(true);
+		});
 	});
 	
 	describe("displays html links", function () {

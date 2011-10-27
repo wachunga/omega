@@ -26,6 +26,7 @@
 <h3 class="warningMessage loud" data-bind="visible: disconnected()">Warning: disconnected from server. Attempting to reconnect...</h3>
 <form id="form" autocomplete="off" data-bind="visible: !disconnected()">
 	<label data-bind="visible: !user()">You're not signed in. Who are you? <input id="nameInput" type="text" data-bind="attr: { placeholder: namePlaceholder }" /></label>
+	<span class="invalidName loud" data-bind="fadeVisible: !user() && invalidName()">I don't think so. Try again.</span>
 	<input id="messageInput" type="text" data-bind="visible: user()" tabindex="1" placeholder="Type commands (like '/help') or just chat it up"/>
 	<input type="submit" />
 </form>
@@ -58,7 +59,7 @@
 </script>
 <script type="text/x-jquery-tmpl" id="issueItemTemplate">
 	<li id="{{= id}}" data-bind="fadeVisible: !($item.hideClosed() && closed()) && !($item.hideAssigned() && assignee() != 'nobody'), css: { closed: closed, highlighted: id === $item.highlightedIssue() }"><a href="#{{= id}}" title="Permalink" class="issueId">{{= id}}</a>:&nbsp;<span class="loud" data-bind="text: critical() ? '★ ' : ''"></span>
-		<span class="assignee" data-bind="css: { myself: assignee() === $item.user() }, text: assignee() != 'nobody' ? '(@' + assignee() + ')' : ''"></span>
+		<span class="assignee" data-bind="css: { myself: $item.user() && assignee().toLowerCase() === $item.user().toLowerCase() }, text: assignee().toLowerCase() !== 'nobody' ? '(@' + assignee() + ')' : ''"></span>
 		&nbsp;<span class="description" data-bind="html: addHtmlLinks(escapeHtml(description))"></span>
 		&nbsp;<span class="details subtle">(created by {{= creator}} <time datetime="{{= createdDate}}"></time>)</span>
 	</li>

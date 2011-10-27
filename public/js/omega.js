@@ -49,7 +49,7 @@ var OmegaIssueTracker = {};
 
 	OIT.Tracker = function ($messagesList, $nameInput, $messageInput, $form, socket) {
 		var that = this;
-		
+
 		this.$messagesList = $messagesList;
 		this.$nameInput = $nameInput;
 		this.namePlaceholder = getRandomItem(NAMES);
@@ -84,6 +84,7 @@ var OmegaIssueTracker = {};
 		
 		$form.submit(function (e) {
 			e.preventDefault();
+			requestNotificationPermission(); // FIXME: has to be on user input, but this is horrible... make a checkbox or something
 			that.handleInput();
 		});
 		
@@ -112,6 +113,7 @@ var OmegaIssueTracker = {};
 		});
 		
 		this.socket.on('user message', function (user, msg) {
+			that.notify(user, user + ' says...', msg);
 			that.handleMessage(msg, user);
 		});
 		
@@ -120,6 +122,7 @@ var OmegaIssueTracker = {};
 		});
 		
 		this.socket.on('issue created', function (issue) {
+			that.notify(issue.creator, 'New issue', issue.description);
 			that.handleMessage(issue.creator + ' created ' + issue.id + '.');
 			that.issues.push(new OIT.Issue(issue.id, issue));
 		});	
@@ -131,6 +134,7 @@ var OmegaIssueTracker = {};
 		this.socket.on('issue closed', function (closer, id) {
 			that.handleMessage(addFlavour(closer + ' closed ' + id + '.'));
 			var issue = that.findIssue(id);
+			that.notify(closer, 'Issue closed', issue.description());
 			issue.closed(true);
 		});	
 		
@@ -351,8 +355,31 @@ var OmegaIssueTracker = {};
 			}
 		}
 	};
-	
+
+	var NOTIFICATION_ALLOWED = 0; // unintuitive, but correct
+	var NOTIFICATION_DURATION = 4000;
+
+	OIT.Tracker.prototype.notify = function (user, title, message) {
+		if (!window.webkitNotifications || window.webkitNotifications.checkPermission() !== NOTIFICATION_ALLOWED) {
+			return;
+		}
+		if (user === this.user()) {
+			return; // don't notify myself
+		}
+
+		var popup = window.webkitNotifications.createNotification("favicon.ico", title, message);
+		popup.show();
+		setInterval(function () { popup.cancel(); }, NOTIFICATION_DURATION);
+	};
+
+	function requestNotificationPermission() {
+		if (window.webkitNotifications && window.webkitNotifications.checkPermission() !== NOTIFICATION_ALLOWED) {
+			window.webkitNotifications.requestPermission();
+		}
+	}
+
 	OIT.Tracker.prototype.send = function (message) {
+
 		this.socket.emit('user message', message);
 	};
 	

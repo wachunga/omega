@@ -2,7 +2,8 @@ var http = require('http'),
 	sio = require('socket.io'),
 	_ = require('underscore'),
 	static = require('node-static'),
-	issueDb = require('./lib/issueDb');
+	issueDb = require('./lib/issueDb'),
+	exec = require('child_process').exec;
 
 var PORT = process.argv[2] || process.env['app_port'] || 1337;
 
@@ -32,6 +33,7 @@ io.sockets.on('connection', function(socket) {
 	applyIssueDefaults();
 	socket.emit('issues', issues);
 	socket.emit('usernames', usernames);
+	exec("git rev-parse HEAD", emitVersionNumber);
 
 	socket.on('login user', function(name, callback) {
 		if (_.include(RESERVED_USERNAMES, name.toLowerCase())) {
@@ -123,6 +125,11 @@ io.sockets.on('connection', function(socket) {
 		_.each(issues, function (issue) {
 			_.defaults(issue, {critical: false});
 		});
+	}
+	
+	function emitVersionNumber(error, stdout) {
+		console.log("version: " + stdout);
+		socket.emit('version', stdout);
 	}
 
 	socket.on('disconnect', removeCurrentUser);

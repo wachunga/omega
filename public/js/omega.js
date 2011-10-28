@@ -59,6 +59,10 @@ var OmegaIssueTracker = {};
 		this.disconnected = ko.observable();
 		this.loggedIn = ko.observable(false);
 		this.invalidName = ko.observable(false);
+		this.version = ko.observable();
+		this.shortVersion = ko.dependentObservable(function () {
+			return this.version() && this.version().substr(0,7);			
+		}, this);
 		this.user = ko.observable(window.localStorage[USERNAME_KEY]);
 		this.messages = ko.observableArray();
 		this.onlineUsers = ko.observableArray();
@@ -153,6 +157,10 @@ var OmegaIssueTracker = {};
 			var maybeNot = props.critical ? '' : ' not';
 			that.handleMessage(updater + ' marked ' + id + ' as' + maybeNot + ' critical.');
 			that.refreshIssue(id, props);
+		});
+		
+		this.socket.on('version', function (version) {
+			that.version(version);
 		});
 	};
 

@@ -59,6 +59,7 @@ var OmegaIssueTracker = {};
 		this.disconnected = ko.observable();
 		this.loggedIn = ko.observable(false);
 		this.invalidName = ko.observable(false);
+		this.webNotifyEnabled = ko.observable(checkWebNotificationEnabled());
 		this.version = ko.observable();
 		this.shortVersion = ko.dependentObservable(function () {
 			return this.version() && this.version().substr(0,7);			
@@ -88,7 +89,6 @@ var OmegaIssueTracker = {};
 		
 		$form.submit(function (e) {
 			e.preventDefault();
-			requestNotificationPermission(); // FIXME: has to be on user input, but this is horrible... make a checkbox or something
 			that.handleInput();
 		});
 		
@@ -368,11 +368,8 @@ var OmegaIssueTracker = {};
 	var NOTIFICATION_DURATION = 4000;
 
 	OIT.Tracker.prototype.notify = function (user, title, message) {
-		if (!window.webkitNotifications || window.webkitNotifications.checkPermission() !== NOTIFICATION_ALLOWED) {
+		if (!window.webkitNotifications || !this.webNotifyEnabled() || user === this.user()) {
 			return;
-		}
-		if (user === this.user()) {
-			return; // don't notify myself
 		}
 
 		var popup = window.webkitNotifications.createNotification("favicon.ico", title, message);
@@ -380,14 +377,31 @@ var OmegaIssueTracker = {};
 		setInterval(function () { popup.cancel(); }, NOTIFICATION_DURATION);
 	};
 
-	function requestNotificationPermission() {
-		if (window.webkitNotifications && window.webkitNotifications.checkPermission() !== NOTIFICATION_ALLOWED) {
-			window.webkitNotifications.requestPermission();
+	OIT.Tracker.prototype.requestNotificationPermission = function () {
+		if (!window.webkitNotifications) {
+			alert('Your browser doesn\'t support web notifications. Try Chrome or something.');
 		}
+		if (this.webNotifyEnabled()) {
+			this.webNotifyEnabled(false); // TODO: save this setting
+			return;
+		}
+		
+		// otherwise, ask user to grant permission
+		if (window.webkitNotifications.checkPermission() === NOTIFICATION_ALLOWED) {
+			this.webNotifyEnabled(checkWebNotificationEnabled());
+		} else {
+			var that = this;
+			window.webkitNotifications.requestPermission(function () {
+				that.webNotifyEnabled(checkWebNotificationEnabled());
+			});
+		}
+	};
+	
+	function checkWebNotificationEnabled() {
+		return window.webkitNotifications && window.webkitNotifications.checkPermission() === NOTIFICATION_ALLOWED;
 	}
 
 	OIT.Tracker.prototype.send = function (message) {
-
 		this.socket.emit('user message', message);
 	};
 	

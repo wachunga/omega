@@ -21,6 +21,13 @@ a:hover {
 	margin: 0;
 	font-size: 1em;
 }
+.notificationToggle {
+	cursor: pointer;
+	color: #7A6A53;
+}
+.notificationToggle:hover {
+	color: #999;
+}
 #header {
 	position: relative;	
 }

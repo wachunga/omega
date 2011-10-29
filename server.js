@@ -33,7 +33,8 @@ io.sockets.on('connection', function(socket) {
 	applyIssueDefaults();
 	socket.emit('issues', issues);
 	socket.emit('usernames', usernames);
-	exec("git rev-parse HEAD", {cwd: __dirname}, emitVersionNumber);
+	console.log(__dirname, process.cwd());
+	exec("cd " + __dirname + ";git rev-parse HEAD", emitVersionNumber);
 
 	socket.on('login user', function(name, callback) {
 		if (_.include(RESERVED_USERNAMES, name.toLowerCase())) {

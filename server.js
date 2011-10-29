@@ -33,7 +33,7 @@ io.sockets.on('connection', function(socket) {
 	applyIssueDefaults();
 	socket.emit('issues', issues);
 	socket.emit('usernames', usernames);
-	exec("git rev-parse HEAD", emitVersionNumber);
+	exec("git rev-parse HEAD", {cwd: __dirname}, emitVersionNumber);
 
 	socket.on('login user', function(name, callback) {
 		if (_.include(RESERVED_USERNAMES, name.toLowerCase())) {
@@ -128,8 +128,9 @@ io.sockets.on('connection', function(socket) {
 	}
 	
 	function emitVersionNumber(error, stdout, stderr) {
-		if (error) {
-			console.log(error, stderr);
+		if (error !== null) {
+			console.log(error);
+			return;
 		}
 		console.log("version: " + stdout);
 		socket.emit('version', stdout);

@@ -127,7 +127,10 @@ io.sockets.on('connection', function(socket) {
 		});
 	}
 	
-	function emitVersionNumber(error, stdout) {
+	function emitVersionNumber(error, stdout, stderr) {
+		if (error) {
+			console.log(error, stderr);
+		}
 		console.log("version: " + stdout);
 		socket.emit('version', stdout);
 	}

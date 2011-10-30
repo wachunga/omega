@@ -41,6 +41,7 @@ Start the server:
     node server.js [<port>] [<file>]
 
 `<port>` - Where the server listens for connections. Defaults to 1337.
+
 `<file>` - Where issues are persisted as json. Defaults to "issues".
 
 Then just open a browser to http://localhost:1337 or wherever.

@@ -9,9 +9,9 @@ Features
 ---
 
 * real-time
-    * issues created and closed right before your eyes; you **never need to refresh**
+    * you **never need to refresh** to get updates 
     * **chat** with team members in the same context
-    * optional growl-like **notifications** even outside the browser (Chrome only until browser support improves)
+    * optional growl-like **notifications** even outside the browser (only supported in Chrome for now)
 
 * minimalist
     * single page
@@ -19,6 +19,7 @@ Features
     * priority: critical or not
     * if you need metadata, like component or severity, just include it in the description
 
+To avoid bloat, new features are added reluctantly. One thing that is likely to be added is support for multiple projects. 
 
 Installation
 ---
@@ -37,16 +38,17 @@ Usage
 
 Start the server:
 
-    node server.js [port] [file]
+    node server.js [<port>] [<file>]
 
-(`port` defaults to `1337`; `file`, which determines where issues are persisted, defaults to `issues`)
+`<port>` - Where the server listens for connections. Defaults to 1337.
+`<file>` - Where issues are persisted as json. Defaults to "issues".
 
 Then just open a browser to http://localhost:1337 or wherever.
 
 Testing
 ---
 
-Omega is unit tested using [Jasmine](https://github.com/pivotal/jasmine). Open `tests/SpecRunner.html` to run the tests.
+Ω is unit tested using [Jasmine](https://github.com/pivotal/jasmine). Open `tests/SpecRunner.html` to run the tests.
 
 History
 ---

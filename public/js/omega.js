@@ -116,47 +116,51 @@ var OmegaIssueTracker = {};
 			}));
 		});
 		
-		this.socket.on('user message', function (user, msg) {
-			that.notify(user, user + ' says...', msg);
-			that.handleMessage(msg, user);
+		this.socket.on('history', function (events) {
+			//console.log(events);
+			_.each(events, function (event) {
+				that.appendMessage(event);
+			});
 		});
 		
-		this.socket.on('announcement', function (msg) {
-			that.handleMessage(msg);
+		this.socket.on('user message', function (event) {
+			that.appendMessage(event);
+			that.notify(event.speaker, event);
 		});
 		
-		this.socket.on('issue created', function (issue) {
-			that.notify(issue.creator, 'New issue', issue.description);
-			that.handleMessage(issue.creator + ' created ' + issue.id + '.');
-			that.issues.push(new OIT.Issue(issue.id, issue));
+		this.socket.on('issue created', function (event) {
+			that.appendMessage(event);
+			that.notify(event.issue.creator, event);
+			
+			that.issues.push(new OIT.Issue(event.issue.id, event.issue));
 		});	
 		
 		function addFlavour(text) {
 			return text + ' ' + getRandomItem(FLAVOUR);
 		}
 		
-		this.socket.on('issue closed', function (closer, id) {
-			that.handleMessage(addFlavour(closer + ' closed ' + id + '.'));
-			var issue = that.findIssue(id);
-			that.notify(closer, 'Issue closed', issue.description());
+		this.socket.on('issue closed', function (closer, event) {
+			that.appendMessage(event);
+			that.notify(closer, event);
+			
+			var issue = that.findIssue(event.issue.id);
 			issue.closed(true);
 		});	
 		
-		this.socket.on('issue assigned', function (assigner, id, assignee) {
-			that.handleMessage(assigner + ' assigned ' + id + ' to ' + assignee + '.');
-			var issue = that.findIssue(id);
-			issue.assignee(assignee);
+		this.socket.on('issue assigned', function (event) {
+			that.appendMessage(event);
+			var issue = that.findIssue(event.issue.id);
+			issue.assignee(event.issue.assignee);
 		});
 		
-		this.socket.on('issue updated', function (updater, id, props) {
-			that.handleMessage(updater + ' updated ' + id + '.');
-			that.refreshIssue(id, props);
+		this.socket.on('issue updated', function (props, event) {
+			that.appendMessage(event);
+			that.refreshIssue(event.issue.id, props);
 		});
 
-		this.socket.on('issue prioritized', function (updater, id, props) {
-			var maybeNot = props.critical ? '' : ' not';
-			that.handleMessage(updater + ' marked ' + id + ' as' + maybeNot + ' critical.');
-			that.refreshIssue(id, props);
+		this.socket.on('issue prioritized', function (props, event) {
+			that.appendMessage(event);
+			that.refreshIssue(event.issue.id, props);
 		});
 		
 		this.socket.on('version', function (version) {
@@ -367,12 +371,12 @@ var OmegaIssueTracker = {};
 	var NOTIFICATION_ALLOWED = 0; // unintuitive, but correct
 	var NOTIFICATION_DURATION = 4000;
 
-	OIT.Tracker.prototype.notify = function (user, title, message) {
-		if (!window.webkitNotifications || !this.webNotifyEnabled() || user === this.user()) {
+	OIT.Tracker.prototype.notify = function (user, event) {
+		if (!window.webkitNotifications || !this.webNotifyEnabled() || user === this.user() || !event.notification) {
 			return;
 		}
 
-		var popup = window.webkitNotifications.createNotification("favicon.ico", title, message);
+		var popup = window.webkitNotifications.createNotification("favicon.ico", event.notification.title, event.notification.body);
 		popup.show();
 		setInterval(function () { popup.cancel(); }, NOTIFICATION_DURATION);
 	};
@@ -408,9 +412,9 @@ var OmegaIssueTracker = {};
 	function scrollToBottom(el) {
 		el.scrollTop = el.scrollHeight;
 	}
-
-	OIT.Tracker.prototype.handleMessage = function (msg, user) {
-		this.messages.push({user: user, msg: msg});
+	
+	OIT.Tracker.prototype.appendMessage = function (event) {
+		this.messages.push({msg: event.message, speaker: event.speaker});
 		scrollToBottom(this.$messagesList.get(0));
 	};
 

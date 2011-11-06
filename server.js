@@ -17,11 +17,62 @@ server.listen(PORT);
 
 console.log('Server running at http://127.0.0.1:' + PORT);
 
-var usernames = {};
-var issues = issueDb.load();
 var UNASSIGNED = "nobody";
 var CURRENT_USER = "me";
+var HISTORY_ITEMS_TO_SHOW = 10;
+var MAX_HISTORY_ITEMS = 100;
 var RESERVED_USERNAMES = [UNASSIGNED, CURRENT_USER];
+
+var usernames = {};
+var issues = issueDb.load();
+var history = [];
+
+
+//TODO: extract this stuff
+var EventType = {
+	UserMessage: "userMessage",
+	NewIssue: "newIssue",
+	AssignIssue: "assignIssue",
+	UpdateIssue: "updateIssue",
+	CloseIssue: "closeIssue",
+	PrioritizeIssue: "prioritizeIssue"
+};
+
+function Event(type, details) {
+	this.type = type;
+	this.issue = details.issue; // undefined for some types
+	this.init(details);
+}
+
+Event.prototype.init = function (details) {
+	switch (this.type) {
+		case EventType.UserMessage:
+			this.speaker = details.speaker;
+			this.message = details.message;
+			this.notification = {title: details.speaker + ' says...', body: details.message};
+			break;
+		case EventType.NewIssue:
+			this.message = this.issue.creator + ' created ' + this.issue.id + '.';
+			this.notification = {title: 'New issue', body: this.issue.description};
+			break;
+		case EventType.AssignIssue:
+			this.message = details.assigner + ' assigned ' + this.issue.id + ' to ' + this.issue.assignee + '.';
+			break;
+		case EventType.UpdateIssue:
+			this.message = details.updater + ' updated ' + this.issue.id + '.';
+			break;
+		case EventType.CloseIssue:
+			this.message = details.closer + ' closed ' + this.issue.id + '.'; // TODO: addFlavour()
+			this.notification = {title: 'Issue closed', body: this.issue.description};
+			break;
+		case EventType.PrioritizeIssue:
+			var maybeNot = this.issue.critical ? '' : ' not';
+			this.message = details.updater + ' marked ' + this.issue.id + ' as' + maybeNot + ' critical.';
+			break;
+		default:
+			throw "Can't initialize unknown event type";
+	}
+};
 
 var io = sio.listen(server);
 io.configure(function () {
@@ -33,6 +84,7 @@ io.sockets.on('connection', function(socket) {
 	applyIssueDefaults();
 	socket.emit('issues', issues);
 	socket.emit('usernames', usernames);
+	socket.emit('history', _.last(history, HISTORY_ITEMS_TO_SHOW));
 	exec("git rev-parse HEAD", {cwd: __dirname}, emitVersionNumber);
 
 	socket.on('login user', function(name, callback) {
@@ -44,13 +96,12 @@ io.sockets.on('connection', function(socket) {
 		socket.nickname = name;
 		// keep track of duplicate usernames
 		usernames[name] = (usernames[name] || 0) + 1;
-		// no need to announce... can get spammy in chat
-		// socket.broadcast.emit('announcement', name + ' connected.');
 		io.sockets.emit('usernames', usernames);
 	});
 	
 	socket.on('user message', function(msg) {
-		io.sockets.emit('user message', socket.nickname, msg);
+		var event = recordEvent(EventType.UserMessage, {message: msg, speaker: socket.nickname});
+		io.sockets.emit('user message', event);
 	});
 	
 	socket.on('new issue', function(desc) {
@@ -65,7 +116,9 @@ io.sockets.on('connection', function(socket) {
 		};
 		issues.push(newIssue);
 		issueDb.write(issues);
-		io.sockets.emit('issue created', newIssue);
+		
+		var event = recordEvent(EventType.NewIssue, {issue: newIssue});
+		io.sockets.emit('issue created', event);
 	});
 
 	socket.on('assign issue', function(id, specifiedAssignee) {
@@ -73,15 +126,22 @@ io.sockets.on('connection', function(socket) {
 		if (!specifiedAssignee || specifiedAssignee === CURRENT_USER) {
 			assignee = socket.nickname;
 		}
-		issues[id-1].assignee = assignee; 
+		var issue = issues[id-1];
+		issue.assignee = assignee; 
 		issueDb.write(issues);
-		io.sockets.emit('issue assigned', socket.nickname, id, assignee);
+		
+		var event = recordEvent(EventType.AssignIssue, {assigner: socket.nickname, issue: issue});
+		io.sockets.emit('issue assigned', event);
 	});
 	
 	socket.on('close issue', function(id) {
-		issues[id-1].closed = true;
+		var issue = issues[id-1]; 
+		issue.closed = true;
 		issueDb.write(issues);
-		io.sockets.emit('issue closed', socket.nickname, id);
+		
+		var closer = socket.nickname; // TODO: store this
+		var event = recordEvent(EventType.CloseIssue, {closer: closer, issue: issue});
+		io.sockets.emit('issue closed', closer, event);
 	});
 	
 	socket.on('update issue', function(id, props) {
@@ -91,13 +151,18 @@ io.sockets.on('connection', function(socket) {
 			issue[key] = props[key];
 		}
 		issueDb.write(issues);
-		io.sockets.emit('issue updated', socket.nickname, id, props);
+		
+		var event = recordEvent(EventType.UpdateIssue, {updater: socket.nickname, issue: issue});
+		io.sockets.emit('issue updated', props, event);
 	});
 
 	socket.on('prioritize issue', function(id) {
-		issues[id-1].critical = !issues[id-1].critical;
+		var issue = issues[id-1]; 
+		issue.critical = !issue.critical;
 		issueDb.write(issues);
-		io.sockets.emit('issue prioritized', socket.nickname, id, {critical: issues[id-1].critical});
+		
+		var event = recordEvent(EventType.PrioritizeIssue, {updater: socket.nickname, issue: issue});
+		io.sockets.emit('issue prioritized', {critical: issue.critical}, event);
 	});
 	
 	socket.on('reset issues', function() {
@@ -106,6 +171,15 @@ io.sockets.on('connection', function(socket) {
 		io.sockets.emit('issues', issues);
 	});
 
+	function recordEvent(type, details) {
+		var event = new Event(type, details);
+		history.push(event);
+		if (history.length > MAX_HISTORY_ITEMS) {
+			history = _.last(history, HISTORY_ITEMS_TO_SHOW);
+		}
+		return event;
+	}
+	
 	function removeCurrentUser() {
 		if (!socket.nickname) {
 			return;
@@ -116,8 +190,6 @@ io.sockets.on('connection', function(socket) {
 			usernames[socket.nickname]--;
 		}
 		delete socket.nickname;
-		// no need to announce... can get spammy in chat
-		// socket.broadcast.emit('announcement', socket.nickname + ' disconnected.');
 		io.sockets.emit('usernames', usernames);
 	}
 

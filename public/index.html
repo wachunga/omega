@@ -55,7 +55,7 @@
 	<span class="onlineUser">{{if count > 1}}{{= name }} <span class="subtle">({{= count}})</span>{{else}}{{= name}}{{/if}}</span>
 </script>
 <script type="text/x-jquery-tmpl" id="messageItemTemplate">
-	<li data-bind="css: {system: !user}"><span class="speaker" data-bind="text: user ? user + ': ' : ''"></span><span data-bind="html: addHtmlLinks(msg)"></span></li>
+	<li data-bind="css: {system: !speaker}"><span class="speaker" data-bind="text: speaker ? speaker + ': ' : ''"></span><span data-bind="html: addHtmlLinks(msg)"></span></li>
 </script>
 <script type="text/x-jquery-tmpl" id="issueItemTemplate">
 	<li id="{{= id}}" data-bind="fadeVisible: !($item.hideClosed() && closed()) && !($item.hideAssigned() && assignee() != 'nobody'), css: { closed: closed, highlighted: id === $item.highlightedIssue() }"><a href="#{{= id}}" title="Permalink" class="issueId">{{= id}}</a>:&nbsp;<span class="loud" data-bind="text: critical() ? '★ ' : ''"></span>

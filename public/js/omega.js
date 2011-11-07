@@ -117,7 +117,10 @@ var OmegaIssueTracker = {};
 		});
 		
 		this.socket.on('history', function (events) {
-			//console.log(events);
+			console.log(events);
+			if (that.messages().length) {
+				return; // don't repeat history; FIXME: what if there's some, but it's out of date?
+			}
 			_.each(events, function (event) {
 				that.appendMessage(event);
 			});

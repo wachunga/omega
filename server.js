@@ -38,7 +38,10 @@ io.sockets.on('connection', function(socket) {
 	applyIssueDefaults();
 	socket.emit('issues', issues);
 	socket.emit('usernames', usernames);
-	socket.emit('history', _.last(history, HISTORY_ITEMS_TO_SHOW));
+	
+	// NOTE-DH: underscore 1.2.1 has bug with last
+	//socket.emit('history', _.last(history, HISTORY_ITEMS_TO_SHOW));
+	socket.emit('history', history.slice(-HISTORY_ITEMS_TO_SHOW));
 	exec("git rev-parse HEAD", {cwd: __dirname}, emitVersionNumber);
 
 	socket.on('login user', function(name, callback) {
@@ -127,9 +130,8 @@ io.sockets.on('connection', function(socket) {
 
 	function recordEvent(type, details) {
 		var event = new oe.OmegaEvent(type, details);
-		history.push(event);console.log(history);
+		history.push(event);
 		if (history.length > MAX_HISTORY_ITEMS) {
-			console.log("BADDDDD@@@@@@@@");
 			history = _.last(history, HISTORY_ITEMS_TO_SHOW);
 		}
 		return event;

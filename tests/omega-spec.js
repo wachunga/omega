@@ -4,9 +4,11 @@ describe("omega", function () {
 		on: function () {},
 		emit: function () {}
 	};
-	var messages = {};
+	var messageList = {
+		get: function () { return window; }
+	};
 	var name = {};
-	var message = {};
+	var messageInput = {};
 	var form = {
 		submit: function () {}
 	};
@@ -14,9 +16,36 @@ describe("omega", function () {
 	var tracker;
 	
 	beforeEach(function () {
-		tracker = new OmegaIssueTracker.Tracker(messages, name, message, form, socket);
+		tracker = new OmegaIssueTracker.Tracker(messageList, name, messageInput, form, socket);
 		tracker.user("norris");
 		tracker.loggedIn(true);
+	});
+	
+	describe("shows message history", function () {
+		it("upon connection", function () {
+			var omegaEvents = [
+				{message: "test1"},
+				{message: "test2"},
+				{message: "test3"}
+			];
+			
+			tracker.processHistory(omegaEvents);
+			expect(tracker.messages().length).toBe(3);
+			expect(tracker.messages()[0]).toEqual({msg: "test1"});
+		});
+		
+		it("overwrites any existing messages", function () {
+			tracker.messages([{msg: 'foo'}, {msg: 'bar'}]);
+			var omegaEvents = [
+				{message: "test1"},
+				{message: "test2"},
+				{message: "test3"}
+			];
+			
+			tracker.processHistory(omegaEvents);
+			expect(tracker.messages().length).toBe(3);
+			expect(tracker.messages()[0]).toEqual({msg: "test1"});
+		});
 	});
 
 	describe("handles login", function () {
@@ -96,14 +125,14 @@ describe("omega", function () {
 	describe("parses commands", function () {
 
 		it("can view help", function () {
-			message.val = function () { return "/help"; };
+			messageInput.val = function () { return "/help"; };
 
 			tracker.handleInput();
 			expect(tracker.helpOpen()).toEqual(true);
 		});
 
 		it("can chat", function () {
-			message.val = function () { return "hello peeps"; };
+			messageInput.val = function () { return "hello peeps"; };
 
 			spyOn(socket, 'emit');
 			tracker.handleInput();
@@ -111,7 +140,7 @@ describe("omega", function () {
 		});
 
 		it("can reset", function () {
-			message.val = function () { return "/reset"; };
+			messageInput.val = function () { return "/reset"; };
 
 			spyOn(tracker, 'reset');
 			tracker.handleInput();
@@ -119,7 +148,7 @@ describe("omega", function () {
 		});
 
 		it("can create issues", function () {
-			message.val = function () { return "/create new issue"; };
+			messageInput.val = function () { return "/create new issue"; };
 
 			spyOn(tracker, 'createIssue');
 			tracker.handleInput();
@@ -127,7 +156,7 @@ describe("omega", function () {
 		});
 
 		it("mixed case and unicode works", function () {
-			message.val = function () { return "/CREATE Ω=aw3som#"; };
+			messageInput.val = function () { return "/CREATE Ω=aw3som#"; };
 
 			spyOn(tracker, 'createIssue');
 			tracker.handleInput();
@@ -135,7 +164,7 @@ describe("omega", function () {
 		});
 
 		it ("can prioritize issues", function () {
-			message.val = function () { return ":star 5"; };
+			messageInput.val = function () { return ":star 5"; };
 
 			spyOn(tracker, 'prioritizeIssue');
 			tracker.handleInput();
@@ -143,7 +172,7 @@ describe("omega", function () {
 		});
 		
 		it("can assign multi-digit issues", function () {
-			message.val = function () { return ":assign 50"; };
+			messageInput.val = function () { return ":assign 50"; };
 		
 			spyOn(tracker, 'assignIssue');
 			tracker.handleInput();
@@ -153,7 +182,7 @@ describe("omega", function () {
 		describe("handles invalid input", function () {
 
 			it("bad command", function () {
-				message.val = function () { return "/fluffernutter"; };
+				messageInput.val = function () { return "/fluffernutter"; };
 
 				spyOn(tracker, 'notifyOfBadCommand');
 				tracker.handleInput();
@@ -161,7 +190,7 @@ describe("omega", function () {
 			});
 
 			it("create no args", function () {
-				message.val = function () { return ":create"; };
+				messageInput.val = function () { return ":create"; };
 				
 				spyOn(tracker, 'notifyOfBadCommand');
 				tracker.handleInput();
@@ -169,7 +198,7 @@ describe("omega", function () {
 			});
 			
 			it("create whitespace only", function () {
-				message.val = function () { return ":create  "; };
+				messageInput.val = function () { return ":create  "; };
 				
 				spyOn(tracker, 'notifyOfBadCommand');
 				tracker.handleInput();
@@ -177,7 +206,7 @@ describe("omega", function () {
 			});
 			
 			it("assign no args", function () {
-				message.val = function () { return ":assign"; };
+				messageInput.val = function () { return ":assign"; };
 				
 				spyOn(tracker, 'notifyOfBadCommand');
 				tracker.handleInput();
@@ -185,7 +214,7 @@ describe("omega", function () {
 			});
 			
 			it("assign bad id", function () {
-				message.val = function () { return ":assign this is not an id"; };
+				messageInput.val = function () { return ":assign this is not an id"; };
 				
 				spyOn(tracker, 'notifyOfBadCommand');
 				tracker.handleInput();
@@ -193,7 +222,7 @@ describe("omega", function () {
 			});
 			
 			it("critical no args", function () {
-				message.val = function () { return ":critical"; };
+				messageInput.val = function () { return ":critical"; };
 				
 				spyOn(tracker, 'notifyOfBadCommand');
 				tracker.handleInput();
@@ -201,7 +230,7 @@ describe("omega", function () {
 			});
 			
 			it("critical bad id", function () {
-				message.val = function () { return ":critical this is not an id"; };
+				messageInput.val = function () { return ":critical this is not an id"; };
 				
 				spyOn(tracker, 'notifyOfBadCommand');
 				tracker.handleInput();
@@ -209,7 +238,7 @@ describe("omega", function () {
 			});
 			
 			it("edit no args", function () {
-				message.val = function () { return ":edit"; };
+				messageInput.val = function () { return ":edit"; };
 				
 				spyOn(tracker, 'notifyOfBadCommand');
 				tracker.handleInput();
@@ -217,7 +246,7 @@ describe("omega", function () {
 			});
 			
 			it("edit bad id", function () {
-				message.val = function () { return ":edit not an id"; };
+				messageInput.val = function () { return ":edit not an id"; };
 				
 				spyOn(tracker, 'notifyOfBadCommand');
 				tracker.handleInput();
@@ -225,7 +254,7 @@ describe("omega", function () {
 			});
 			
 			it("close no args", function () {
-				message.val = function () { return ":close"; };
+				messageInput.val = function () { return ":close"; };
 				
 				spyOn(tracker, 'notifyOfBadCommand');
 				tracker.handleInput();
@@ -233,7 +262,7 @@ describe("omega", function () {
 			});
 			
 			it("close bad id", function () {
-				message.val = function () { return ":close this is not an id"; };
+				messageInput.val = function () { return ":close this is not an id"; };
 				
 				spyOn(tracker, 'notifyOfBadCommand');
 				tracker.handleInput();
@@ -241,7 +270,7 @@ describe("omega", function () {
 			});
 			
 			it("reopen no args", function () {
-				message.val = function () { return ":reopen"; };
+				messageInput.val = function () { return ":reopen"; };
 				
 				spyOn(tracker, 'notifyOfBadCommand');
 				tracker.handleInput();
@@ -249,7 +278,7 @@ describe("omega", function () {
 			});
 			
 			it("reopen bad id", function () {
-				message.val = function () { return ":reopen this is not an id"; };
+				messageInput.val = function () { return ":reopen this is not an id"; };
 				
 				spyOn(tracker, 'notifyOfBadCommand');
 				tracker.handleInput();

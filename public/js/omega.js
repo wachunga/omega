@@ -116,15 +116,7 @@ var OmegaIssueTracker = {};
 			}));
 		});
 		
-		this.socket.on('history', function (events) {
-			console.log(events);
-			if (that.messages().length) {
-				return; // don't repeat history; FIXME: what if there's some, but it's out of date?
-			}
-			_.each(events, function (event) {
-				that.appendMessage(event);
-			});
-		});
+		this.socket.on('history', _.bind(this.processHistory, this));
 		
 		this.socket.on('user message', function (event) {
 			that.appendMessage(event);
@@ -168,6 +160,17 @@ var OmegaIssueTracker = {};
 		
 		this.socket.on('version', function (version) {
 			that.version(version);
+		});
+	};
+	
+	// @VisibleForTesting
+	OIT.Tracker.prototype.processHistory = function (events) {
+		if (this.messages().length) {
+			this.messages([]); // TODO: should properly find where left off 
+		}
+		var that = this;
+		_.each(events, function (event) {
+			that.appendMessage(event);
 		});
 	};
 

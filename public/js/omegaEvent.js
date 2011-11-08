@@ -31,6 +31,7 @@ var isNode = (typeof exports !== 'undefined');
 		}
 	}
 	
+	// TODO: this should be client only
 	OmegaEvent.Type = {
 		UserMessage: new OmegaEventType("userMessage", "<%= message %>", "<%= speaker %> says...", "<%= message %>"),
 		NewIssue: new OmegaEventType("newIssue", "<%= issue.creator %> created <%= issue.id %>.", "New issue", "<%= issue.description %>"),

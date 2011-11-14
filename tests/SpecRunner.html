@@ -6,22 +6,29 @@
   <link rel="stylesheet" type="text/css" href="lib/jasmine-1.0.2/jasmine.css">
   <script type="text/javascript" src="lib/jasmine-1.0.2/jasmine.js"></script>
   <script type="text/javascript" src="lib/jasmine-1.0.2/jasmine-html.js"></script>
-
-  <!-- include source files here... -->
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.js"></script>
-  <script type="text/javascript" src="../public/js/underscore-1.1.7.js"></script>
-  <script type="text/javascript" src="../public/js/knockout-1.2.1.js"></script>
-  <script type="text/javascript" src="../public/js/util.js"></script>
-  <script type="text/javascript" src="../public/js/omega.js"></script>
-
-  <!-- include spec files here... -->
-  <script type="text/javascript" src="omega-spec.js"></script>
+  
+  <script type="text/javascript" src="../public/js/require.js"></script>
 </head>
 <body>
 
 <script type="text/javascript">
+require.config({
+	paths: {
+		'jquery': 'http://ajax.googleapis.com/ajax/libs/jquery/1.7.0/jquery.min',
+		'ko': '../public/js/lib/knockout-1.2.1',
+		'tmpl': '../public/js/lib/jquery.tmpl',
+		'underscore': '../public/js/lib/underscore-1.2.1.min',
+		'timeago': '../public/js/lib/jquery.timeago',
+		'Tracker': '../public/js/Tracker',
+		'Issue': '../public/js/Issue',
+		'util': '../public/js/util'
+	}
+});
+
+require(['spec/tracker'], function () {
   jasmine.getEnv().addReporter(new jasmine.TrivialReporter());
   jasmine.getEnv().execute();
+});
 </script>
 
 </body>

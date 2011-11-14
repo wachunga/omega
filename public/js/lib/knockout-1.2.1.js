@@ -2,6 +2,8 @@
 // (c) Steven Sanderson - http://knockoutjs.com/
 // License: MIT (http://www.opensource.org/licenses/mit-license.php)
 
+define(['tmpl'], function (tmpl) {
+
 (function(window,undefined){ 
 var ko = window["ko"] = {};
 // Google Closure Compiler helpers (used only to make the minified file smaller)
@@ -2217,3 +2219,7 @@ ko.jqueryTmplTemplateEngine.prototype = new ko.templateEngine();
 ko.setTemplateEngine(new ko.jqueryTmplTemplateEngine());
 
 ko.exportSymbol('ko.jqueryTmplTemplateEngine', ko.jqueryTmplTemplateEngine);})(window);                  
+
+return ko;
+
+});

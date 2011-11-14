@@ -1,3 +1,5 @@
+define(['jquery', 'Tracker', 'util'], function ($, Tracker, util) {
+	
 describe("omega", function () {
 
 	var socket = {
@@ -16,7 +18,7 @@ describe("omega", function () {
 	var tracker;
 	
 	beforeEach(function () {
-		tracker = new OmegaIssueTracker.Tracker(messageList, name, messageInput, form, socket);
+		tracker = new Tracker(messageList, name, messageInput, form, socket);
 		tracker.user("norris");
 		tracker.loggedIn(true);
 	});
@@ -287,4 +289,6 @@ describe("omega", function () {
 		});
 	});
 	
+});
+
 });

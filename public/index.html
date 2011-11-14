@@ -5,15 +5,8 @@
 	<title>Omega Issue Tracker</title>
 	<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans" type="text/css">
 	<link rel="stylesheet" href="css/omega.css" type="text/css">
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.js"></script>
 	<script src="/socket.io/socket.io.js"></script>
-	<script src="js/jquery.tmpl.js"></script>
-	<script src="js/knockout-1.2.1.js"></script>
-	<script src="js/underscore-1.1.7.js"></script>
-	<script src="js/omega.js"></script>
-	<!-- <script src="js/omegaEvent.js"></script> -->
-	<script src="js/util.js"></script>
-	<script src="js/jquery.timeago.js"></script>
+	<script data-main="js/main" src="js/require.js"></script>
 </head>
 <body>
 <div id="header">
@@ -61,7 +54,7 @@
 <script type="text/x-jquery-tmpl" id="issueItemTemplate">
 	<li id="{{= id}}" data-bind="fadeVisible: !($item.hideClosed() && closed()) && !($item.hideAssigned() && assignee() != 'nobody'), css: { closed: closed, highlighted: id === $item.highlightedIssue() }"><a href="#{{= id}}" title="Permalink" class="issueId">{{= id}}</a>:&nbsp;<span class="loud" data-bind="text: critical() ? '★ ' : ''"></span>
 		<span class="assignee" data-bind="css: { myself: $item.user() && assignee().toLowerCase() === $item.user().toLowerCase() }, text: assignee().toLowerCase() !== 'nobody' ? '(@' + assignee() + ')' : ''"></span>
-		&nbsp;<span class="description" data-bind="html: addHtmlLinks(escapeHtml(description))"></span>
+		&nbsp;<span class="description" data-bind="html: addHtmlLinks(description)"></span>
 		&nbsp;<span class="details subtle">(created by {{= creator}} <time datetime="{{= createdDate}}"></time>)</span>
 	</li>
 </script>
@@ -69,17 +62,5 @@
 	<span data-bind="fadeVisible: !!version()">Version <a href="https://github.com/Wachunga/Omega-Issue-Tracker/commit/{{= version}}">{{= shortVersion}}</a>.</span>
 </script>
 
-<script type="text/javascript">
-var socket = io.connect();
-
-var tracker; // for debugging
-$(function () {
-	if (!isLocalStorageSupported) {
-		alert("Your browser is very out of date. To use Ω, please use a newer browser.");
-		return;
-	}
-	tracker = new OmegaIssueTracker.Tracker($("#messages"), $("#nameInput"), $("#messageInput"), $("#form"), socket);
-});
-</script>
 </body>
 </html>

@@ -1,15 +1,6 @@
 /* global $, ko, socket, _, window */
-var OmegaIssueTracker = {};
-(function (OIT) {
-	
-	OIT.Issue = function (id, props) {
-		this.id = id; // id should never change
-		_.each(props, function (value, key) {
-			if (key !== 'id') {
-				this[key] = ko.observable(value);
-			}
-		}, this);
-	};
+
+define(['jquery', 'underscore', 'ko', 'Issue', 'timeago'], function ($, _, ko, Issue, timeago) {
 	
 	function getRandomItem(array) {
 		return array[Math.floor(Math.random() * array.length)];
@@ -47,7 +38,7 @@ var OmegaIssueTracker = {};
 		'These are not the droids you\'re looking for.'
 	];
 
-	OIT.Tracker = function ($messagesList, $nameInput, $messageInput, $form, socket) {
+	var Tracker = function ($messagesList, $nameInput, $messageInput, $form, socket) {
 		var that = this;
 
 		this.$messagesList = $messagesList;
@@ -105,7 +96,7 @@ var OmegaIssueTracker = {};
 		
 		this.socket.on('issues', function (issues) {
 			that.issues(_.map(issues, function (issue) {
-				return new OIT.Issue(issue.id, issue);
+				return new Issue(issue.id, issue);
 			}));
 			that.showBookmarkedIssue();
 		});
@@ -127,7 +118,7 @@ var OmegaIssueTracker = {};
 			that.appendMessage(event);
 			that.notify(event.issue.creator, event);
 			
-			that.issues.push(new OIT.Issue(event.issue.id, event.issue));
+			that.issues.push(new Issue(event.issue.id, event.issue));
 		});	
 		
 		function addFlavour(text) {
@@ -164,7 +155,7 @@ var OmegaIssueTracker = {};
 	};
 	
 	// @VisibleForTesting
-	OIT.Tracker.prototype.processHistory = function (events) {
+	Tracker.prototype.processHistory = function (events) {
 		if (this.messages().length) {
 			this.messages([]); // TODO: should properly find where left off 
 		}
@@ -175,7 +166,7 @@ var OmegaIssueTracker = {};
 	};
 
 	// doesn't highlight if filtering issues, but not a big deal
-	OIT.Tracker.prototype.showBookmarkedIssue = function () {
+	Tracker.prototype.showBookmarkedIssue = function () {
 		var bookmarked = parseInt(window.location.hash.substring(1), 10);
 		var found = _.detect(this.issues(), function (issue) { 
 			return issue.id === bookmarked;
@@ -193,20 +184,20 @@ var OmegaIssueTracker = {};
 		}
 	};
 	
-	OIT.Tracker.prototype.findIssue = function (id) {
+	Tracker.prototype.findIssue = function (id) {
 		return _.find(this.issues(), function (issue) {
 			return issue.id === id;
 		});
 	};
 
-	OIT.Tracker.prototype.logout = function () {
+	Tracker.prototype.logout = function () {
 		delete window.localStorage[USERNAME_KEY];
 		this.user(undefined);
 		this.$nameInput.focus();
 		this.socket.emit('logout');
 	};
 	
-	OIT.Tracker.prototype.login = function (name) {
+	Tracker.prototype.login = function (name) {
 		var that = this;
 		this.loggedIn(false);
 		this.socket.emit('login user', name, function (invalidName) {
@@ -238,11 +229,11 @@ var OmegaIssueTracker = {};
 	}
 	
 	// @VisibleForTesting
-	OIT.Tracker.prototype.notifyOfBadCommand = function () {
+	Tracker.prototype.notifyOfBadCommand = function () {
 		window.alert(getRandomItem(BAD_COMMAND_RESPONSES) + ' Try /help.'); // TODO: style
 	};
 
-	OIT.Tracker.prototype.handleInput = function () {
+	Tracker.prototype.handleInput = function () {
 		if (!this.user()) {
 			this.handleNameInput();
 			return;
@@ -332,7 +323,7 @@ var OmegaIssueTracker = {};
 		}
 	};
 
-	OIT.Tracker.prototype.handleNameInput = function () {
+	Tracker.prototype.handleNameInput = function () {
 		this.invalidName(false);
 		var name = this.$nameInput.val();
 		if (!name || name.trim().length < 3) { // TODO: disallow other chars?
@@ -343,30 +334,30 @@ var OmegaIssueTracker = {};
 		this.login(name);
 	};
 	
-	OIT.Tracker.prototype.createIssue = function (desc) {
+	Tracker.prototype.createIssue = function (desc) {
 		this.socket.emit('new issue', desc);
 	};
 	
-	OIT.Tracker.prototype.assignIssue = function (id, assignee) {
+	Tracker.prototype.assignIssue = function (id, assignee) {
 		this.socket.emit('assign issue', id, assignee);
 	};
 	
-	OIT.Tracker.prototype.closeIssue = function (id) {
+	Tracker.prototype.closeIssue = function (id) {
 		if (this.findIssue(id).closed()) {
 			return;
 		}
 		this.socket.emit('close issue', id);
 	};
 	
-	OIT.Tracker.prototype.updateIssue = function (id, props) {
+	Tracker.prototype.updateIssue = function (id, props) {
 		this.socket.emit('update issue', id, props);
 	};
 
-	OIT.Tracker.prototype.prioritizeIssue = function (id) {
+	Tracker.prototype.prioritizeIssue = function (id) {
 		this.socket.emit('prioritize issue', id);
 	};
 
-	OIT.Tracker.prototype.reset = function () {
+	Tracker.prototype.reset = function () {
 		if (window.confirm('Warning: this will completely delete all issues from the server.')) {
 			if (window.confirm('I have a bad feeling about this. Are you absolutely sure?')) {
 				this.socket.emit('reset issues');
@@ -377,7 +368,7 @@ var OmegaIssueTracker = {};
 	var NOTIFICATION_ALLOWED = 0; // unintuitive, but correct
 	var NOTIFICATION_DURATION = 4000;
 
-	OIT.Tracker.prototype.notify = function (user, event) {
+	Tracker.prototype.notify = function (user, event) {
 		if (!window.webkitNotifications || !this.webNotifyEnabled() || user === this.user() || !event.notification) {
 			return;
 		}
@@ -387,7 +378,7 @@ var OmegaIssueTracker = {};
 		setInterval(function () { popup.cancel(); }, NOTIFICATION_DURATION);
 	};
 
-	OIT.Tracker.prototype.requestNotificationPermission = function () {
+	Tracker.prototype.requestNotificationPermission = function () {
 		if (!window.webkitNotifications) {
 			alert('Your browser doesn\'t support web notifications. Try Chrome or something.');
 		}
@@ -411,7 +402,7 @@ var OmegaIssueTracker = {};
 		return window.webkitNotifications && window.webkitNotifications.checkPermission() === NOTIFICATION_ALLOWED;
 	}
 
-	OIT.Tracker.prototype.send = function (message) {
+	Tracker.prototype.send = function (message) {
 		this.socket.emit('user message', message);
 	};
 	
@@ -419,12 +410,12 @@ var OmegaIssueTracker = {};
 		el.scrollTop = el.scrollHeight;
 	}
 	
-	OIT.Tracker.prototype.appendMessage = function (event) {
+	Tracker.prototype.appendMessage = function (event) {
 		this.messages.push({msg: event.message, speaker: event.speaker});
 		scrollToBottom(this.$messagesList.get(0));
 	};
 
-	OIT.Tracker.prototype.refreshIssue = function (id, props) {
+	Tracker.prototype.refreshIssue = function (id, props) {
 		var issue = this.findIssue(id);
 		_.each(props, function (value, key) {
 			if (ko.isObservable(issue[key])) {
@@ -435,7 +426,7 @@ var OmegaIssueTracker = {};
 		});
 	};
 	
-	OIT.Tracker.prototype.applyTimeago = function (elements) {
+	Tracker.prototype.applyTimeago = function (elements) {
 		_.each(elements, function (element) {
 			var $time = $(element).find("time");
 			if ($time && $time.length) {
@@ -444,4 +435,6 @@ var OmegaIssueTracker = {};
 		});
 	};
 	
-}(OmegaIssueTracker));
+	return Tracker;
+	
+});

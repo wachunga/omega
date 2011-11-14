@@ -13,6 +13,8 @@
  *
  * Copyright (c) 2008-2011, Ryan McGeary (ryanonjavascript -[at]- mcgeary [*dot*] org)
  */
+define(['jquery'], function ($) {
+	
 (function($) {
   $.timeago = function(timestamp) {
     if (timestamp instanceof Date) {
@@ -145,3 +147,5 @@
   document.createElement("abbr");
   document.createElement("time");
 }(jQuery));
+
+});

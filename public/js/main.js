@@ -5,7 +5,7 @@ require.config({
 		'jquery': 'http://ajax.googleapis.com/ajax/libs/jquery/1.7.0/jquery.min',
 		'ko': 'lib/knockout-1.2.1',
 		'tmpl': 'lib/jquery.tmpl',
-		'underscore': 'lib/underscore-1.2.1.min',
+		'underscore': 'lib/underscore-1.2.2.min',
 		'timeago': 'lib/jquery.timeago'
 	}
 });

@@ -132,7 +132,9 @@ io.sockets.on('connection', function(socket) {
 		var event = new oe.OmegaEvent(type, details);
 		history.push(event);
 		if (history.length > MAX_HISTORY_ITEMS) {
-			history = _.last(history, HISTORY_ITEMS_TO_SHOW);
+			// NOTE-RP: underscore 1.2.2 has bug with last
+			// history = _.last(history, HISTORY_ITEMS_TO_SHOW);
+			history = history.slice(-HISTORY_ITEMS_TO_SHOW);
 		}
 		return event;
 	}

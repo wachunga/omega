@@ -29,7 +29,7 @@ Install [node.js](https://github.com/joyent/node) and [npm](https://github.com/i
 Get required dependencies:
 
     npm install socket.io
-    npm install underscore
+    npm install underscore (requires >= 1.2.0)
     npm install node-static
 
 

@@ -43,7 +43,7 @@
 	<ul class="issuesList" data-bind="template: {name: 'issueItemTemplate', foreach: sortedIssues, templateOptions: { user: user, hideClosed: hideClosed, hideAssigned: hideAssigned, highlightedIssue: highlightedIssue }, afterRender: applyTimeago }">
 	</ul>
 </div>
-<div class="footer subtle">Powered by node.js. <a href="https://github.com/Wachunga/Omega-Issue-Tracker">Hosted</a> on GitHub. <span data-bind="template: 'versionTemplate'"></span></div>
+<div class="footer subtle">Powered by node.js. <a href="https://github.com/wachunga/omega">Hosted</a> on GitHub. <span data-bind="template: 'versionTemplate'"></span></div>
 
 <script type="text/x-jquery-tmpl" id="onlineUsersTemplate">
 	<span class="onlineUser">{{if count > 1}}{{= name }} <span class="subtle">({{= count}})</span>{{else}}{{= name}}{{/if}}</span>
@@ -59,7 +59,7 @@
 	</li>
 </script>
 <script type="text/x-jquery-tmpl" id="versionTemplate">
-	<span data-bind="fadeVisible: !!version()">Version <a href="https://github.com/Wachunga/Omega-Issue-Tracker/commit/{{= version}}">{{= shortVersion}}</a>.</span>
+	<span data-bind="fadeVisible: !!version()">Version <a href="https://github.com/wachunga/omega/commit/{{= version}}">{{= shortVersion}}</a>.</span>
 </script>
 
 </body>

@@ -25,11 +25,11 @@ function ($, _, ko, timeago, util, Issue) {
 		'These are not the droids you\'re looking for.'
 	];
 
-	var Tracker = function ($nameInput, $messageInput, $form, socket, messageList) {
+	var Tracker = function ($nameInput, $messageInput, $form, socket, messageList, notifier) {
 		var that = this;
 
-		// TODO: extract notifier
 		this.messageList = messageList;
+		this.notifier = notifier;
 
 		this.$nameInput = $nameInput;
 		this.$messageInput = $messageInput;
@@ -39,7 +39,6 @@ function ($, _, ko, timeago, util, Issue) {
 		this.disconnected = ko.observable();
 		this.loggedIn = ko.observable(false);
 		this.invalidName = ko.observable(false);
-		this.webNotifyEnabled = ko.observable(checkWebNotificationEnabled());
 		this.version = ko.observable();
 		this.shortVersion = ko.dependentObservable(function () {
 			return this.version() && this.version().substr(0,7);			
@@ -94,12 +93,12 @@ function ($, _, ko, timeago, util, Issue) {
 		
 		this.socket.on('user message', function (event) {
 			that.messageList.append(event);
-			that.notify(event.speaker, event);
+			that.notifier.notify(event.speaker, event);
 		});
 		
 		this.socket.on('issue created', function (event) {
 			that.messageList.append(event);
-			that.notify(event.issue.creator, event);
+			that.notifier.notify(event.issue.creator, event);
 			
 			that.issues.push(new Issue(event.issue.id, event.issue));
 		});	
@@ -110,7 +109,7 @@ function ($, _, ko, timeago, util, Issue) {
 		
 		this.socket.on('issue closed', function (closer, event) {
 			that.messageList.append(event);
-			that.notify(closer, event);
+			that.notifier.notify(closer, event);
 			
 			var issue = that.findIssue(event.issue.id);
 			issue.closed(true);
@@ -336,43 +335,6 @@ function ($, _, ko, timeago, util, Issue) {
 			}
 		}
 	};
-
-	var NOTIFICATION_ALLOWED = 0; // unintuitive, but correct
-	var NOTIFICATION_DURATION = 4000;
-
-	Tracker.prototype.notify = function (user, event) {
-		if (!window.webkitNotifications || !this.webNotifyEnabled() || user === this.user() || !event.notification) {
-			return;
-		}
-
-		var popup = window.webkitNotifications.createNotification("favicon.ico", event.notification.title, event.notification.body);
-		popup.show();
-		setInterval(function () { popup.cancel(); }, NOTIFICATION_DURATION);
-	};
-
-	Tracker.prototype.requestNotificationPermission = function () {
-		if (!window.webkitNotifications) {
-			alert('Your browser doesn\'t support web notifications. Try Chrome or something.');
-		}
-		if (this.webNotifyEnabled()) {
-			this.webNotifyEnabled(false); // TODO: save this setting
-			return;
-		}
-		
-		// otherwise, ask user to grant permission
-		if (window.webkitNotifications.checkPermission() === NOTIFICATION_ALLOWED) {
-			this.webNotifyEnabled(checkWebNotificationEnabled());
-		} else {
-			var that = this;
-			window.webkitNotifications.requestPermission(function () {
-				that.webNotifyEnabled(checkWebNotificationEnabled());
-			});
-		}
-	};
-	
-	function checkWebNotificationEnabled() {
-		return window.webkitNotifications && window.webkitNotifications.checkPermission() === NOTIFICATION_ALLOWED;
-	}
 
 	Tracker.prototype.send = function (message) {
 		this.socket.emit('user message', message);

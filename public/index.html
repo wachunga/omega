@@ -9,13 +9,23 @@
 	<script data-main="js/main" src="js/require.js"></script>
 </head>
 <body>
+
 <div id="header">
-	<h1>Ω</h1><div id="loggedInUser" data-bind="visible: !!user()"><span data-bind="html: 'welcome, <strong>' + user() + '</strong>'"></span> | <span class="notificationToggle" data-bind="text: webNotifyEnabled() ? '⚑' : '⚐', click: requestNotificationPermission, attr: { title: webNotifyEnabled() ? 'Web notifications are enabled' : 'Web notifications are disabled' }"></span> | <a href="#" data-bind="click: logout">kthxbye</a></div>
+	<h1>Ω</h1><div id="loggedInUser" data-bind="visible: !!user()">welcome, <strong data-bind="html: user"></strong> | <span class="notificationToggle" data-bind="text: webNotifyEnabled() ? '⚑' : '⚐', click: requestNotificationPermission, attr: { title: webNotifyEnabled() ? 'Web notifications are enabled' : 'Web notifications are disabled' }"></span> | <a href="#" data-bind="click: logout">kthxbye</a></div>
 </div>
-<ul id="messages" data-bind="template: {name: 'messageItemTemplate', foreach: messages, beforeRemove: function(elem) { $(elem).fadeOut() }, afterAdd: function(elem) { $(elem).hide().fadeIn('fast') }}">
+<ul id="messages" data-bind="foreach: { data: messages, beforeRemove: function(elem) { $(elem).fadeOut() }, afterAdd: function(elem) { $(elem).hide().fadeIn('fast') } }">
+	<li data-bind="css: { system: !speaker }"><span class="speaker" data-bind="text: speaker ? speaker + ': ' : ''"></span><span data-bind="html: addHtmlLinks(msg)"></span></li>
 </ul>
 <div id="onlineUsers">
-	online: <span data-bind="template: { name: 'onlineUsersTemplate', foreach: onlineUsers }"></span><span data-bind="visible: !onlineUsers().length" class="subtle">nobody</span>
+	online:
+	<!-- ko foreach: onlineUsers -->
+	<span class="onlineUser">
+		<span data-bind="text: name"></span><!-- ko if: count > 1 --> <span class="subtle" data-bind="text: '(' + count + ')'"></span><!-- /ko -->
+	</span>
+	<!-- /ko -->
+	<!-- ko if: !onlineUsers().length -->
+	<span class="subtle">nobody</span>
+	<!-- /ko -->
 </div>
 <h3 class="warningMessage loud" data-bind="visible: disconnected()">Warning: disconnected from server. Attempting to reconnect...</h3>
 <form id="form" autocomplete="off" data-bind="visible: !disconnected()">
@@ -40,27 +50,18 @@
 	<label class="hideIssues"><input type="checkbox" data-bind="checked: hideAssigned"/> hide assigned</label>
 	<h2>Issues <span data-bind="fadeVisible: issues().length >= 3" class="issueCounts subtle">(<var data-bind="text: openIssuesCount"></var> open, <var data-bind="text: issues().length - openIssuesCount()"></var> closed)</span></h2>
 	<p class="noneMessage subtle" data-bind="fadeVisible: !issues().length || (hideClosed() && openIssuesCount() == 0)">No open issues. w00t!</p>
-	<ul class="issuesList" data-bind="template: {name: 'issueItemTemplate', foreach: sortedIssues, templateOptions: { user: user, hideClosed: hideClosed, hideAssigned: hideAssigned, highlightedIssue: highlightedIssue }, afterRender: applyTimeago }">
+	<ul class="issuesList" data-bind="foreach: { data: sortedIssues, afterRender: applyTimeago }">
+		<li data-bind="attr: { id: id }, fadeVisible: !($parent.hideClosed() && closed()) && !($parent.hideAssigned() && assignee() != 'nobody'), css: { closed: closed, highlighted: id === $parent.highlightedIssue() }"><a data-bind="attr: { href: '#' + id }, text: id" title="Permalink" class="issueId"></a>:&nbsp;<span class="loud" data-bind="text: critical() ? '★ ' : ''"></span>
+			<span class="assignee" data-bind="css: { myself: $parent.user() && assignee().toLowerCase() === $parent.user().toLowerCase() }, text: assignee().toLowerCase() !== 'nobody' ? '(@' + assignee() + ')' : ''"></span>
+			&nbsp;<span class="description" data-bind="html: addHtmlLinks(description)"></span>
+			&nbsp;<span class="details subtle">(created by <span data-bind="text: creator"></span> <time data-bind="attr: { datetime: createdDate }"></time>)</span>
+		</li>
 	</ul>
 </div>
-<div class="footer subtle">Powered by node.js. <a href="https://github.com/wachunga/omega">Hosted</a> on GitHub. <span data-bind="template: 'versionTemplate'"></span></div>
-
-<script type="text/x-jquery-tmpl" id="onlineUsersTemplate">
-	<span class="onlineUser">{{if count > 1}}{{= name }} <span class="subtle">({{= count}})</span>{{else}}{{= name}}{{/if}}</span>
-</script>
-<script type="text/x-jquery-tmpl" id="messageItemTemplate">
-	<li data-bind="css: {system: !speaker}"><span class="speaker" data-bind="text: speaker ? speaker + ': ' : ''"></span><span data-bind="html: addHtmlLinks(msg)"></span></li>
-</script>
-<script type="text/x-jquery-tmpl" id="issueItemTemplate">
-	<li id="{{= id}}" data-bind="fadeVisible: !($item.hideClosed() && closed()) && !($item.hideAssigned() && assignee() != 'nobody'), css: { closed: closed, highlighted: id === $item.highlightedIssue() }"><a href="#{{= id}}" title="Permalink" class="issueId">{{= id}}</a>:&nbsp;<span class="loud" data-bind="text: critical() ? '★ ' : ''"></span>
-		<span class="assignee" data-bind="css: { myself: $item.user() && assignee().toLowerCase() === $item.user().toLowerCase() }, text: assignee().toLowerCase() !== 'nobody' ? '(@' + assignee() + ')' : ''"></span>
-		&nbsp;<span class="description" data-bind="html: addHtmlLinks(description)"></span>
-		&nbsp;<span class="details subtle">(created by {{= creator}} <time datetime="{{= createdDate}}"></time>)</span>
-	</li>
-</script>
-<script type="text/x-jquery-tmpl" id="versionTemplate">
-	<span data-bind="fadeVisible: !!version()">Version <a href="https://github.com/wachunga/omega/commit/{{= version}}">{{= shortVersion}}</a>.</span>
-</script>
+<div class="footer subtle">
+	Powered by node.js. <a href="https://github.com/wachunga/omega">Hosted</a> on GitHub.
+	<span data-bind="fadeVisible: !!version()">Version <a data-bind="attr: { href: 'https://github.com/wachunga/omega/commit/' + shortVersion() }, text: shortVersion"></a>.</span>
+</div>
 
 </body>
 </html>

@@ -159,10 +159,9 @@ define(['jquery', 'underscore', 'ko', 'Issue', 'timeago'], function ($, _, ko, I
 		if (this.messages().length) {
 			this.messages([]); // TODO: should properly find where left off 
 		}
-		var that = this;
 		_.each(events, function (event) {
-			that.appendMessage(event);
-		});
+			this.appendMessage(event);
+		}, this);
 	};
 
 	// doesn't highlight if filtering issues, but not a big deal
@@ -253,7 +252,7 @@ define(['jquery', 'underscore', 'ko', 'Issue', 'timeago'], function ($, _, ko, I
 			this.send(input); // assume chat message
 			return;
 		}
-		
+
 		try {
 			var matches = input.match(/[:\/]([\S]+)(?:\s+(.*))?/); 
 			var cmd = matches[1] && matches[1].trim();

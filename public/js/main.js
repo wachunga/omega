@@ -2,9 +2,8 @@ var tracker; // for debugging only
 
 require.config({
 	paths: {
-		'jquery': 'http://ajax.googleapis.com/ajax/libs/jquery/1.7.0/jquery.min',
-		'ko': 'lib/knockout-1.2.1',
-		'tmpl': 'lib/jquery.tmpl',
+		'jquery': 'http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min',
+		'ko': 'lib/knockout-2.0.0.min',
 		'underscore': 'lib/underscore-1.2.2.min',
 		'timeago': 'lib/jquery.timeago'
 	}

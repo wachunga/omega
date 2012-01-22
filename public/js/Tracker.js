@@ -1,24 +1,11 @@
 /* global $, ko, socket, _, window */
 
-define(['jquery', 'underscore', 'ko', 'Issue', 'timeago'], function ($, _, ko, Issue, timeago) {
-	
-	function getRandomItem(array) {
-		return array[Math.floor(Math.random() * array.length)];
-	}
+define([
+	'jquery', 'underscore', 'ko', 'timeago',
+	'util', 'Issue'
+],
+function ($, _, ko, timeago, util, Issue) {
 
-	function issueSort(a, b) {
-		if (a.critical()) {
-			if (b.critical()) {
-				return a.id - b.id;
-			}
-			return -1;
-		}
-		if (b.critical()) {
-			return 1;
-		}
-		return a.id - b.id;
-	}
-	
 	var USERNAME_KEY = 'OmegaIssueTracker.username';
 	var NAMES = [
 		'Captain Hammer', 'Release Llama', 'Chuck Norris',
@@ -43,7 +30,7 @@ define(['jquery', 'underscore', 'ko', 'Issue', 'timeago'], function ($, _, ko, I
 
 		this.$messagesList = $messagesList;
 		this.$nameInput = $nameInput;
-		this.namePlaceholder = getRandomItem(NAMES);
+		this.namePlaceholder = util.getRandomItem(NAMES);
 		this.$messageInput = $messageInput;
 		this.socket = socket;
 
@@ -60,8 +47,9 @@ define(['jquery', 'underscore', 'ko', 'Issue', 'timeago'], function ($, _, ko, I
 		this.onlineUsers = ko.observableArray();
 		this.issues = ko.observableArray();
 		this.sortedIssues = ko.dependentObservable(function () {
-			return this.issues().sort(issueSort);
+			return this.issues().sort(Issue.sort);
 		}, this);
+		this.addHtmlLinks = util.addHtmlLinks;
 
 		this.openIssuesCount = ko.dependentObservable(function () {
 			return _.select(this.issues(), function (issue) {
@@ -77,11 +65,6 @@ define(['jquery', 'underscore', 'ko', 'Issue', 'timeago'], function ($, _, ko, I
 		ko.applyBindings(this);
 		
 		$(window).bind('hashchange', _.bind(this.showBookmarkedIssue, this));
-		
-		$form.submit(function (e) {
-			e.preventDefault();
-			that.handleInput();
-		});
 		
 		this.socket.on('connect', function () {
 			that.disconnected(false);
@@ -122,7 +105,7 @@ define(['jquery', 'underscore', 'ko', 'Issue', 'timeago'], function ($, _, ko, I
 		});	
 		
 		function addFlavour(text) {
-			return text + ' ' + getRandomItem(FLAVOUR);
+			return text + ' ' + util.getRandomItem(FLAVOUR);
 		}
 		
 		this.socket.on('issue closed', function (closer, event) {
@@ -229,7 +212,7 @@ define(['jquery', 'underscore', 'ko', 'Issue', 'timeago'], function ($, _, ko, I
 	
 	// @VisibleForTesting
 	Tracker.prototype.notifyOfBadCommand = function () {
-		window.alert(getRandomItem(BAD_COMMAND_RESPONSES) + ' Try /help.'); // TODO: style
+		window.alert(util.getRandomItem(BAD_COMMAND_RESPONSES) + ' Try /help.'); // TODO: style
 	};
 
 	Tracker.prototype.handleInput = function () {

@@ -1,11 +1,11 @@
 define(['ko'], function (ko) {
 	var URL_REGEX = /(\(?\bhttps?:\/\/[-A-Z0-9+&@#\/%?=~_()|!:,.;]*[-A-Z0-9+&@#\/%=~_()|])/ig;
-	
+
 	function escapeHtml(text) {
 		return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 	}
 	
-	window.addHtmlLinks = function (text) {
+	function addHtmlLinks(text) {
 		text = escapeHtml(ko.utils.unwrapObservable(text));
 		return text.replace(URL_REGEX, function (url) {
 			var parens = false;
@@ -20,7 +20,7 @@ define(['ko'], function (ko) {
 			}
 			return htmlLink.join('');
 		});
-	};
+	}
 	
 	ko.bindingHandlers.fadeVisible = {
 		init: function(element, valueAccessor) {
@@ -32,4 +32,13 @@ define(['ko'], function (ko) {
 			ko.utils.unwrapObservable(value) ? $(element).fadeIn('fast') : $(element).fadeOut('fast');
 		}
 	};
+
+	function getRandomItem(array) {
+		return array[Math.floor(Math.random() * array.length)];
+	}
+
+	return {
+		addHtmlLinks: addHtmlLinks,
+		getRandomItem: getRandomItem
+	}
 });

@@ -9,7 +9,7 @@ require.config({
 	}
 });
 
-require(['jquery', 'Tracker', 'util', 'ko'], function ($, Tracker, util, ko) {
+require(['jquery', 'Tracker', 'util'], function ($, Tracker, util) {
 	var socket = io.connect();
 	
 	$(function () {

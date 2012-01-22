@@ -11,6 +11,12 @@ a:hover {
 	text-decoration: none;
 	color: white;
 }
+.offscreen {
+	position: absolute;
+	left: -9999px;
+	width: 1px;
+	height: 1px;
+}
 .subtle {
     color: #666;
 }
@@ -67,12 +73,6 @@ a:hover {
 }
 .onlineUser + .onlineUser:before {
 	content: ', ';
-}
-#form input[type='submit'] {
-	position: absolute;
-	left: -9999px;
-	width: 1px;
-	height: 1px;
 }
 #messageInput {
 	width: 100%;

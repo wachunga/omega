@@ -13,7 +13,7 @@
 <div id="header">
 	<h1>Ω</h1><div id="loggedInUser" data-bind="visible: !!user()">welcome, <strong data-bind="html: user"></strong> | <span class="notificationToggle" data-bind="text: webNotifyEnabled() ? '⚑' : '⚐', click: requestNotificationPermission, attr: { title: webNotifyEnabled() ? 'Web notifications are enabled' : 'Web notifications are disabled' }"></span> | <a href="#" data-bind="click: logout">kthxbye</a></div>
 </div>
-<ul id="messages" data-bind="foreach: { data: messages, beforeRemove: function(elem) { $(elem).fadeOut() }, afterAdd: function(elem) { $(elem).hide().fadeIn('fast') } }">
+<ul id="messages" data-bind="foreach: { data: messageList.messages, beforeRemove: function(elem) { $(elem).fadeOut() }, afterAdd: function(elem) { $(elem).hide().fadeIn('fast') } }">
 	<li data-bind="css: { system: !speaker }"><span class="speaker" data-bind="text: speaker ? speaker + ': ' : ''"></span><span data-bind="html: $parent.addHtmlLinks(msg)"></span></li>
 </ul>
 <div id="onlineUsers">

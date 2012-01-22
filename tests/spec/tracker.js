@@ -1,4 +1,4 @@
-define(['jquery', 'Tracker', 'util'], function ($, Tracker, util) {
+define(['jquery', 'Tracker', 'util', 'MessageList'], function ($, Tracker, util, MessageList) {
 	
 describe("omega", function () {
 
@@ -6,7 +6,7 @@ describe("omega", function () {
 		on: function () {},
 		emit: function () {}
 	};
-	var messageList = {
+	var messagesElement = {
 		get: function () { return window; }
 	};
 	var name = {};
@@ -16,9 +16,11 @@ describe("omega", function () {
 	};
 	
 	var tracker;
+	var messageList;
 	
 	beforeEach(function () {
-		tracker = new Tracker(messageList, name, messageInput, form, socket);
+		messageList = new MessageList(messagesElement, socket);
+		tracker = new Tracker(name, messageInput, form, socket, messageList);
 		tracker.user("norris");
 		tracker.loggedIn(true);
 	});
@@ -31,22 +33,22 @@ describe("omega", function () {
 				{message: "test3"}
 			];
 			
-			tracker.processHistory(omegaEvents);
-			expect(tracker.messages().length).toBe(3);
-			expect(tracker.messages()[0]).toEqual({msg: "test1"});
+			messageList.processHistory(omegaEvents);
+			expect(messageList.messages().length).toBe(3);
+			expect(messageList.messages()[0]).toEqual({msg: "test1"});
 		});
 		
 		it("overwrites any existing messages", function () {
-			tracker.messages([{msg: 'foo'}, {msg: 'bar'}]);
+			messageList.messages([{msg: 'foo'}, {msg: 'bar'}]);
 			var omegaEvents = [
 				{message: "test1"},
 				{message: "test2"},
 				{message: "test3"}
 			];
 			
-			tracker.processHistory(omegaEvents);
-			expect(tracker.messages().length).toBe(3);
-			expect(tracker.messages()[0]).toEqual({msg: "test1"});
+			messageList.processHistory(omegaEvents);
+			expect(messageList.messages().length).toBe(3);
+			expect(messageList.messages()[0]).toEqual({msg: "test1"});
 		});
 	});
 
@@ -96,31 +98,31 @@ describe("omega", function () {
 	describe("displays html links", function () {
 		it("for basic urls", function () {
 			var text = "http://www.foo.com";
-			expect(addHtmlLinks(text)).toEqual('<a href="http://www.foo.com">http://www.foo.com</a>');
+			expect(util.addHtmlLinks(text)).toEqual('<a href="http://www.foo.com">http://www.foo.com</a>');
 		});
 		it("for urls in parens", function () {
 			var text = "at foo (http://www.foo.com) I'm telling you";
-			expect(addHtmlLinks(text)).toEqual('at foo (<a href="http://www.foo.com">http://www.foo.com</a>) I\'m telling you');
+			expect(util.addHtmlLinks(text)).toEqual('at foo (<a href="http://www.foo.com">http://www.foo.com</a>) I\'m telling you');
 		});
 		it("for urls with a query string etc.", function () {
 			var text = "at http://foo.com?id=bar#asdf";
-			expect(addHtmlLinks(text)).toEqual('at <a href="http://foo.com?id=bar#asdf">http://foo.com?id=bar#asdf</a>');
+			expect(util.addHtmlLinks(text)).toEqual('at <a href="http://foo.com?id=bar#asdf">http://foo.com?id=bar#asdf</a>');
 		});
 		it("for https", function () {
 			var text = "at https://foo.com/?id=bar#asdf";
-			expect(addHtmlLinks(text)).toEqual('at <a href="https://foo.com/?id=bar#asdf">https://foo.com/?id=bar#asdf</a>');
+			expect(util.addHtmlLinks(text)).toEqual('at <a href="https://foo.com/?id=bar#asdf">https://foo.com/?id=bar#asdf</a>');
 		});
 		it("for urls followed by a question mark", function () {
 			var text = "did you find it with http://www.foo.ca?";
-			expect(addHtmlLinks(text)).toEqual('did you find it with <a href="http://www.foo.ca">http://www.foo.ca</a>?');
+			expect(util.addHtmlLinks(text)).toEqual('did you find it with <a href="http://www.foo.ca">http://www.foo.ca</a>?');
 		});
 		it("for urls followed by a comma", function () {
 			var text = "at http://foo.com?id=bar#asdf, really?";
-			expect(addHtmlLinks(text)).toEqual('at <a href="http://foo.com?id=bar#asdf">http://foo.com?id=bar#asdf</a>, really?');
+			expect(util.addHtmlLinks(text)).toEqual('at <a href="http://foo.com?id=bar#asdf">http://foo.com?id=bar#asdf</a>, really?');
 		});
 		it("but must be preceded by http", function () {
 			var text = "at foo.com, really?";
-			expect(addHtmlLinks(text)).toEqual('at foo.com, really?');
+			expect(util.addHtmlLinks(text)).toEqual('at foo.com, really?');
 		});
 	});
 

@@ -25,13 +25,15 @@ function ($, _, ko, timeago, util, Issue) {
 		'These are not the droids you\'re looking for.'
 	];
 
-	var Tracker = function ($messagesList, $nameInput, $messageInput, $form, socket) {
+	var Tracker = function ($nameInput, $messageInput, $form, socket, messageList) {
 		var that = this;
 
-		this.$messagesList = $messagesList;
+		// TODO: extract notifier
+		this.messageList = messageList;
+
 		this.$nameInput = $nameInput;
-		this.namePlaceholder = util.getRandomItem(NAMES);
 		this.$messageInput = $messageInput;
+		this.namePlaceholder = util.getRandomItem(NAMES);
 		this.socket = socket;
 
 		this.disconnected = ko.observable();
@@ -43,7 +45,7 @@ function ($, _, ko, timeago, util, Issue) {
 			return this.version() && this.version().substr(0,7);			
 		}, this);
 		this.user = ko.observable(window.localStorage[USERNAME_KEY]);
-		this.messages = ko.observableArray();
+
 		this.onlineUsers = ko.observableArray();
 		this.issues = ko.observableArray();
 		this.sortedIssues = ko.dependentObservable(function () {
@@ -90,15 +92,13 @@ function ($, _, ko, timeago, util, Issue) {
 			}));
 		});
 		
-		this.socket.on('history', _.bind(this.processHistory, this));
-		
 		this.socket.on('user message', function (event) {
-			that.appendMessage(event);
+			that.messageList.append(event);
 			that.notify(event.speaker, event);
 		});
 		
 		this.socket.on('issue created', function (event) {
-			that.appendMessage(event);
+			that.messageList.append(event);
 			that.notify(event.issue.creator, event);
 			
 			that.issues.push(new Issue(event.issue.id, event.issue));
@@ -109,7 +109,7 @@ function ($, _, ko, timeago, util, Issue) {
 		}
 		
 		this.socket.on('issue closed', function (closer, event) {
-			that.appendMessage(event);
+			that.messageList.append(event);
 			that.notify(closer, event);
 			
 			var issue = that.findIssue(event.issue.id);
@@ -117,34 +117,24 @@ function ($, _, ko, timeago, util, Issue) {
 		});	
 		
 		this.socket.on('issue assigned', function (event) {
-			that.appendMessage(event);
+			that.messageList.append(event);
 			var issue = that.findIssue(event.issue.id);
 			issue.assignee(event.issue.assignee);
 		});
 		
 		this.socket.on('issue updated', function (props, event) {
-			that.appendMessage(event);
+			that.messageList.append(event);
 			that.refreshIssue(event.issue.id, props);
 		});
 
 		this.socket.on('issue prioritized', function (props, event) {
-			that.appendMessage(event);
+			that.messageList.append(event);
 			that.refreshIssue(event.issue.id, props);
 		});
 		
 		this.socket.on('version', function (version) {
 			that.version(version);
 		});
-	};
-	
-	// @VisibleForTesting
-	Tracker.prototype.processHistory = function (events) {
-		if (this.messages().length) {
-			this.messages([]); // TODO: should properly find where left off 
-		}
-		_.each(events, function (event) {
-			this.appendMessage(event);
-		}, this);
 	};
 
 	// doesn't highlight if filtering issues, but not a big deal
@@ -386,15 +376,6 @@ function ($, _, ko, timeago, util, Issue) {
 
 	Tracker.prototype.send = function (message) {
 		this.socket.emit('user message', message);
-	};
-	
-	function scrollToBottom(el) {
-		el.scrollTop = el.scrollHeight;
-	}
-	
-	Tracker.prototype.appendMessage = function (event) {
-		this.messages.push({msg: event.message, speaker: event.speaker});
-		scrollToBottom(this.$messagesList.get(0));
 	};
 
 	Tracker.prototype.refreshIssue = function (id, props) {

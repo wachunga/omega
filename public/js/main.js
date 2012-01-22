@@ -9,7 +9,7 @@ require.config({
 	}
 });
 
-require(['jquery', 'Tracker', 'util'], function ($, Tracker, util) {
+require(['jquery', 'Tracker', 'MessageList'], function ($, Tracker, MessageList) {
 	var socket = io.connect();
 	
 	$(function () {
@@ -17,7 +17,8 @@ require(['jquery', 'Tracker', 'util'], function ($, Tracker, util) {
 			alert("Your browser is very out of date. To use Ω, please use a newer browser.");
 			return;
 		}
-		tracker = new Tracker($("#messages"), $("#nameInput"), $("#messageInput"), $("#form"), socket);
+		var messageList = new MessageList($("#messages"), socket);
+		tracker = new Tracker($("#nameInput"), $("#messageInput"), $("#form"), socket, messageList);
 	});
 	
 	function isLocalStorageSupported() {

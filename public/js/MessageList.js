@@ -1,6 +1,6 @@
-define(['ko', 'underscore'], function (ko, _) {
+define(['ko', 'underscore', 'SocketManager'], function (ko, _, socket) {
 
-	function MessageList($element, socket) {
+	function MessageList($element) {
 		this.$element = $element;
 		this.messages = ko.observableArray();
 

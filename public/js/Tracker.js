@@ -1,10 +1,10 @@
-/* global $, ko, socket, _, window */
+/* global window */
 
 define([
 	'jquery', 'underscore', 'ko', 'timeago',
-	'util', 'Issue'
+	'util', 'Issue', 'Notifier', 'SocketManager'
 ],
-function ($, _, ko, timeago, util, Issue) {
+function ($, _, ko, timeago, util, Issue, Notifier, socket) {
 
 	var USERNAME_KEY = 'OmegaIssueTracker.username';
 	var NAMES = [
@@ -25,16 +25,15 @@ function ($, _, ko, timeago, util, Issue) {
 		'These are not the droids you\'re looking for.'
 	];
 
-	var Tracker = function ($nameInput, $messageInput, $form, socket, messageList, notifier) {
+	var Tracker = function ($nameInput, $messageInput, $form, messageList) {
 		var that = this;
 
 		this.messageList = messageList;
-		this.notifier = notifier;
+		this.notifier = new Notifier();
 
 		this.$nameInput = $nameInput;
 		this.$messageInput = $messageInput;
 		this.namePlaceholder = util.getRandomItem(NAMES);
-		this.socket = socket;
 
 		this.disconnected = ko.observable();
 		this.loggedIn = ko.observable(false);
@@ -43,8 +42,8 @@ function ($, _, ko, timeago, util, Issue) {
 		this.shortVersion = ko.dependentObservable(function () {
 			return this.version() && this.version().substr(0,7);			
 		}, this);
-		this.user = ko.observable(window.localStorage[USERNAME_KEY]);
 
+		this.user = ko.observable(window.localStorage[USERNAME_KEY]);
 		this.onlineUsers = ko.observableArray();
 		this.issues = ko.observableArray();
 		this.sortedIssues = ko.dependentObservable(function () {
@@ -67,36 +66,36 @@ function ($, _, ko, timeago, util, Issue) {
 		
 		$(window).bind('hashchange', _.bind(this.showBookmarkedIssue, this));
 		
-		this.socket.on('connect', function () {
+		socket.on('connect', function () {
 			that.disconnected(false);
 			if (that.user()) {
 				that.login(that.user());
 			}
 		});
 
-		this.socket.on('disconnect', function () {
+		socket.on('disconnect', function () {
 			that.disconnected(true);
 		});
 		
-		this.socket.on('issues', function (issues) {
+		socket.on('issues', function (issues) {
 			that.issues(_.map(issues, function (issue) {
 				return new Issue(issue.id, issue);
 			}));
 			that.showBookmarkedIssue();
 		});
 		
-		this.socket.on('usernames', function (users) {
+		socket.on('usernames', function (users) {
 			that.onlineUsers(_.map(users, function (count, name) {
 				return { name: name, count: count };
 			}));
 		});
 		
-		this.socket.on('user message', function (event) {
+		socket.on('user message', function (event) {
 			that.messageList.append(event);
 			that.notifier.notify(event.speaker, event);
 		});
 		
-		this.socket.on('issue created', function (event) {
+		socket.on('issue created', function (event) {
 			that.messageList.append(event);
 			that.notifier.notify(event.issue.creator, event);
 			
@@ -107,7 +106,7 @@ function ($, _, ko, timeago, util, Issue) {
 			return text + ' ' + util.getRandomItem(FLAVOUR);
 		}
 		
-		this.socket.on('issue closed', function (closer, event) {
+		socket.on('issue closed', function (closer, event) {
 			that.messageList.append(event);
 			that.notifier.notify(closer, event);
 			
@@ -115,23 +114,23 @@ function ($, _, ko, timeago, util, Issue) {
 			issue.closed(true);
 		});	
 		
-		this.socket.on('issue assigned', function (event) {
+		socket.on('issue assigned', function (event) {
 			that.messageList.append(event);
 			var issue = that.findIssue(event.issue.id);
 			issue.assignee(event.issue.assignee);
 		});
 		
-		this.socket.on('issue updated', function (props, event) {
+		socket.on('issue updated', function (props, event) {
 			that.messageList.append(event);
 			that.refreshIssue(event.issue.id, props);
 		});
 
-		this.socket.on('issue prioritized', function (props, event) {
+		socket.on('issue prioritized', function (props, event) {
 			that.messageList.append(event);
 			that.refreshIssue(event.issue.id, props);
 		});
 		
-		this.socket.on('version', function (version) {
+		socket.on('version', function (version) {
 			that.version(version);
 		});
 	};
@@ -165,13 +164,13 @@ function ($, _, ko, timeago, util, Issue) {
 		delete window.localStorage[USERNAME_KEY];
 		this.user(undefined);
 		this.$nameInput.focus();
-		this.socket.emit('logout');
+		socket.emit('logout');
 	};
 	
 	Tracker.prototype.login = function (name) {
 		var that = this;
 		this.loggedIn(false);
-		this.socket.emit('login user', name, function (invalidName) {
+		socket.emit('login user', name, function (invalidName) {
 			if (!invalidName) {
 				window.localStorage[USERNAME_KEY] = name;
 				that.$nameInput.val('');
@@ -306,38 +305,38 @@ function ($, _, ko, timeago, util, Issue) {
 	};
 	
 	Tracker.prototype.createIssue = function (desc) {
-		this.socket.emit('new issue', desc);
+		socket.emit('new issue', desc);
 	};
 	
 	Tracker.prototype.assignIssue = function (id, assignee) {
-		this.socket.emit('assign issue', id, assignee);
+		socket.emit('assign issue', id, assignee);
 	};
 	
 	Tracker.prototype.closeIssue = function (id) {
 		if (this.findIssue(id).closed()) {
 			return;
 		}
-		this.socket.emit('close issue', id);
+		socket.emit('close issue', id);
 	};
 	
 	Tracker.prototype.updateIssue = function (id, props) {
-		this.socket.emit('update issue', id, props);
+		socket.emit('update issue', id, props);
 	};
 
 	Tracker.prototype.prioritizeIssue = function (id) {
-		this.socket.emit('prioritize issue', id);
+		socket.emit('prioritize issue', id);
 	};
 
 	Tracker.prototype.reset = function () {
 		if (window.confirm('Warning: this will completely delete all issues from the server.')) {
 			if (window.confirm('I have a bad feeling about this. Are you absolutely sure?')) {
-				this.socket.emit('reset issues');
+				socket.emit('reset issues');
 			}
 		}
 	};
 
 	Tracker.prototype.send = function (message) {
-		this.socket.emit('user message', message);
+		socket.emit('user message', message);
 	};
 
 	Tracker.prototype.refreshIssue = function (id, props) {

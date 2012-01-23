@@ -6,20 +6,21 @@ require.config({
 		'ko': 'lib/knockout-2.0.0.min',
 		'underscore': 'lib/underscore-1.2.2.min',
 		'timeago': 'lib/jquery.timeago'
-	}
+	},
+	priority: ['SocketManager']
 });
 
 require(['jquery', 'Tracker', 'MessageList', 'Notifier'], function ($, Tracker, MessageList, Notifier) {
-	var socket = io.connect();
-	
+
 	$(function () {
 		if (!isLocalStorageSupported) {
-			alert("Your browser is very out of date. To use Ω, please use a newer browser.");
+			alert("Your browser is very out of date. To use Ω, please use a newer browser."); // TODO: graceful degradation
 			return;
 		}
-		var notifier = new Notifier();
-		var messageList = new MessageList($("#messages"), socket);
-		tracker = new Tracker($("#nameInput"), $("#messageInput"), $("#form"), socket, messageList, notifier);
+
+		//var userManager = new UserManager(socket);
+		var messageList = new MessageList($("#messages"));
+		tracker = new Tracker($("#nameInput"), $("#messageInput"), $("#form"), messageList);
 	});
 	
 	function isLocalStorageSupported() {

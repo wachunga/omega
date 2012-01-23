@@ -11,7 +11,7 @@
 <body>
 
 <div id="header">
-	<h1>Ω</h1><div id="loggedInUser" data-bind="visible: !!user()">welcome, <strong data-bind="html: user"></strong> | <span class="notificationToggle" data-bind="text: notifier.webNotifyEnabled() ? '⚑' : '⚐', click: notifier.requestNotificationPermission, attr: { title: notifier.statusMessage }"></span> | <a href="#" data-bind="click: logout">kthxbye</a></div>
+	<h1>Ω</h1><div id="loggedInUser" data-bind="visible: !!user()">welcome, <strong data-bind="text: user"></strong> | <span class="notificationToggle" data-bind="text: notifier.webNotifyEnabled() ? '⚑' : '⚐', click: notifier.requestNotificationPermission, attr: { title: notifier.statusMessage }"></span> | <a href="#" data-bind="click: logout">kthxbye</a></div>
 </div>
 <ul id="messages" data-bind="foreach: { data: messageList.messages, beforeRemove: function(elem) { $(elem).fadeOut() }, afterAdd: function(elem) { $(elem).hide().fadeIn('fast') } }">
 	<li data-bind="css: { system: !speaker }"><span class="speaker" data-bind="text: speaker ? speaker + ': ' : ''"></span><span data-bind="html: $parent.addHtmlLinks(msg)"></span></li>

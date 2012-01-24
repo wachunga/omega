@@ -18,12 +18,8 @@
 </ul>
 <div id="onlineUsers">
 	online:
-	<!-- ko foreach: onlineUsers -->
-	<span class="onlineUser">
-		<span data-bind="text: name"></span><!-- ko if: count > 1 --> <span class="subtle" data-bind="text: '(' + count + ')'"></span><!-- /ko -->
-	</span>
-	<!-- /ko -->
-	<!-- ko if: !onlineUsers().length -->
+	<!-- ko template: { name: 'asdf', foreach: userManager.onlineUsers } --><!-- /ko -->
+	<!-- ko if: !userManager.onlineUsers().length -->
 	<span class="subtle">nobody</span>
 	<!-- /ko -->
 </div>
@@ -63,6 +59,8 @@
 	Powered by node.js. <a href="https://github.com/wachunga/omega">Hosted</a> on GitHub.
 	<span data-bind="fadeVisible: !!version()">Version <a data-bind="attr: { href: 'https://github.com/wachunga/omega/commit/' + shortVersion() }, text: shortVersion"></a>.</span>
 </div>
+
+<script type="text/html" id="asdf"><span class="onlineUser"><span data-bind="text: name"></span><!-- ko if: count > 1 --> <span class="subtle" data-bind="text: '(' + count + ')'"></span><!-- /ko --></span></script>
 
 </body>
 </html>

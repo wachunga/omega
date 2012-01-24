@@ -34,8 +34,6 @@ function ($, _, ko, timeago, util, Issue, Notifier, socket, UserManager, Message
 			return this.version() && this.version().substr(0,7);			
 		}, this);
 
-		this.onlineUsers = ko.observableArray();
-
 		this.issues = ko.observableArray();
 		this.sortedIssues = ko.dependentObservable(function () {
 			return this.issues().sort(Issue.sort);
@@ -72,12 +70,6 @@ function ($, _, ko, timeago, util, Issue, Notifier, socket, UserManager, Message
 			that.showBookmarkedIssue();
 		});
 		
-		socket.on('usernames', function (users) {
-			that.onlineUsers(_.map(users, function (count, name) {
-				return { name: name, count: count };
-			}));
-		});
-		
 		socket.on('user message', function (event) {
 			that.messageList.append(event);
 			that.notifier.notify(event.speaker, event);
@@ -89,7 +81,8 @@ function ($, _, ko, timeago, util, Issue, Notifier, socket, UserManager, Message
 			
 			that.issues.push(new Issue(event.issue.id, event.issue));
 		});	
-		
+
+		// FIXME - unused
 		function addFlavour(text) {
 			return text + ' ' + util.getRandomItem(FLAVOUR);
 		}

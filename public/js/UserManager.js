@@ -14,9 +14,18 @@ define(['jquery', 'ko', 'underscore', 'util', 'SocketManager'], function ($, ko,
 		this.invalidName = ko.observable(false);
 
 		this.user = ko.observable(window.localStorage[USERNAME_KEY]);
+		this.onlineUsers = ko.observableArray();
 
 		this.loggedIn = ko.observable(false);
 		this.logout = _.bind(this.logout, this);
+
+		socket.on('usernames', _.bind(populateOnlineUsers, this));
+	}
+
+	function populateOnlineUsers(users) {
+		this.onlineUsers(_.map(users, function (count, name) {
+			return { name: name, count: count };
+		}));
 	}
 
 	UserManager.prototype.noUser = function () {

@@ -6,8 +6,7 @@ require.config({
 		'ko': 'lib/knockout-2.0.0.min',
 		'underscore': 'lib/underscore-1.2.2.min',
 		'timeago': 'lib/jquery.timeago'
-	},
-	priority: ['SocketManager']
+	}
 });
 
 require(['jquery', 'Tracker'], function ($, Tracker) {

@@ -10,7 +10,7 @@ require.config({
 	priority: ['SocketManager']
 });
 
-require(['jquery', 'Tracker', 'MessageList', 'Notifier'], function ($, Tracker, MessageList, Notifier) {
+require(['jquery', 'Tracker'], function ($, Tracker) {
 
 	$(function () {
 		if (!isLocalStorageSupported) {
@@ -18,9 +18,7 @@ require(['jquery', 'Tracker', 'MessageList', 'Notifier'], function ($, Tracker, 
 			return;
 		}
 
-		//var userManager = new UserManager(socket);
-		var messageList = new MessageList($("#messages"));
-		tracker = new Tracker($("#nameInput"), $("#messageInput"), $("#form"), messageList);
+		tracker = new Tracker($("#nameInput"), $("#messageInput"), $("#form"), $("#messages"));
 	});
 	
 	function isLocalStorageSupported() {

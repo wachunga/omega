@@ -11,10 +11,10 @@
 <body>
 
 <div id="header">
-	<h1>Ω</h1><div id="loggedInUser" data-bind="visible: !!user()">welcome, <strong data-bind="text: user"></strong> | <span class="notificationToggle" data-bind="text: notifier.webNotifyEnabled() ? '⚑' : '⚐', click: notifier.requestNotificationPermission, attr: { title: notifier.statusMessage }"></span> | <a href="#" data-bind="click: logout">kthxbye</a></div>
+	<h1>Ω</h1><div id="loggedInUser" data-bind="visible: userManager.user()">welcome, <strong data-bind="text: userManager.user"></strong> | <span class="notificationToggle" data-bind="text: notifier.webNotifyEnabled() ? '⚑' : '⚐', click: notifier.requestNotificationPermission, attr: { title: notifier.statusMessage }"></span> | <a href="#" data-bind="click: userManager.logout">kthxbye</a></div>
 </div>
 <ul id="messages" data-bind="foreach: { data: messageList.messages, beforeRemove: function(elem) { $(elem).fadeOut() }, afterAdd: function(elem) { $(elem).hide().fadeIn('fast') } }">
-	<li data-bind="css: { system: !speaker }"><span class="speaker" data-bind="text: speaker ? speaker + ': ' : ''"></span><span data-bind="html: $parent.addHtmlLinks(msg)"></span></li>
+	<li data-bind="css: { system: !speaker }"><span class="speaker" data-bind="text: speaker ? speaker + ': ' : ''"></span><span data-bind="html: $root.addHtmlLinks(msg)"></span></li>
 </ul>
 <div id="onlineUsers">
 	online:
@@ -29,9 +29,10 @@
 </div>
 <h3 class="warningMessage loud" data-bind="visible: disconnected()">Warning: disconnected from server. Attempting to reconnect...</h3>
 <form id="form" autocomplete="off" data-bind="visible: !disconnected(), submit: handleInput">
-	<label data-bind="visible: !user()">You're not signed in. Who are you? <input id="nameInput" type="text" data-bind="attr: { placeholder: namePlaceholder }" /></label>
-	<span class="invalidName loud" data-bind="fadeVisible: !user() && invalidName()">I don't think so. Try again.</span>
-	<input id="messageInput" type="text" data-bind="visible: user()" tabindex="1" placeholder="Type commands (like '/help') or just chat it up"/>
+	<label data-bind="visible: userManager.noUser()">You're not signed in. Who are you? <input id="nameInput" type="text" data-bind="attr: { placeholder: userManager.namePlaceholder }" /></label>
+	<span class="invalidName loud" data-bind="fadeVisible: userManager.invalidName">I don't think so. Try again.</span>
+
+	<input id="messageInput" type="text" data-bind="visible: userManager.user()" tabindex="1" placeholder="Type commands (like '/help') or just chat it up"/>
 	<input class="offscreen" type="submit"/>
 </form>
 <dl id="commandList" data-bind="fadeVisible: helpOpen, click: function() { helpOpen(false); $messageInput.focus(); }">
@@ -51,9 +52,9 @@
 	<h2>Issues <span data-bind="fadeVisible: issues().length >= 3" class="issueCounts subtle">(<var data-bind="text: openIssuesCount"></var> open, <var data-bind="text: issues().length - openIssuesCount()"></var> closed)</span></h2>
 	<p class="noneMessage subtle" data-bind="fadeVisible: !issues().length || (hideClosed() && openIssuesCount() == 0)">No open issues. w00t!</p>
 	<ul class="issuesList" data-bind="foreach: { data: sortedIssues, afterRender: applyTimeago }">
-		<li data-bind="attr: { id: id }, fadeVisible: !($parent.hideClosed() && closed()) && !($parent.hideAssigned() && assignee() != 'nobody'), css: { closed: closed, highlighted: id === $parent.highlightedIssue() }"><a data-bind="attr: { href: '#' + id }, text: id" title="Permalink" class="issueId"></a>:&nbsp;<span class="loud" data-bind="text: critical() ? '★ ' : ''"></span>
-			<span class="assignee" data-bind="css: { myself: $parent.user() && assignee().toLowerCase() === $parent.user().toLowerCase() }, text: assignee().toLowerCase() !== 'nobody' ? '(@' + assignee() + ')' : ''"></span>
-			&nbsp;<span class="description" data-bind="html: $parent.addHtmlLinks(description)"></span>
+		<li data-bind="attr: { id: id }, fadeVisible: !($root.hideClosed() && closed()) && !($root.hideAssigned() && assignee() != 'nobody'), css: { closed: closed, highlighted: id === $root.highlightedIssue() }"><a data-bind="attr: { href: '#' + id }, text: id" title="Permalink" class="issueId"></a>:&nbsp;<span class="loud" data-bind="text: critical() ? '★ ' : ''"></span>
+			<span class="assignee" data-bind="css: { myself: $root.userManager.isCurrentUser(assignee()) }, text: assignee().toLowerCase() !== 'nobody' ? '(@' + assignee() + ')' : ''"></span>
+			&nbsp;<span class="description" data-bind="html: $root.addHtmlLinks(description)"></span>
 			&nbsp;<span class="details subtle">(created by <span data-bind="text: creator"></span> <time data-bind="attr: { datetime: createdDate }"></time>)</span>
 		</li>
 	</ul>

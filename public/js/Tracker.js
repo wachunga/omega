@@ -2,16 +2,10 @@
 
 define([
 	'jquery', 'underscore', 'ko', 'timeago',
-	'util', 'Issue', 'Notifier', 'SocketManager'
+	'util', 'Issue', 'Notifier', 'SocketManager', 'UserManager', 'MessageList'
 ],
-function ($, _, ko, timeago, util, Issue, Notifier, socket) {
+function ($, _, ko, timeago, util, Issue, Notifier, socket, UserManager, MessageList) {
 
-	var USERNAME_KEY = 'OmegaIssueTracker.username';
-	var NAMES = [
-		'Captain Hammer', 'Release Llama', 'Chuck Norris',
-		'Snozzcumber', 'Hurley', 'Inigo Montoya', 'Leeroy Jenkins',
-		'Richard Castle'
-	];
 	var FLAVOUR = [
 		'You, sir, are a genius.', 'Die issues, die!', '*golf clap*',
 		'Ω &hearts; you.', 'You deserve a break.',
@@ -25,52 +19,46 @@ function ($, _, ko, timeago, util, Issue, Notifier, socket) {
 		'These are not the droids you\'re looking for.'
 	];
 
-	var Tracker = function ($nameInput, $messageInput, $form, messageList) {
+	var Tracker = function ($nameInput, $messageInput, $form, $messageList) {
 		var that = this;
 
-		this.messageList = messageList;
+		this.messageList = new MessageList($messageList);
+		this.userManager = new UserManager($nameInput);
 		this.notifier = new Notifier();
-
-		this.$nameInput = $nameInput;
 		this.$messageInput = $messageInput;
-		this.namePlaceholder = util.getRandomItem(NAMES);
 
 		this.disconnected = ko.observable();
-		this.loggedIn = ko.observable(false);
-		this.invalidName = ko.observable(false);
+
 		this.version = ko.observable();
 		this.shortVersion = ko.dependentObservable(function () {
 			return this.version() && this.version().substr(0,7);			
 		}, this);
 
-		this.user = ko.observable(window.localStorage[USERNAME_KEY]);
 		this.onlineUsers = ko.observableArray();
+
 		this.issues = ko.observableArray();
 		this.sortedIssues = ko.dependentObservable(function () {
 			return this.issues().sort(Issue.sort);
 		}, this);
-		this.addHtmlLinks = util.addHtmlLinks;
-
 		this.openIssuesCount = ko.dependentObservable(function () {
 			return _.select(this.issues(), function (issue) {
 				return !issue.closed();
 			}).length;
 		}, this);
-		
+		this.highlightedIssue = ko.observable();
+
 		this.hideClosed = ko.observable(true);
 		this.hideAssigned = ko.observable(false);
 		this.helpOpen = ko.observable(false);
-		this.highlightedIssue = ko.observable();
+		this.addHtmlLinks = util.addHtmlLinks;
 
 		ko.applyBindings(this);
-		
+
 		$(window).bind('hashchange', _.bind(this.showBookmarkedIssue, this));
 		
 		socket.on('connect', function () {
 			that.disconnected(false);
-			if (that.user()) {
-				that.login(that.user());
-			}
+			that.userManager.loginExistingUserIfAny();
 		});
 
 		socket.on('disconnect', function () {
@@ -159,27 +147,6 @@ function ($, _, ko, timeago, util, Issue, Notifier, socket) {
 			return issue.id === id;
 		});
 	};
-
-	Tracker.prototype.logout = function () {
-		delete window.localStorage[USERNAME_KEY];
-		this.user(undefined);
-		this.$nameInput.focus();
-		socket.emit('logout');
-	};
-	
-	Tracker.prototype.login = function (name) {
-		var that = this;
-		this.loggedIn(false);
-		socket.emit('login user', name, function (invalidName) {
-			if (!invalidName) {
-				window.localStorage[USERNAME_KEY] = name;
-				that.$nameInput.val('');
-				that.user(name);
-			}
-			that.loggedIn(!invalidName);
-			that.invalidName(invalidName);
-		});
-	};
 	
 	function isCommand(input) {
 		return _.include([':', '/'], input.trim().charAt(0));
@@ -204,12 +171,12 @@ function ($, _, ko, timeago, util, Issue, Notifier, socket) {
 	};
 
 	Tracker.prototype.handleInput = function () {
-		if (!this.user()) {
-			this.handleNameInput();
+		if (this.userManager.noUser()) {
+			this.userManager.attemptLogin();
 			return;
 		}
 
-		if (!this.loggedIn()) {
+		if (!this.userManager.loggedIn()) {
 			return;
 		}
 		var input = this.$messageInput.val();
@@ -293,17 +260,6 @@ function ($, _, ko, timeago, util, Issue, Notifier, socket) {
 		}
 	};
 
-	Tracker.prototype.handleNameInput = function () {
-		this.invalidName(false);
-		var name = this.$nameInput.val();
-		if (!name || name.trim().length < 3) { // TODO: disallow other chars?
-			this.invalidName(true);
-			return;
-		}
-
-		this.login(name);
-	};
-	
 	Tracker.prototype.createIssue = function (desc) {
 		socket.emit('new issue', desc);
 	};

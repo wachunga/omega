@@ -22,7 +22,7 @@ describe("omega", function () {
 
 	beforeEach(function () {
 		tracker = new Tracker(name, messageInput, form, messagesElement, socket);
-		tracker.userManager.user("norris");
+		tracker.userManager.current("norris");
 		tracker.userManager.loggedIn(true);
 	});
 	
@@ -56,7 +56,7 @@ describe("omega", function () {
 	describe("handles login", function () {
 		it("accepts valid names", function () {
 			name.val = function () { return "norris"; };
-			tracker.userManager.user(undefined);
+			tracker.userManager.current(undefined);
 
 			spyOn(socket, 'emit');
 			tracker.handleInput();
@@ -66,7 +66,7 @@ describe("omega", function () {
 		});
 		it("rejects empty name", function () {
 			name.val = function () { return ""; };
-			tracker.userManager.user(undefined);
+			tracker.userManager.current(undefined);
 
 			spyOn(socket, 'emit');
 			tracker.handleInput();
@@ -75,7 +75,7 @@ describe("omega", function () {
 		});
 		it("rejects short names", function () {
 			name.val = function () { return "yo"; };
-			tracker.userManager.user(undefined);
+			tracker.userManager.current(undefined);
 
 			spyOn(socket, 'emit');
 			tracker.handleInput();
@@ -84,7 +84,7 @@ describe("omega", function () {
 		});
 		it("rejects reserved names", function () {
 			name.val = function () { return "nobody"; };
-			tracker.userManager.user(undefined);
+			tracker.userManager.current(undefined);
 
 			spyOn(socket, 'emit');
 			tracker.handleInput();

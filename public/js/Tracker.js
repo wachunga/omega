@@ -25,7 +25,7 @@ function ($, _, ko, timeago, util, Issue, Notifier, UserManager, MessageList) {
 		this.socket = socket;
 		this.messageList = new MessageList($messageList, socket);
 		this.userManager = new UserManager($nameInput, socket);
-		this.notifier = new Notifier();
+		this.notifier = new Notifier(this.userManager);
 		this.$messageInput = $messageInput;
 
 		this.disconnected = ko.observable(true);

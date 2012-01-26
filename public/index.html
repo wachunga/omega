@@ -11,7 +11,7 @@
 <body>
 
 <div id="header">
-	<h1>Ω</h1><div id="loggedInUser" data-bind="visible: userManager.user()">welcome, <strong data-bind="text: userManager.user"></strong> | <span class="notificationToggle" data-bind="text: notifier.webNotifyEnabled() ? '⚑' : '⚐', click: notifier.requestNotificationPermission, attr: { title: notifier.statusMessage }"></span> | <a href="#" data-bind="click: userManager.logout">kthxbye</a></div>
+	<h1>Ω</h1><div id="loggedInUser" data-bind="visible: userManager.current()">welcome, <strong data-bind="text: userManager.current"></strong> | <span class="notificationToggle" data-bind="text: notifier.webNotifyEnabled() ? '⚑' : '⚐', click: notifier.requestNotificationPermission, attr: { title: notifier.statusMessage }"></span> | <a href="#" data-bind="click: userManager.logout">kthxbye</a></div>
 </div>
 <ul id="messages" data-bind="foreach: { data: messageList.messages, beforeRemove: function(elem) { $(elem).fadeOut() }, afterAdd: function(elem) { $(elem).hide().fadeIn('fast') } }">
 	<li data-bind="css: { system: !speaker }"><span class="speaker" data-bind="text: speaker ? speaker + ': ' : ''"></span><span data-bind="html: $root.addHtmlLinks(msg)"></span></li>
@@ -28,7 +28,7 @@
 	<label data-bind="visible: userManager.noUser()">You're not signed in. Who are you? <input id="nameInput" type="text" data-bind="attr: { placeholder: userManager.namePlaceholder }" /></label>
 	<span class="invalidName loud" data-bind="fadeVisible: userManager.invalidName">I don't think so. Try again.</span>
 
-	<input id="messageInput" type="text" data-bind="visible: userManager.user()" tabindex="1" placeholder="Type commands (like '/help') or just chat it up"/>
+	<input id="messageInput" type="text" data-bind="visible: userManager.current()" tabindex="1" placeholder="Type commands (like '/help') or just chat it up"/>
 	<input class="offscreen" type="submit"/>
 </form>
 <dl id="commandList" data-bind="fadeVisible: helpOpen, click: function() { helpOpen(false); $messageInput.focus(); }">

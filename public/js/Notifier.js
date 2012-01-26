@@ -3,9 +3,9 @@ define(['ko', 'underscore'], function (ko, _) {
 	var NOTIFICATION_ALLOWED = 0; // unintuitive, but correct
 	var NOTIFICATION_DURATION = 4000;
 
-	function Notifier() {
+	function Notifier(users) {
 		this.webNotifyEnabled = ko.observable(checkWebNotificationEnabled());
-		this.user = ko.observable(); // fixme
+		this.currentUser = users.current;
 
 		this.statusMessage = ko.computed(function () {
 			return this.webNotifyEnabled() ? 'Web notifications are enabled' : 'Web notifications are disabled';
@@ -15,7 +15,7 @@ define(['ko', 'underscore'], function (ko, _) {
 	}
 
 	Notifier.prototype.notify = function (user, event) {
-		if (!window.webkitNotifications || !this.webNotifyEnabled() || user === this.user() || !event.notification) {
+		if (!window.webkitNotifications || !this.webNotifyEnabled() || user === this.currentUser() || !event.notification) {
 			return;
 		}
 

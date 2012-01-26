@@ -13,7 +13,7 @@ define(['jquery', 'ko', 'underscore', 'util'], function ($, ko, _, util) {
 		this.namePlaceholder = util.getRandomItem(NAMES);
 		this.invalidName = ko.observable(false);
 
-		this.user = ko.observable(window.localStorage[USERNAME_KEY]);
+		this.current = ko.observable(window.localStorage[USERNAME_KEY]);
 		this.onlineUsers = ko.observableArray();
 
 		this.loggedIn = ko.observable(false);
@@ -30,7 +30,7 @@ define(['jquery', 'ko', 'underscore', 'util'], function ($, ko, _, util) {
 	}
 
 	UserManager.prototype.noUser = function () {
-		return !this.user();
+		return !this.current();
 	};
 
 	UserManager.prototype.attemptLogin = function () {
@@ -51,7 +51,7 @@ define(['jquery', 'ko', 'underscore', 'util'], function ($, ko, _, util) {
 			if (!invalidName) {
 				window.localStorage[USERNAME_KEY] = name;
 				that.$nameInput.val('');
-				that.user(name);
+				that.current(name);
 			}
 			that.loggedIn(!invalidName);
 			that.invalidName(invalidName);
@@ -61,18 +61,18 @@ define(['jquery', 'ko', 'underscore', 'util'], function ($, ko, _, util) {
 	UserManager.prototype.logout = function () {
 		this.$nameInput.focus();
 		delete window.localStorage[USERNAME_KEY];
-		this.user(undefined);
+		this.current(undefined);
 		this.socket.emit('logout');
 	};
 
 	UserManager.prototype.loginExistingUserIfAny = function () {
-		if (this.user()) {
-			this.login(this.user());
+		if (this.current()) {
+			this.login(this.current());
 		}
 	};
 
 	UserManager.prototype.isCurrentUser = function (name) {
-		return this.user() && name.toLowerCase() === this.user().toLowerCase();
+		return this.current() && name.toLowerCase() === this.current().toLowerCase();
 	};
 
 	return UserManager;

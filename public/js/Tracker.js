@@ -143,7 +143,7 @@ function ($, _, ko, timeago, util, Issue, Notifier, UserManager, MessageList) {
 	};
 	
 	function isCommand(input) {
-		return _.include([':', '/'], input.trim().charAt(0));
+		return input.trim().charAt(0) === "/";
 	}
 	
 	function requireArgument() {

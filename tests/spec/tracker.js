@@ -144,6 +144,14 @@ describe("omega", function () {
 			expect(socket.emit).toHaveBeenCalledWith('user message', 'hello peeps');
 		});
 
+		it("can emote", function () {
+			messageInput.val = function () { return ":)"; };
+
+			spyOn(socket, 'emit');
+			tracker.handleInput();
+			expect(socket.emit).toHaveBeenCalledWith('user message', ':)');
+		});
+
 		it("can reset", function () {
 			messageInput.val = function () { return "/reset"; };
 
@@ -169,7 +177,7 @@ describe("omega", function () {
 		});
 
 		it ("can prioritize issues", function () {
-			messageInput.val = function () { return ":star 5"; };
+			messageInput.val = function () { return "/star 5"; };
 
 			spyOn(tracker, 'prioritizeIssue');
 			tracker.handleInput();
@@ -177,7 +185,7 @@ describe("omega", function () {
 		});
 		
 		it("can assign multi-digit issues", function () {
-			messageInput.val = function () { return ":assign 50"; };
+			messageInput.val = function () { return "/assign 50"; };
 		
 			spyOn(tracker, 'assignIssue');
 			tracker.handleInput();
@@ -195,7 +203,7 @@ describe("omega", function () {
 			});
 
 			it("create no args", function () {
-				messageInput.val = function () { return ":create"; };
+				messageInput.val = function () { return "/create"; };
 				
 				spyOn(tracker, 'notifyOfBadCommand');
 				tracker.handleInput();
@@ -203,7 +211,7 @@ describe("omega", function () {
 			});
 			
 			it("create whitespace only", function () {
-				messageInput.val = function () { return ":create  "; };
+				messageInput.val = function () { return "/create  "; };
 				
 				spyOn(tracker, 'notifyOfBadCommand');
 				tracker.handleInput();
@@ -211,7 +219,7 @@ describe("omega", function () {
 			});
 			
 			it("assign no args", function () {
-				messageInput.val = function () { return ":assign"; };
+				messageInput.val = function () { return "/assign"; };
 				
 				spyOn(tracker, 'notifyOfBadCommand');
 				tracker.handleInput();
@@ -219,7 +227,7 @@ describe("omega", function () {
 			});
 			
 			it("assign bad id", function () {
-				messageInput.val = function () { return ":assign this is not an id"; };
+				messageInput.val = function () { return "/assign this is not an id"; };
 				
 				spyOn(tracker, 'notifyOfBadCommand');
 				tracker.handleInput();
@@ -227,7 +235,7 @@ describe("omega", function () {
 			});
 			
 			it("critical no args", function () {
-				messageInput.val = function () { return ":critical"; };
+				messageInput.val = function () { return "/critical"; };
 				
 				spyOn(tracker, 'notifyOfBadCommand');
 				tracker.handleInput();
@@ -235,7 +243,7 @@ describe("omega", function () {
 			});
 			
 			it("critical bad id", function () {
-				messageInput.val = function () { return ":critical this is not an id"; };
+				messageInput.val = function () { return "/critical this is not an id"; };
 				
 				spyOn(tracker, 'notifyOfBadCommand');
 				tracker.handleInput();
@@ -243,7 +251,7 @@ describe("omega", function () {
 			});
 			
 			it("edit no args", function () {
-				messageInput.val = function () { return ":edit"; };
+				messageInput.val = function () { return "/edit"; };
 				
 				spyOn(tracker, 'notifyOfBadCommand');
 				tracker.handleInput();
@@ -251,7 +259,7 @@ describe("omega", function () {
 			});
 			
 			it("edit bad id", function () {
-				messageInput.val = function () { return ":edit not an id"; };
+				messageInput.val = function () { return "/edit not an id"; };
 				
 				spyOn(tracker, 'notifyOfBadCommand');
 				tracker.handleInput();
@@ -259,7 +267,7 @@ describe("omega", function () {
 			});
 			
 			it("close no args", function () {
-				messageInput.val = function () { return ":close"; };
+				messageInput.val = function () { return "/close"; };
 				
 				spyOn(tracker, 'notifyOfBadCommand');
 				tracker.handleInput();
@@ -267,7 +275,7 @@ describe("omega", function () {
 			});
 			
 			it("close bad id", function () {
-				messageInput.val = function () { return ":close this is not an id"; };
+				messageInput.val = function () { return "/close this is not an id"; };
 				
 				spyOn(tracker, 'notifyOfBadCommand');
 				tracker.handleInput();
@@ -275,7 +283,7 @@ describe("omega", function () {
 			});
 			
 			it("reopen no args", function () {
-				messageInput.val = function () { return ":reopen"; };
+				messageInput.val = function () { return "/reopen"; };
 				
 				spyOn(tracker, 'notifyOfBadCommand');
 				tracker.handleInput();
@@ -283,7 +291,7 @@ describe("omega", function () {
 			});
 			
 			it("reopen bad id", function () {
-				messageInput.val = function () { return ":reopen this is not an id"; };
+				messageInput.val = function () { return "/reopen this is not an id"; };
 				
 				spyOn(tracker, 'notifyOfBadCommand');
 				tracker.handleInput();

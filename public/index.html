@@ -23,7 +23,7 @@
 	<span class="subtle">nobody</span>
 	<!-- /ko -->
 </div>
-<h3 class="warningMessage loud" data-bind="visible: disconnected()">Warning: disconnected from server. Attempting to reconnect...</h3>
+<h3 class="warningMessage loud" data-bind="visible: disconnected">Warning: disconnected from server. Attempting to reconnect...</h3>
 <form id="form" autocomplete="off" data-bind="visible: !disconnected(), submit: handleInput">
 	<label data-bind="visible: userManager.noUser()">You're not signed in. Who are you? <input id="nameInput" type="text" data-bind="attr: { placeholder: userManager.namePlaceholder }" /></label>
 	<span class="invalidName loud" data-bind="fadeVisible: userManager.invalidName">I don't think so. Try again.</span>

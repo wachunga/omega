@@ -2,9 +2,9 @@
 
 define([
 	'jquery', 'underscore', 'ko', 'timeago',
-	'util', 'Issue', 'Notifier', 'SocketManager', 'UserManager', 'MessageList'
+	'util', 'Issue', 'Notifier', 'UserManager', 'MessageList'
 ],
-function ($, _, ko, timeago, util, Issue, Notifier, socket, UserManager, MessageList) {
+function ($, _, ko, timeago, util, Issue, Notifier, UserManager, MessageList) {
 
 	var FLAVOUR = [
 		'You, sir, are a genius.', 'Die issues, die!', '*golf clap*',
@@ -19,15 +19,16 @@ function ($, _, ko, timeago, util, Issue, Notifier, socket, UserManager, Message
 		'These are not the droids you\'re looking for.'
 	];
 
-	var Tracker = function ($nameInput, $messageInput, $form, $messageList) {
+	var Tracker = function ($nameInput, $messageInput, $form, $messageList, socket) {
 		var that = this;
 
-		this.messageList = new MessageList($messageList);
-		this.userManager = new UserManager($nameInput);
+		this.socket = socket;
+		this.messageList = new MessageList($messageList, socket);
+		this.userManager = new UserManager($nameInput, socket);
 		this.notifier = new Notifier();
 		this.$messageInput = $messageInput;
 
-		this.disconnected = ko.observable();
+		this.disconnected = ko.observable(true);
 
 		this.version = ko.observable();
 		this.shortVersion = ko.dependentObservable(function () {
@@ -53,29 +54,29 @@ function ($, _, ko, timeago, util, Issue, Notifier, socket, UserManager, Message
 		ko.applyBindings(this);
 
 		$(window).bind('hashchange', _.bind(this.showBookmarkedIssue, this));
-		
-		socket.on('connect', function () {
+
+		this.socket.on('connect', function () {
 			that.disconnected(false);
 			that.userManager.loginExistingUserIfAny();
 		});
 
-		socket.on('disconnect', function () {
+		this.socket.on('disconnect', function () {
 			that.disconnected(true);
 		});
 		
-		socket.on('issues', function (issues) {
+		this.socket.on('issues', function (issues) {
 			that.issues(_.map(issues, function (issue) {
 				return new Issue(issue.id, issue);
 			}));
 			that.showBookmarkedIssue();
 		});
 		
-		socket.on('user message', function (event) {
+		this.socket.on('user message', function (event) {
 			that.messageList.append(event);
 			that.notifier.notify(event.speaker, event);
 		});
 		
-		socket.on('issue created', function (event) {
+		this.socket.on('issue created', function (event) {
 			that.messageList.append(event);
 			that.notifier.notify(event.issue.creator, event);
 			
@@ -87,7 +88,7 @@ function ($, _, ko, timeago, util, Issue, Notifier, socket, UserManager, Message
 			return text + ' ' + util.getRandomItem(FLAVOUR);
 		}
 		
-		socket.on('issue closed', function (closer, event) {
+		this.socket.on('issue closed', function (closer, event) {
 			that.messageList.append(event);
 			that.notifier.notify(closer, event);
 			
@@ -95,23 +96,23 @@ function ($, _, ko, timeago, util, Issue, Notifier, socket, UserManager, Message
 			issue.closed(true);
 		});	
 		
-		socket.on('issue assigned', function (event) {
+		this.socket.on('issue assigned', function (event) {
 			that.messageList.append(event);
 			var issue = that.findIssue(event.issue.id);
 			issue.assignee(event.issue.assignee);
 		});
 		
-		socket.on('issue updated', function (props, event) {
+		this.socket.on('issue updated', function (props, event) {
 			that.messageList.append(event);
 			that.refreshIssue(event.issue.id, props);
 		});
 
-		socket.on('issue prioritized', function (props, event) {
+		this.socket.on('issue prioritized', function (props, event) {
 			that.messageList.append(event);
 			that.refreshIssue(event.issue.id, props);
 		});
 		
-		socket.on('version', function (version) {
+		this.socket.on('version', function (version) {
 			that.version(version);
 		});
 	};
@@ -254,38 +255,38 @@ function ($, _, ko, timeago, util, Issue, Notifier, socket, UserManager, Message
 	};
 
 	Tracker.prototype.createIssue = function (desc) {
-		socket.emit('new issue', desc);
+		this.socket.emit('new issue', desc);
 	};
 	
 	Tracker.prototype.assignIssue = function (id, assignee) {
-		socket.emit('assign issue', id, assignee);
+		this.socket.emit('assign issue', id, assignee);
 	};
 	
 	Tracker.prototype.closeIssue = function (id) {
 		if (this.findIssue(id).closed()) {
 			return;
 		}
-		socket.emit('close issue', id);
+		this.socket.emit('close issue', id);
 	};
 	
 	Tracker.prototype.updateIssue = function (id, props) {
-		socket.emit('update issue', id, props);
+		this.socket.emit('update issue', id, props);
 	};
 
 	Tracker.prototype.prioritizeIssue = function (id) {
-		socket.emit('prioritize issue', id);
+		this.socket.emit('prioritize issue', id);
 	};
 
 	Tracker.prototype.reset = function () {
 		if (window.confirm('Warning: this will completely delete all issues from the server.')) {
 			if (window.confirm('I have a bad feeling about this. Are you absolutely sure?')) {
-				socket.emit('reset issues');
+				this.socket.emit('reset issues');
 			}
 		}
 	};
 
 	Tracker.prototype.send = function (message) {
-		socket.emit('user message', message);
+		this.socket.emit('user message', message);
 	};
 
 	Tracker.prototype.refreshIssue = function (id, props) {

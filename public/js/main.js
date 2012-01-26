@@ -9,7 +9,10 @@ require.config({
 	}
 });
 
+
 require(['jquery', 'Tracker'], function ($, Tracker) {
+
+	var socket = io.connect(); // would love to push this into module, but causes odd race condition in some browser
 
 	$(function () {
 		if (!isLocalStorageSupported) {
@@ -17,7 +20,7 @@ require(['jquery', 'Tracker'], function ($, Tracker) {
 			return;
 		}
 
-		tracker = new Tracker($("#nameInput"), $("#messageInput"), $("#form"), $("#messages"));
+		tracker = new Tracker($("#nameInput"), $("#messageInput"), $("#form"), $("#messages"), socket);
 	});
 	
 	function isLocalStorageSupported() {

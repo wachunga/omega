@@ -1,4 +1,4 @@
-define(['jquery', 'ko', 'underscore', 'util', 'SocketManager'], function ($, ko, _, util, socket) {
+define(['jquery', 'ko', 'underscore', 'util'], function ($, ko, _, util) {
 
 	var USERNAME_KEY = 'OmegaIssueTracker.username';
 
@@ -8,7 +8,7 @@ define(['jquery', 'ko', 'underscore', 'util', 'SocketManager'], function ($, ko,
 		'Richard Castle'
 	];
 
-	function UserManager($nameInput) {
+	function UserManager($nameInput, socket) {
 		this.$nameInput = $nameInput;
 		this.namePlaceholder = util.getRandomItem(NAMES);
 		this.invalidName = ko.observable(false);
@@ -19,7 +19,8 @@ define(['jquery', 'ko', 'underscore', 'util', 'SocketManager'], function ($, ko,
 		this.loggedIn = ko.observable(false);
 		this.logout = _.bind(this.logout, this);
 
-		socket.on('usernames', _.bind(populateOnlineUsers, this));
+		this.socket = socket;
+		this.socket.on('usernames', _.bind(populateOnlineUsers, this));
 	}
 
 	function populateOnlineUsers(users) {
@@ -46,7 +47,7 @@ define(['jquery', 'ko', 'underscore', 'util', 'SocketManager'], function ($, ko,
 	UserManager.prototype.login = function (name) {
 		var that = this;
 		this.loggedIn(false);
-		socket.emit('login user', name, function (invalidName) {
+		this.socket.emit('login user', name, function (invalidName) {
 			if (!invalidName) {
 				window.localStorage[USERNAME_KEY] = name;
 				that.$nameInput.val('');
@@ -61,7 +62,7 @@ define(['jquery', 'ko', 'underscore', 'util', 'SocketManager'], function ($, ko,
 		this.$nameInput.focus();
 		delete window.localStorage[USERNAME_KEY];
 		this.user(undefined);
-		socket.emit('logout');
+		this.socket.emit('logout');
 	};
 
 	UserManager.prototype.loginExistingUserIfAny = function () {

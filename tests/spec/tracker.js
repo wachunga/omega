@@ -1,4 +1,7 @@
-define(['jquery', 'Tracker', 'util', 'MessageList'], function ($, Tracker, util, MessageList) {
+define([
+	'jquery', 'Tracker', 'util'
+],
+function ($, Tracker, util) {
 	
 describe("omega", function () {
 
@@ -16,13 +19,11 @@ describe("omega", function () {
 	};
 	
 	var tracker;
-	var messageList;
-	
+
 	beforeEach(function () {
-		messageList = new MessageList(messagesElement, socket);
-		tracker = new Tracker(name, messageInput, form, socket, messageList);
-		tracker.user("norris");
-		tracker.loggedIn(true);
+		tracker = new Tracker(name, messageInput, form, messagesElement, socket);
+		tracker.userManager.user("norris");
+		tracker.userManager.loggedIn(true);
 	});
 	
 	describe("shows message history", function () {
@@ -33,29 +34,29 @@ describe("omega", function () {
 				{message: "test3"}
 			];
 			
-			messageList.processHistory(omegaEvents);
-			expect(messageList.messages().length).toBe(3);
-			expect(messageList.messages()[0]).toEqual({msg: "test1"});
+			tracker.messageList.processHistory(omegaEvents);
+			expect(tracker.messageList.messages().length).toBe(3);
+			expect(tracker.messageList.messages()[0]).toEqual({msg: "test1"});
 		});
 		
 		it("overwrites any existing messages", function () {
-			messageList.messages([{msg: 'foo'}, {msg: 'bar'}]);
+			tracker.messageList.messages([{msg: 'foo'}, {msg: 'bar'}]);
 			var omegaEvents = [
 				{message: "test1"},
 				{message: "test2"},
 				{message: "test3"}
 			];
 			
-			messageList.processHistory(omegaEvents);
-			expect(messageList.messages().length).toBe(3);
-			expect(messageList.messages()[0]).toEqual({msg: "test1"});
+			tracker.messageList.processHistory(omegaEvents);
+			expect(tracker.messageList.messages().length).toBe(3);
+			expect(tracker.messageList.messages()[0]).toEqual({msg: "test1"});
 		});
 	});
 
 	describe("handles login", function () {
 		it("accepts valid names", function () {
 			name.val = function () { return "norris"; };
-			tracker.user(undefined);
+			tracker.userManager.user(undefined);
 
 			spyOn(socket, 'emit');
 			tracker.handleInput();
@@ -65,33 +66,33 @@ describe("omega", function () {
 		});
 		it("rejects empty name", function () {
 			name.val = function () { return ""; };
-			tracker.user(undefined);
+			tracker.userManager.user(undefined);
 
 			spyOn(socket, 'emit');
 			tracker.handleInput();
 			expect(socket.emit).wasNotCalled();
-			expect(tracker.invalidName()).toBe(true);
+			expect(tracker.userManager.invalidName()).toBe(true);
 		});
 		it("rejects short names", function () {
 			name.val = function () { return "yo"; };
-			tracker.user(undefined);
+			tracker.userManager.user(undefined);
 
 			spyOn(socket, 'emit');
 			tracker.handleInput();
 			expect(socket.emit).wasNotCalled();
-			expect(tracker.invalidName()).toBe(true);
+			expect(tracker.userManager.invalidName()).toBe(true);
 		});
 		it("rejects reserved names", function () {
 			name.val = function () { return "nobody"; };
-			tracker.user(undefined);
+			tracker.userManager.user(undefined);
 
 			spyOn(socket, 'emit');
 			tracker.handleInput();
 			expect(socket.emit).toHaveBeenCalled();
 			var callback = socket.emit.mostRecentCall.args[2];
-			expect(tracker.invalidName()).toBe(false);
+			expect(tracker.userManager.invalidName()).toBe(false);
 			callback(true); // server says invalid
-			expect(tracker.invalidName()).toBe(true);
+			expect(tracker.userManager.invalidName()).toBe(true);
 		});
 	});
 	

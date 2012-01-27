@@ -2,6 +2,7 @@ define(['ko', 'underscore'], function (ko, _) {
 
 	var NOTIFICATION_ALLOWED = 0; // unintuitive, but correct
 	var NOTIFICATION_DURATION = 4000;
+	var NOTIFICATION_PREF_OFF = "OmegaIssueTracker.notificationsOff";
 
 	function Notifier(users, socket) {
 		this.webNotifyEnabled = ko.observable(checkWebNotificationEnabled());
@@ -35,10 +36,14 @@ define(['ko', 'underscore'], function (ko, _) {
 			alert('Your browser doesn\'t support web notifications. Try Chrome or something.');
 			return;
 		}
+
 		if (this.webNotifyEnabled()) {
-			this.webNotifyEnabled(false); // TODO: save this setting
+			window.localStorage[NOTIFICATION_PREF_OFF] = true;
+			this.webNotifyEnabled(false);
 			return;
 		}
+
+		window.localStorage.removeItem(NOTIFICATION_PREF_OFF);
 
 		// otherwise, ask user to grant permission
 		if (window.webkitNotifications.checkPermission() === NOTIFICATION_ALLOWED) {
@@ -52,7 +57,7 @@ define(['ko', 'underscore'], function (ko, _) {
 	}
 
 	function checkWebNotificationEnabled() {
-		return window.webkitNotifications && window.webkitNotifications.checkPermission() === NOTIFICATION_ALLOWED;
+		return !window.localStorage[NOTIFICATION_PREF_OFF] && window.webkitNotifications && window.webkitNotifications.checkPermission() === NOTIFICATION_ALLOWED;
 	}
 
 	return Notifier;

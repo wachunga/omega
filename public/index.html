@@ -45,10 +45,10 @@
 <div id="issuesContainer">
 	<label class="hideIssues"><input type="checkbox" data-bind="checked: hideClosed"/> hide closed</label>
 	<label class="hideIssues"><input type="checkbox" data-bind="checked: hideAssigned"/> hide assigned</label>
-	<h2>Issues <span data-bind="fadeVisible: issues().length >= 3" class="issueCounts subtle">(<var data-bind="text: openIssuesCount"></var> open, <var data-bind="text: issues().length - openIssuesCount()"></var> closed)</span></h2>
-	<p class="noneMessage subtle" data-bind="fadeVisible: !issues().length || (hideClosed() && openIssuesCount() == 0)">No open issues. w00t!</p>
-	<ul class="issuesList" data-bind="foreach: { data: sortedIssues, afterRender: applyTimeago }">
-		<li data-bind="attr: { id: id }, fadeVisible: !($root.hideClosed() && closed()) && !($root.hideAssigned() && assignee() != 'nobody'), css: { closed: closed, highlighted: id === $root.highlightedIssue() }"><a data-bind="attr: { href: '#' + id }, text: id" title="Permalink" class="issueId"></a>:&nbsp;<span class="loud" data-bind="text: critical() ? '★ ' : ''"></span>
+	<h2>Issues <span data-bind="fadeVisible: issueManager.issues().length >= 3" class="issueCounts subtle">(<var data-bind="text: issueManager.openIssuesCount"></var> open, <var data-bind="text: issueManager.closedIssuesCount"></var> closed)</span></h2>
+	<p class="noneMessage subtle" data-bind="fadeVisible: !issueManager.issues().length || (hideClosed() && issueManager.openIssuesCount() == 0)">No open issues. w00t!</p>
+	<ul class="issuesList" data-bind="foreach: { data: issueManager.sortedIssues, afterRender: applyTimeago }">
+		<li data-bind="attr: { id: id }, fadeVisible: !($root.hideClosed() && closed()) && !($root.hideAssigned() && assignee() != 'nobody'), css: { closed: closed, highlighted: id === $root.issueManager.highlightedIssue() }"><a data-bind="attr: { href: '#' + id }, text: id" title="Permalink" class="issueId"></a>:&nbsp;<span class="loud" data-bind="text: critical() ? '★ ' : ''"></span>
 			<span class="assignee" data-bind="css: { myself: $root.userManager.isCurrentUser(assignee()) }, text: assignee().toLowerCase() !== 'nobody' ? '(@' + assignee() + ')' : ''"></span>
 			&nbsp;<span class="description" data-bind="html: $root.addHtmlLinks(description)"></span>
 			&nbsp;<span class="details subtle">(created by <span data-bind="text: creator"></span> <time data-bind="attr: { datetime: createdDate }"></time>)</span>

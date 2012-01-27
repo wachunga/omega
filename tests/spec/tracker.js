@@ -163,33 +163,33 @@ describe("omega", function () {
 		it("can create issues", function () {
 			messageInput.val = function () { return "/create new issue"; };
 
-			spyOn(tracker, 'createIssue');
+			spyOn(tracker.issueManager, 'createIssue');
 			tracker.handleInput();
-			expect(tracker.createIssue).toHaveBeenCalledWith("new issue");
+			expect(tracker.issueManager.createIssue).toHaveBeenCalledWith("new issue");
 		});
 
 		it("mixed case and unicode works", function () {
 			messageInput.val = function () { return "/CREATE Ω=aw3som#"; };
 
-			spyOn(tracker, 'createIssue');
+			spyOn(tracker.issueManager, 'createIssue');
 			tracker.handleInput();
-			expect(tracker.createIssue).toHaveBeenCalledWith("Ω=aw3som#");
+			expect(tracker.issueManager.createIssue).toHaveBeenCalledWith("Ω=aw3som#");
 		});
 
 		it ("can prioritize issues", function () {
 			messageInput.val = function () { return "/star 5"; };
 
-			spyOn(tracker, 'prioritizeIssue');
+			spyOn(tracker.issueManager, 'prioritizeIssue');
 			tracker.handleInput();
-			expect(tracker.prioritizeIssue).toHaveBeenCalledWith(5);
+			expect(tracker.issueManager.prioritizeIssue).toHaveBeenCalledWith(5);
 		});
 		
 		it("can assign multi-digit issues", function () {
 			messageInput.val = function () { return "/assign 50"; };
 		
-			spyOn(tracker, 'assignIssue');
+			spyOn(tracker.issueManager, 'assignIssue');
 			tracker.handleInput();
-			expect(tracker.assignIssue).toHaveBeenCalledWith(50, undefined);
+			expect(tracker.issueManager.assignIssue).toHaveBeenCalledWith(50, undefined);
 		});
 		
 		describe("handles invalid input", function () {

@@ -5,6 +5,17 @@ define(['ko', 'underscore'], function (ko, _) {
 		this.messages = ko.observableArray();
 
 		socket.on('history', _.bind(this.processHistory, this));
+		socket.on('issue created', _.bind(this.append, this));
+		socket.on('issue assigned', _.bind(this.append, this));
+		socket.on('issue updated', _.bind(function (props, event) {
+			this.append(event);
+		}, this));
+		socket.on('issue prioritized', _.bind(function (props, event) {
+			this.append(event);
+		}, this));
+		socket.on('issue closed', _.bind(function (closer, event) {
+			this.append(event);
+		}, this));
 	}
 
 	MessageList.prototype.processHistory = function (events) {

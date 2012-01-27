@@ -2,15 +2,21 @@
 
 define([
 	'jquery', 'underscore', 'ko', 'timeago',
-	'util', 'Issue', 'Notifier', 'UserManager', 'MessageList'
+	'util', 'Issue', 'Notifier', 'UserManager', 'MessageList', 'IssueManager'
 ],
-function ($, _, ko, timeago, util, Issue, Notifier, UserManager, MessageList) {
+function ($, _, ko, timeago, util, Issue, Notifier, UserManager, MessageList, IssueManager) {
 
 	var FLAVOUR = [
 		'You, sir, are a genius.', 'Die issues, die!', '*golf clap*',
 		'Ω &hearts; you.', 'You deserve a break.',
 		'Not bad, not bad at all.', 'FTW!'
 	];
+
+	// FIXME - unused
+	function addFlavour(text) {
+		return text + ' ' + util.getRandomItem(FLAVOUR);
+	}
+
 	var BAD_COMMAND_RESPONSES = [
 		'Oops.', 'This is not a Turing test.',
 		'The least you could do is be grammatical.',
@@ -25,7 +31,8 @@ function ($, _, ko, timeago, util, Issue, Notifier, UserManager, MessageList) {
 		this.socket = socket;
 		this.messageList = new MessageList($messageList, socket);
 		this.userManager = new UserManager($nameInput, socket);
-		this.notifier = new Notifier(this.userManager);
+		this.issueManager = new IssueManager(socket);
+		this.notifier = new Notifier(this.userManager, socket);
 		this.$messageInput = $messageInput;
 
 		this.disconnected = ko.observable(true);
@@ -35,25 +42,12 @@ function ($, _, ko, timeago, util, Issue, Notifier, UserManager, MessageList) {
 			return this.version() && this.version().substr(0,7);			
 		}, this);
 
-		this.issues = ko.observableArray();
-		this.sortedIssues = ko.dependentObservable(function () {
-			return this.issues().sort(Issue.sort);
-		}, this);
-		this.openIssuesCount = ko.dependentObservable(function () {
-			return _.select(this.issues(), function (issue) {
-				return !issue.closed();
-			}).length;
-		}, this);
-		this.highlightedIssue = ko.observable();
-
 		this.hideClosed = ko.observable(true);
 		this.hideAssigned = ko.observable(false);
 		this.helpOpen = ko.observable(false);
 		this.addHtmlLinks = util.addHtmlLinks;
 
 		ko.applyBindings(this);
-
-		$(window).bind('hashchange', _.bind(this.showBookmarkedIssue, this));
 
 		this.socket.on('connect', function () {
 			that.disconnected(false);
@@ -64,81 +58,13 @@ function ($, _, ko, timeago, util, Issue, Notifier, UserManager, MessageList) {
 			that.disconnected(true);
 		});
 		
-		this.socket.on('issues', function (issues) {
-			that.issues(_.map(issues, function (issue) {
-				return new Issue(issue.id, issue);
-			}));
-			that.showBookmarkedIssue();
-		});
-		
 		this.socket.on('user message', function (event) {
 			that.messageList.append(event);
 			that.notifier.notify(event.speaker, event);
 		});
 		
-		this.socket.on('issue created', function (event) {
-			that.messageList.append(event);
-			that.notifier.notify(event.issue.creator, event);
-			
-			that.issues.push(new Issue(event.issue.id, event.issue));
-		});	
-
-		// FIXME - unused
-		function addFlavour(text) {
-			return text + ' ' + util.getRandomItem(FLAVOUR);
-		}
-		
-		this.socket.on('issue closed', function (closer, event) {
-			that.messageList.append(event);
-			that.notifier.notify(closer, event);
-			
-			var issue = that.findIssue(event.issue.id);
-			issue.closed(true);
-		});	
-		
-		this.socket.on('issue assigned', function (event) {
-			that.messageList.append(event);
-			var issue = that.findIssue(event.issue.id);
-			issue.assignee(event.issue.assignee);
-		});
-		
-		this.socket.on('issue updated', function (props, event) {
-			that.messageList.append(event);
-			that.refreshIssue(event.issue.id, props);
-		});
-
-		this.socket.on('issue prioritized', function (props, event) {
-			that.messageList.append(event);
-			that.refreshIssue(event.issue.id, props);
-		});
-		
 		this.socket.on('version', function (version) {
 			that.version(version);
-		});
-	};
-
-	// doesn't highlight if filtering issues, but not a big deal
-	Tracker.prototype.showBookmarkedIssue = function () {
-		var bookmarked = parseInt(window.location.hash.substring(1), 10);
-		var found = _.detect(this.issues(), function (issue) { 
-			return issue.id === bookmarked;
-		});
-		if (!found) {
-			return;
-		}
-		
-		this.highlightedIssue(found.id);
-		
-		var $target = $(window.location.hash);
-		if ($target.length) {
-			var pos = $target.offset();
-			window.scrollTo(pos.left, pos.top);
-		}
-	};
-	
-	Tracker.prototype.findIssue = function (id) {
-		return _.find(this.issues(), function (issue) {
-			return issue.id === id;
 		});
 	};
 	
@@ -200,30 +126,30 @@ function ($, _, ko, timeago, util, Issue, Notifier, UserManager, MessageList) {
 				case 'new':
 				case 'open':
 					requireArgument(rest);
-					this.createIssue(rest);
+					this.issueManager.createIssue(rest);
 					break;
 				case 'close':
 				case 'resolve':
 					var id = parseInt(rest, 10);
 					requireArgument(id);
-					this.closeIssue(id);
+					this.issueManager.closeIssue(id);
 					break;
 				case 'reopen':
 					var id = parseInt(rest, 10);
 					requireArgument(id);
-					this.updateIssue(id, { closed: false });
+					this.issueManager.updateIssue(id, { closed: false });
 					break;
 				case 'unassign':
 					var id = parseInt(rest, 10);
 					requireArgument(id);
-					this.assignIssue(id, 'nobody');
+					this.issueManager.assignIssue(id, 'nobody');
 					break;
 				case 'assign':
 				case '@':
 					var id = parseInt(getArgument(rest, 1), 10);
 					var assignee = getArgument(rest, 2);
 					requireArgument(id);
-					this.assignIssue(id, assignee);
+					this.issueManager.assignIssue(id, assignee);
 					break;
 				case 'critical':
 				case 'urgent':
@@ -232,7 +158,7 @@ function ($, _, ko, timeago, util, Issue, Notifier, UserManager, MessageList) {
 				case 'star':
 					var id = parseInt(getArgument(rest, 1), 10);
 					requireArgument(id);
-					this.prioritizeIssue(id);
+					this.issueManager.prioritizeIssue(id);
 					break;
 				case 'edit':
 				case 'update':
@@ -240,7 +166,7 @@ function ($, _, ko, timeago, util, Issue, Notifier, UserManager, MessageList) {
 					var id = parseInt(getArgument(rest, 1), 10);
 					var desc = getArgument(rest, 2);
 					requireArgument(id, desc);
-					this.updateIssue(id, { description: desc });
+					this.issueManager.updateIssue(id, { description: desc });
 					break;
 				case 'reset':
 					this.reset();
@@ -252,29 +178,6 @@ function ($, _, ko, timeago, util, Issue, Notifier, UserManager, MessageList) {
 		} catch (e) {
 			this.notifyOfBadCommand();
 		}
-	};
-
-	Tracker.prototype.createIssue = function (desc) {
-		this.socket.emit('new issue', desc);
-	};
-	
-	Tracker.prototype.assignIssue = function (id, assignee) {
-		this.socket.emit('assign issue', id, assignee);
-	};
-	
-	Tracker.prototype.closeIssue = function (id) {
-		if (this.findIssue(id).closed()) {
-			return;
-		}
-		this.socket.emit('close issue', id);
-	};
-	
-	Tracker.prototype.updateIssue = function (id, props) {
-		this.socket.emit('update issue', id, props);
-	};
-
-	Tracker.prototype.prioritizeIssue = function (id) {
-		this.socket.emit('prioritize issue', id);
 	};
 
 	Tracker.prototype.reset = function () {
@@ -289,17 +192,6 @@ function ($, _, ko, timeago, util, Issue, Notifier, UserManager, MessageList) {
 		this.socket.emit('user message', message);
 	};
 
-	Tracker.prototype.refreshIssue = function (id, props) {
-		var issue = this.findIssue(id);
-		_.each(props, function (value, key) {
-			if (ko.isObservable(issue[key])) {
-				issue[key](value);
-			} else {
-				issue[key] = value;
-			}
-		});
-	};
-	
 	Tracker.prototype.applyTimeago = function (elements) {
 		_.each(elements, function (element) {
 			var $time = $(element).find("time");

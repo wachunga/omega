@@ -3,7 +3,7 @@ define(['ko', 'underscore'], function (ko, _) {
 	var NOTIFICATION_ALLOWED = 0; // unintuitive, but correct
 	var NOTIFICATION_DURATION = 4000;
 
-	function Notifier(users) {
+	function Notifier(users, socket) {
 		this.webNotifyEnabled = ko.observable(checkWebNotificationEnabled());
 		this.currentUser = users.current;
 
@@ -12,6 +12,12 @@ define(['ko', 'underscore'], function (ko, _) {
 		}, this);
 
 		this.requestNotificationPermission = _.bind(requestNotificationPermission, this);
+
+		var that = this;
+		socket.on('issue created', function (event) {
+			that.notify(event.issue.creator, event);
+		});
+		socket.on('issue closed', _.bind(this.notify, this));
 	}
 
 	Notifier.prototype.notify = function (user, event) {

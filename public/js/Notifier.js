@@ -14,15 +14,13 @@ define(['ko', 'underscore'], function (ko, _) {
 
 		this.requestNotificationPermission = _.bind(requestNotificationPermission, this);
 
-		var that = this;
-		socket.on('issue created', function (event) {
-			that.notify(event.issue.creator, event);
-		});
+		socket.on('issue created', _.bind(this.notify, this));
 		socket.on('issue closed', _.bind(this.notify, this));
+		socket.on('user message', _.bind(this.notify, this));
 	}
 
-	Notifier.prototype.notify = function (user, event) {
-		if (!window.webkitNotifications || !this.webNotifyEnabled() || user === this.currentUser() || !event.notification) {
+	Notifier.prototype.notify = function (event) {
+		if (!window.webkitNotifications || !this.webNotifyEnabled() || getUserFromEvent(event) === this.currentUser() || !event.notification) {
 			return;
 		}
 
@@ -30,6 +28,19 @@ define(['ko', 'underscore'], function (ko, _) {
 		popup.show();
 		setInterval(function () { popup.cancel(); }, NOTIFICATION_DURATION);
 	};
+
+	function getUserFromEvent(event) {
+		switch (event.type.name) {
+			case 'newIssue':
+				return event.issue.creator;
+			case 'closeIssue':
+				return event.issue.closer;
+			case 'userMessage':
+				return event.speaker;
+			default:
+				throw new Error('Could not determine user for event: ' + event);
+		}
+	}
 
 	function requestNotificationPermission() {
 		if (!window.webkitNotifications) {

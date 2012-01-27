@@ -65,6 +65,7 @@ io.sockets.on('connection', function(socket) {
 			description: desc,
 			critical: false,
 			creator: socket.nickname,
+			closer: UNASSIGNED,
 			assignee: UNASSIGNED,
 			closed: false,
 			createdDate: new Date()
@@ -93,10 +94,10 @@ io.sockets.on('connection', function(socket) {
 		var issue = issues[id-1]; 
 		issue.closed = true;
 		issueDb.write(issues);
+		issue.closer = socket.nickname;
 		
-		var closer = socket.nickname; // TODO: store this
-		var event = recordEvent(ET.CloseIssue, {closer: closer, issue: issue});
-		io.sockets.emit('issue closed', closer, event);
+		var event = recordEvent(ET.CloseIssue, {issue: issue});
+		io.sockets.emit('issue closed', event);
 	});
 	
 	socket.on('update issue', function(id, props) {
@@ -150,7 +151,7 @@ io.sockets.on('connection', function(socket) {
 
 	function applyIssueDefaults() {
 		_.each(issues, function (issue) {
-			_.defaults(issue, {critical: false});
+			_.defaults(issue, { critical: false, closer: UNASSIGNED });
 		});
 	}
 	

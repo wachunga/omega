@@ -31,14 +31,11 @@ define(['ko', 'underscore', 'jquery', 'Issue'], function (ko, _, $, Issue) {
 			var issue = that.findIssue(event.issue.id);
 			issue.assignee(event.issue.assignee);
 		});
-		this.socket.on('issue updated', function (props, event) {
-			that.refreshIssue(event.issue.id, props);
-		});
-		this.socket.on('issue prioritized', function (props, event) {
-			that.refreshIssue(event.issue.id, props);
-		});
-		this.socket.on('issue closed', function (closer, event) {
+		this.socket.on('issue updated', _.bind(this.refreshIssue, this));
+		this.socket.on('issue prioritized', _.bind(this.refreshIssue, this));
+		this.socket.on('issue closed', function (event) {
 			var issue = that.findIssue(event.issue.id);
+			issue.closer(event.issue.closer);
 			issue.closed(true);
 		});
 
@@ -77,8 +74,8 @@ define(['ko', 'underscore', 'jquery', 'Issue'], function (ko, _, $, Issue) {
 		this.highlightedIssue(issue.id);
 	};
 
-	IssueManager.prototype.refreshIssue = function (id, props) {
-		var issue = this.findIssue(id);
+	IssueManager.prototype.refreshIssue = function (props, event) {
+		var issue = this.findIssue(event.issue.id);
 		_.each(props, function (value, key) {
 			if (ko.isObservable(issue[key])) {
 				issue[key](value);

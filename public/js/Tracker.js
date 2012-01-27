@@ -59,11 +59,6 @@ function ($, _, ko, timeago, util, Issue, Notifier, UserManager, MessageList, Is
 		this.socket.on('disconnect', function () {
 			that.disconnected(true);
 		});
-		
-		this.socket.on('user message', function (event) {
-			that.messageList.append(event);
-			that.notifier.notify(event.speaker, event);
-		});
 
 		this.socket.on('issues', function (issues) {
 			that.checkHashForBookmark();

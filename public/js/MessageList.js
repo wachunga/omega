@@ -13,9 +13,8 @@ define(['ko', 'underscore'], function (ko, _) {
 		socket.on('issue prioritized', _.bind(function (props, event) {
 			this.append(event);
 		}, this));
-		socket.on('issue closed', _.bind(function (closer, event) {
-			this.append(event);
-		}, this));
+		socket.on('issue closed', _.bind(this.append, this));
+		socket.on('user message', _.bind(this.append, this));
 	}
 
 	MessageList.prototype.processHistory = function (events) {

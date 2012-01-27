@@ -6,17 +6,6 @@ define([
 ],
 function ($, _, ko, timeago, util, Issue, Notifier, UserManager, MessageList, IssueManager) {
 
-	var FLAVOUR = [
-		'You, sir, are a genius.', 'Die issues, die!', '*golf clap*',
-		'Ω &hearts; you.', 'You deserve a break.',
-		'Not bad, not bad at all.', 'FTW!'
-	];
-
-	// FIXME - unused
-	function addFlavour(text) {
-		return text + ' ' + util.getRandomItem(FLAVOUR);
-	}
-
 	var BAD_COMMAND_RESPONSES = [
 		'Oops.', 'This is not a Turing test.',
 		'The least you could do is be grammatical.',

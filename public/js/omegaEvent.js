@@ -37,7 +37,6 @@ var isNode = (typeof exports !== 'undefined');
 		NewIssue: new OmegaEventType("newIssue", "<%= issue.creator %> created <%= issue.id %>.", "New issue", "<%= issue.description %>"),
 		AssignIssue: new OmegaEventType("assignIssue", "<%= assigner %> assigned <%= issue.id %> to <%= issue.assignee %>."),
 		UpdateIssue: new OmegaEventType("updateIssue", "<%= updater %> updated <%= issue.id %>."),
-		// TODO: addFlavour()
 		CloseIssue: new OmegaEventType("closeIssue", "<%= issue.closer %> closed <%= issue.id %>.", "Issue closed", "<%= issue.description %>"),
 		PrioritizeIssue: new OmegaEventType("prioritizeIssue", "<%= updater %> marked <%= issue.id %> as<% if (!issue.critical) print(' not'); %> critical.")
 	};

@@ -1,4 +1,4 @@
-define(['ko', 'underscore'], function (ko, _) {
+define(['ko', 'underscore', 'flavour'], function (ko, _, flavour) {
 
 	function MessageList($element, socket) {
 		this.$element = $element;
@@ -32,7 +32,7 @@ define(['ko', 'underscore'], function (ko, _) {
 	};
 
 	MessageList.prototype.append = function (event) {
-		this.messages.push({ msg: event.message, speaker: event.speaker });
+		this.messages.push({ msg: flavour(event.type.name, event.message), speaker: event.speaker });
 		scrollToBottom(this.$element.get(0));
 	};
 

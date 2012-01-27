@@ -42,6 +42,8 @@ function ($, _, ko, timeago, util, Issue, Notifier, UserManager, MessageList, Is
 			return this.version() && this.version().substr(0,7);			
 		}, this);
 
+		$(window).bind('hashchange', _.bind(this.checkHashForBookmark, this));
+
 		this.hideClosed = ko.observable(true);
 		this.hideAssigned = ko.observable(false);
 		this.helpOpen = ko.observable(false);
@@ -61,6 +63,10 @@ function ($, _, ko, timeago, util, Issue, Notifier, UserManager, MessageList, Is
 		this.socket.on('user message', function (event) {
 			that.messageList.append(event);
 			that.notifier.notify(event.speaker, event);
+		});
+
+		this.socket.on('issues', function (issues) {
+			that.checkHashForBookmark();
 		});
 		
 		this.socket.on('version', function (version) {
@@ -180,6 +186,10 @@ function ($, _, ko, timeago, util, Issue, Notifier, UserManager, MessageList, Is
 		}
 	};
 
+	Tracker.prototype.send = function (message) {
+		this.socket.emit('user message', message);
+	};
+
 	Tracker.prototype.reset = function () {
 		if (window.confirm('Warning: this will completely delete all issues from the server.')) {
 			if (window.confirm('I have a bad feeling about this. Are you absolutely sure?')) {
@@ -188,8 +198,21 @@ function ($, _, ko, timeago, util, Issue, Notifier, UserManager, MessageList, Is
 		}
 	};
 
-	Tracker.prototype.send = function (message) {
-		this.socket.emit('user message', message);
+	// doesn't highlight if filtering issues, but not a big deal
+	Tracker.prototype.checkHashForBookmark = function () {
+		var bookmarked = parseInt(window.location.hash.substring(1), 10);
+		var found = this.issueManager.findIssue(bookmarked);
+		if (!found) {
+			return;
+		}
+
+		this.issueManager.highlightIssue(found);
+
+		var $target = $(window.location.hash);
+		if ($target.length) {
+			var pos = $target.offset();
+			window.scrollTo(pos.left, pos.top);
+		}
 	};
 
 	Tracker.prototype.applyTimeago = function (elements) {

@@ -17,14 +17,11 @@ define(['ko', 'underscore', 'jquery', 'Issue'], function (ko, _, $, Issue) {
 		}, this);
 		this.highlightedIssue = ko.observable();
 
-		$(window).bind('hashchange', _.bind(this.showBookmarkedIssue, this));
-
 		var that = this;
 		this.socket.on('issues', function (issues) {
 			that.issues(_.map(issues, function (issue) {
 				return new Issue(issue.id, issue);
 			}));
-			that.showBookmarkedIssue();
 		});
 
 		this.socket.on('issue created', function (event) {
@@ -76,21 +73,8 @@ define(['ko', 'underscore', 'jquery', 'Issue'], function (ko, _, $, Issue) {
 		this.socket.emit('prioritize issue', id);
 	};
 
-	// doesn't highlight if filtering issues, but not a big deal
-	IssueManager.prototype.showBookmarkedIssue = function () {
-		var bookmarked = parseInt(window.location.hash.substring(1), 10);
-		var found = this.findIssue(bookmarked);
-		if (!found) {
-			return;
-		}
-
-		this.highlightedIssue(found.id);
-
-		var $target = $(window.location.hash);
-		if ($target.length) {
-			var pos = $target.offset();
-			window.scrollTo(pos.left, pos.top);
-		}
+	IssueManager.prototype.highlightIssue = function (issue) {
+		this.highlightedIssue(issue.id);
 	};
 
 	IssueManager.prototype.refreshIssue = function (id, props) {

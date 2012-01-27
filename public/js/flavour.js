@@ -4,7 +4,13 @@ define(['util'], function (util) {
 		closeIssue: [
 			'You, sir, are a genius.', 'Die issues, die!', '*golf clap*',
 			'Ω ♥ you.', 'You deserve a break.',
-			'Not bad, not bad at all.', 'FTW!'
+			'Not bad, not bad at all.', 'FTW!',
+			'You win a bike!<br>'
+				+ '<pre>'
+				+ '     __o   \n'
+				+ '   _ \\<,_ \n'
+				+ '  (_)/ (_)'
+				+ '</pre>',
 		]
 	}
 

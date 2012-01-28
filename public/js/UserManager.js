@@ -14,6 +14,10 @@ define(['jquery', 'ko', 'underscore', 'util'], function ($, ko, _, util) {
 		this.invalidName = ko.observable(false);
 
 		this.current = ko.observable(window.localStorage[USERNAME_KEY]);
+		this.noUser = ko.computed(function () {
+			return !this.current();
+		}, this);
+
 		this.onlineUsers = ko.observableArray();
 
 		this.loggedIn = ko.observable(false);
@@ -28,10 +32,6 @@ define(['jquery', 'ko', 'underscore', 'util'], function ($, ko, _, util) {
 			return { name: name, count: count };
 		}));
 	}
-
-	UserManager.prototype.noUser = function () {
-		return !this.current();
-	};
 
 	UserManager.prototype.attemptLogin = function () {
 		this.invalidName(false);

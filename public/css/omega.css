@@ -1,3 +1,6 @@
+html {
+	overflow-y: scroll; /* prevent jump */
+}
 body {
 	margin: 3em 3em 1em;
 	font-family: 'Open Sans', sans-serif;
@@ -10,6 +13,13 @@ a:hover {
 	background-color: #7A6A53;
 	text-decoration: none;
 	color: white;
+}
+pre {
+	font-style: normal;
+}
+
+.hidden {
+	display: none;
 }
 .offscreen {
 	position: absolute;
@@ -24,8 +34,9 @@ a:hover {
 	color: #899FA4;
 }
 .warningMessage {
-	margin: 0;
+	margin: 0.5em 0 0 0;
 	font-size: 1em;
+	font-weight: normal;
 }
 .notificationToggle {
 	cursor: pointer;
@@ -34,6 +45,7 @@ a:hover {
 .notificationToggle:hover {
 	color: #999;
 }
+
 #header {
 	position: relative;	
 }
@@ -51,14 +63,25 @@ a:hover {
 	bottom: 0;
 	line-height: 2em;
 }
+input[type='text'] {
+	padding: 0.6em;
+	outline: none;
+}
+input[type='text']:focus {
+	border: 1px solid #aaa;
+	box-shadow: 0 0 3px rgba(0,0,0,0.2);
+}
+#messages, input[type='text'] {
+	border: 1px solid #ccc;
+	border-radius: 0.4em;
+	font-size: 0.9em;
+}
 #messages {
 	height: 15em;
-	border: 1px solid grey;
 	list-style-type: none;
-	padding: 0.3em;
+	padding: 0.6em;
 	overflow: auto;
 	margin: 0.2em 0;
-	font-size: 0.9em;
 	resize: vertical;
 }
 #messages .speaker {
@@ -87,6 +110,12 @@ a:hover {
 #commandList dt {
 	font-family: monospace;
 	font-size: 0.9em;
+}
+#form {
+	height: 3em;
+}
+#nameInput {
+	margin: 0 0.5em;
 }
 #issuesContainer {
 	margin-top: 1em;
@@ -153,6 +182,6 @@ input:-moz-placeholder {
 	text-align: center;
 	margin-top: 4em;
 }
-pre {
-	font-style: normal;
-}
+
+
+

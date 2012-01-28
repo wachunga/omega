@@ -24,7 +24,8 @@ function ($, _, ko, timeago, util, Issue, Notifier, UserManager, MessageList, Is
 		this.notifier = new Notifier(this.userManager, socket);
 		this.$messageInput = $messageInput;
 
-		this.disconnected = ko.observable(true);
+		this.disconnected = ko.observable();
+		this.loading = ko.observable(true);
 
 		this.version = ko.observable();
 		this.shortVersion = ko.dependentObservable(function () {
@@ -43,6 +44,7 @@ function ($, _, ko, timeago, util, Issue, Notifier, UserManager, MessageList, Is
 		this.socket.on('connect', function () {
 			that.disconnected(false);
 			that.userManager.loginExistingUserIfAny();
+			that.loading(false);
 		});
 
 		this.socket.on('disconnect', function () {

@@ -5,19 +5,17 @@ function ($, Tracker, util) {
 	
 describe("omega", function () {
 
+	var name = {};
+	var messageInput = {};
+	var form = {};
+	var messagesElement = {
+		get: function () { return window; }
+	};
 	var socket = {
 		on: function () {},
 		emit: function () {}
 	};
-	var messagesElement = {
-		get: function () { return window; }
-	};
-	var name = {};
-	var messageInput = {};
-	var form = {
-		submit: function () {}
-	};
-	
+
 	var tracker;
 
 	beforeEach(function () {
@@ -26,12 +24,12 @@ describe("omega", function () {
 		tracker.userManager.loggedIn(true);
 	});
 	
-	describe("shows message history", function () {
-		it("upon connection", function () {
+	describe("message list", function () {
+		it("shows history upon connection", function () {
 			var omegaEvents = [
-				{message: "test1"},
-				{message: "test2"},
-				{message: "test3"}
+				{ type: { name: 'openIssue' }, message: "test1" },
+				{ type: { name: 'updateIssue' }, message: "test2" },
+				{ type: { name: 'assignIssue' }, message: "test3" }
 			];
 			
 			tracker.messageList.processHistory(omegaEvents);
@@ -39,17 +37,30 @@ describe("omega", function () {
 			expect(tracker.messageList.messages()[0]).toEqual({msg: "test1"});
 		});
 		
-		it("overwrites any existing messages", function () {
+		it("shows consistent history by overwriting existing messages", function () {
 			tracker.messageList.messages([{msg: 'foo'}, {msg: 'bar'}]);
 			var omegaEvents = [
-				{message: "test1"},
-				{message: "test2"},
-				{message: "test3"}
+				{ type: { name: 'openIssue' }, message: "test1" },
+				{ type: { name: 'updateIssue' }, message: "test2" },
+				{ type: { name: 'assignIssue' }, message: "test3" }
 			];
 			
 			tracker.messageList.processHistory(omegaEvents);
 			expect(tracker.messageList.messages().length).toBe(3);
 			expect(tracker.messageList.messages()[0]).toEqual({msg: "test1"});
+		});
+
+		it("adds flavour when appropriate", function () {
+			var closeEvent = { type: { name: 'closeIssue' }, message: "bob closed 3." };
+			var assignEvent = { type: { name: 'assignIssue' }, message: "bob assigned 3 to jim." };
+			tracker.messageList.append(closeEvent);
+			tracker.messageList.append(assignEvent);
+
+			var closeMessage = tracker.messageList.messages()[0].msg;
+			expect(closeMessage.length).toBeGreaterThan(closeEvent.message.length);
+
+			var assignMessage = tracker.messageList.messages()[1].msg;
+			expect(assignMessage.length).toEqual(assignEvent.message.length);
 		});
 	});
 

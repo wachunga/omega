@@ -7,9 +7,36 @@ var http = require('http'),
 	oe = require('./public/js/omegaEvent'),
 	ET = oe.OmegaEvent.Type;
 
-var PORT = process.argv[2] || process.env['app_port'] || 1337;
+// command line parameters
+var argv = require('optimist')
+		.options('port', {
+			alias: 'p',
+			default: 1337
+		})
+		.options('issues', {
+			alias: 'db',
+			default: 'issues.json'
+		})
+		.options('optimized', {
+			alias: 'opt',
+			default: false
+		})
+		.argv;
 
-var fileServer = new static.Server(__dirname + '/public');
+// run with --optimized to use 'public-built/' directory
+// built 'public-built/' using 'node r.js -o app.build.js'
+var www_public = argv.optimized ? '/public-built' : '/public';
+
+// TODO switch to node server.js -p 1337 --db issues.json --optimized,
+// then use:
+// var PORT = argv.port;
+// var issuesJson = argv.issues;
+var PORT = (parseInt(process.argv[2], 10) && process.argv[2]) || process.env.app_port || argv.port;
+var issuesJson = (process.argv[3] !== '--optimized') && process.argv[3] || argv.issues;
+
+issueDb.setIssueFile(issuesJson);
+
+var fileServer = new static.Server(__dirname + www_public);
 var server = http.createServer(function (request, response) {
     request.addListener('end', function () {
         fileServer.serve(request, response);

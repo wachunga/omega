@@ -1,0 +1,22 @@
+{
+  "name": "omega",
+  "description": "A real-time issue tracker optimized for small teams",
+  "keywords": ["issue", "bug", "tracker", "minimal", "realtime", "socket"],
+  "author": "David Hirtle",
+  "contributors": [
+    { "name": "David Hirtle" },
+    { "name": "Neil Gentleman" },
+    { "name": "Drew Miller" }
+  ],
+  "repository": { "type": "git", "url": "https://wachunga@github.com/wachunga/omega.git" },
+  "dependencies": {
+    "socket.io": "0.8.x",
+    "underscore": ">=1.2.0 <=1.3.0",
+    "node-static": "0.5.x"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": { "node": ">=0.4.10 <=0.6.9" },
+  "version": "0.9.0"
+}

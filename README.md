@@ -33,7 +33,7 @@ Usage
 
 Start the server:
 
-    node server.js [<port>] [<file>]
+    node server.js [-p <port>] [-db <file>]
 
 `<port>` - Where the server listens for connections. Defaults to 1337.
 

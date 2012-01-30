@@ -1,13 +1,16 @@
 // RequireJS Optimizer Configuration
 //
-// Docs: https://github.com/jrburke/r.js/blob/master/build/example.build.js
+// This is only recommended for *production* installations of Omega.
+//
+// To optimize: node r.js -o app.build.js
+//
+// Run Omega with the --optimize switch to use the new ./public-built directory.
 //
 ({
-	// paths here override the settings in ./app/js/main.js
+	mainConfigFile: "./public/js/main.js",
 	paths: {
 		'jquery': 'empty:'               // override main.js
 	},
-	mainConfigFile: "./public/js/main.js",
 	appDir: "./public",
 	baseUrl: "js",
 	dir: "./public-built",

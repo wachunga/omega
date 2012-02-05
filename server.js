@@ -11,19 +11,19 @@ var http = require('http'),
 
 // command line parameters
 var argv = require('optimist')
-		.options('port', {
-			alias: 'p',
-			default: 1337
-		})
-		.options('issues', {
-			alias: 'db',
-			default: 'issues.json'
-		})
-		.options('optimized', {
-			alias: 'opt',
-			default: false
-		})
-		.argv;
+	.options('port', {
+		alias: 'p',
+		default: 1337
+	})
+	.options('issues', {
+		alias: 'db',
+		default: 'issues.json'
+	})
+	.options('optimized', {
+		alias: 'opt',
+		default: false
+	})
+	.argv;
 
 // run with --optimized to use 'public-built/' directory
 // built 'public-built/' using 'node r.js -o app.build.js'
@@ -40,9 +40,9 @@ issueDb.setIssueFile(issuesJson);
 
 var fileServer = new static.Server(__dirname + www_public);
 var server = http.createServer(function (request, response) {
-    request.addListener('end', function () {
-        fileServer.serve(request, response);
-    });
+	request.addListener('end', function () {
+		fileServer.serve(request, response);
+	});
 });
 server.listen(PORT);
 
@@ -154,6 +154,8 @@ io.sockets.on('connection', function(socket) {
 		issues = [];
 		issueDb.write(issues);
 		io.sockets.emit('issues', issues);
+		history = [];
+		socket.emit('history', history);
 	});
 
 	function recordEvent(type, details) {
@@ -183,7 +185,8 @@ io.sockets.on('connection', function(socket) {
 			_.defaults(issue, { critical: false, closer: UNASSIGNED });
 		});
 	}
-	
+
+	// TODO: use standard versioning
 	function emitVersionNumber(error, stdout, stderr) {
 		if (error !== null) {
 			console.log(error);

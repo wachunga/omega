@@ -12,6 +12,7 @@ var isNode = (typeof exports !== 'undefined');
 		this.issue = details.issue;
 		this.speaker = details.speaker;
 		this.message = _.template(type.message, details);
+		this.timestamp = new Date();
 		
 		if (type.notificationTitle) {
 			this.notification = {

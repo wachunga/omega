@@ -21,6 +21,7 @@
     "optimist": ">= 0.1.0"
   },
   "preferGlobal": true,
+  "bin": "./server.js",
   "scripts": {
     "start": "node server.js"
   },

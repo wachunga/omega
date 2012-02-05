@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 var http = require('http'),
 	sio = require('socket.io'),
 	_ = require('underscore'),

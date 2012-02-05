@@ -90,9 +90,9 @@ input[type='text']:focus {
 #messages .system {
 	font-style: italic;
 }
-#messages li:hover {
+#messages li:hover .message,
+#issuesContainer .issuesList li:hover .description {
 	opacity: 0.5;
-	cursor: wait;
 }
 #onlineUsers {
 	font-size: 0.9em;
@@ -153,6 +153,10 @@ input[type='text']:focus {
 	list-style-type: none;
 	padding: 0;
 }
+#messages li,
+#issuesContainer .issuesList li {
+	position: relative;
+}
 #issuesContainer .issuesList .myself {
 	color: #fff;
 	background-color: #666;
@@ -163,10 +167,19 @@ input[type='text']:focus {
 	-webkit-transition: background-color 1s;
 	-firefox-transition: background-color 1s;	
 }
+#messages .details,
 #issuesContainer .issuesList .details {
 	display: none;
+	padding-left: 0.5em;
 	font-size: small;
+	font-style: normal;
+	height: 100%;
+	position: absolute;
+	right: 0;
+	top: 0;
+	background-color: rgba(255,255,255,0.95);
 }
+#messages li:hover .details,
 #issuesContainer .issuesList li:hover .details {
 	display: inline;
 }

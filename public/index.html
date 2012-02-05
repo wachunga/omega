@@ -13,7 +13,10 @@
 	<h1>Ω</h1><div id="loggedInUser" data-bind="visible: userManager.current()">welcome, <strong data-bind="text: userManager.current"></strong> | <span class="notificationToggle" data-bind="text: notifier.webNotifyEnabled() ? '⚑' : '⚐', click: notifier.requestNotificationPermission, attr: { title: notifier.statusMessage }"></span> | <a href="#" data-bind="click: userManager.logout">kthxbye</a></div>
 </div>
 <ul id="messages" data-bind="foreach: { data: messageList.messages, beforeRemove: function(elem) { $(elem).fadeOut() }, afterAdd: function(elem) { $(elem).hide().fadeIn('fast') } }">
-	<li data-bind="css: { system: !speaker }, attr: { title: $.timeago(date) }"><span class="speaker" data-bind="text: speaker ? speaker + ': ' : ''"></span><span data-bind="html: msg"></span></li>
+	<li data-bind="css: { system: !speaker }">
+		<span class="speaker" data-bind="text: speaker ? speaker + ': ' : ''"></span><span class="message" data-bind="html: msg"></span>
+		<span class="details subtle" data-bind="text: '(' + $.timeago(date) + ')'"></span>
+	</li>
 </ul>
 <div id="onlineUsers">
 	online:
@@ -49,9 +52,9 @@
 	<p class="noneMessage subtle" data-bind="fadeVisible: !issueManager.issues().length || (hideClosed() && issueManager.openIssuesCount() == 0)">No open issues. w00t!</p>
 	<ul class="issuesList" data-bind="foreach: { data: issueManager.sortedIssues, afterRender: applyTimeago }">
 		<li data-bind="attr: { id: id }, fadeVisible: !($root.hideClosed() && closed()) && !($root.hideAssigned() && assignee() != 'nobody'), css: { closed: closed, highlighted: id === $root.issueManager.highlightedIssue() }"><a data-bind="attr: { href: '#' + id }, text: id" title="Permalink" class="issueId"></a>:&nbsp;<span class="loud" data-bind="text: critical() ? '★ ' : ''"></span>
-			<span class="assignee" data-bind="css: { myself: $root.userManager.isCurrentUser(assignee()) }, text: assignee().toLowerCase() !== 'nobody' ? '(@' + assignee() + ')' : ''"></span>
+			<span class="assignee" data-bind="css: { myself: $root.userManager.isCurrentUser(assignee()) }, text: assigneeLabel"></span>
 			&nbsp;<span class="description" data-bind="html: $root.addHtmlLinks(description)"></span>
-			&nbsp;<span class="details subtle">(created by <span data-bind="text: creator"></span> <time data-bind="attr: { datetime: createdDate }"></time>)</span>
+			<span class="details subtle">(created by <span data-bind="text: creator"></span> <time data-bind="attr: { datetime: createdDate }"></time>)</span>
 		</li>
 	</ul>
 </div>

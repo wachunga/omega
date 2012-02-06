@@ -13,7 +13,7 @@ Features
 * real-time
     * you **never need to refresh** to get updates 
     * **chat** with team members in the same context
-    * optional growl-like **notifications** even outside the browser (only supported in Chrome for now)
+    * optional growl-like **notifications** even outside the browser (Chrome only, [for now](http://caniuse.com/#feat=notifications))
 
 * minimalist
     * single page
@@ -21,19 +21,19 @@ Features
     * priority: critical or not
     * if you need metadata, like component or severity, just include it in the description
 
-To avoid bloat, new features are added reluctantly. One thing that is likely to be added is support for multiple projects. 
+Coming soon: support for multiple projects on a single instance of Ω.
 
 Installation
 ---
 
-Install [node.js](https://github.com/joyent/node), clone this repo, and then `npm install` from that directory.
+Once [node.js](https://github.com/joyent/node) (with npm) is installed, run `npm install omega -g`.
 
 Usage
 ---
 
 Start the server:
 
-    node server.js [-p <port>] [-db <file>]
+    omega [-p <port>] [-db <file>]
 
 `<port>` - Where the server listens for connections. Defaults to 1337.
 

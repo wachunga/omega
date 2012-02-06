@@ -5,7 +5,6 @@ var http = require('http'),
 	_ = require('underscore'),
 	static = require('node-static'),
 	issueDb = require('./lib/issueDb'),
-	exec = require('child_process').exec,
 	oe = require('./public/js/omegaEvent'),
 	ET = oe.OmegaEvent.Type;
 
@@ -69,7 +68,6 @@ io.sockets.on('connection', function(socket) {
 	socket.emit('usernames', usernames);
 	
 	socket.emit('history', _.last(history, HISTORY_ITEMS_TO_SHOW));
-	exec("git rev-parse HEAD", {cwd: __dirname}, emitVersionNumber);
 
 	socket.on('login user', function(name, callback) {
 		if (_.include(RESERVED_USERNAMES, name.toLowerCase())) {
@@ -184,16 +182,6 @@ io.sockets.on('connection', function(socket) {
 		_.each(issues, function (issue) {
 			_.defaults(issue, { critical: false, closer: UNASSIGNED });
 		});
-	}
-
-	// TODO: use standard versioning
-	function emitVersionNumber(error, stdout, stderr) {
-		if (error !== null) {
-			console.log(error);
-			return;
-		}
-		console.log("version: " + stdout);
-		socket.emit('version', stdout);
 	}
 
 	socket.on('disconnect', removeCurrentUser);

@@ -27,11 +27,6 @@ function ($, _, ko, timeago, util, Issue, Notifier, UserManager, MessageList, Is
 		this.disconnected = ko.observable();
 		this.loading = ko.observable(true);
 
-		this.version = ko.observable();
-		this.shortVersion = ko.dependentObservable(function () {
-			return this.version() && this.version().substr(0,7);			
-		}, this);
-
 		$(window).bind('hashchange', _.bind(this.checkHashForBookmark, this));
 
 		this.hideClosed = ko.observable(true);
@@ -53,10 +48,6 @@ function ($, _, ko, timeago, util, Issue, Notifier, UserManager, MessageList, Is
 
 		this.socket.on('issues', function (issues) {
 			that.checkHashForBookmark();
-		});
-		
-		this.socket.on('version', function (version) {
-			that.version(version);
 		});
 	};
 	

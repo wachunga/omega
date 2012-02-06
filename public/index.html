@@ -20,7 +20,7 @@
 </ul>
 <div id="onlineUsers">
 	online:
-	<!-- ko template: { name: 'asdf', foreach: userManager.onlineUsers } --><!-- /ko -->
+	<!-- ko template: { name: 'onlineUsersTemplate', foreach: userManager.onlineUsers } --><!-- /ko -->
 	<!-- ko if: !userManager.onlineUsers().length -->
 	<span class="subtle">nobody</span>
 	<!-- /ko -->
@@ -63,7 +63,7 @@
 	Powered by node.js | <a href="https://github.com/wachunga/omega">Hosted</a> on GitHub | Version 0.9.0</span>
 </div>
 
-<script type="text/html" id="asdf"><span class="onlineUser"><span data-bind="text: name"></span><!-- ko if: count > 1 --> <span class="subtle" data-bind="text: '(' + count + ')'"></span><!-- /ko --></span></script>
+<script type="text/html" id="onlineUsersTemplate"><span class="onlineUser"><span data-bind="text: name"></span><!-- ko if: count > 1 --> <span class="subtle" data-bind="text: '(' + count + ')'"></span><!-- /ko --></span></script>
 
 </body>
 </html>

@@ -28,12 +28,8 @@ var argv = require('optimist')
 // built 'public-built/' using 'node r.js -o app.build.js'
 var www_public = argv.optimized ? '/public-built' : '/public';
 
-// TODO switch to node server.js -p 1337 --db issues.json --optimized,
-// then use:
-// var PORT = argv.port;
-// var issuesJson = argv.issues;
-var PORT = (parseInt(process.argv[2], 10) && process.argv[2]) || process.env.app_port || argv.port;
-var issuesJson = (process.argv[3] !== '--optimized') && process.argv[3] || argv.issues;
+var PORT = process.env.app_port || argv.port;
+var issuesJson = argv.issues;
 
 issueDb.setIssueFile(issuesJson);
 

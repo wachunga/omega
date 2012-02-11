@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
 var http = require('http'),
+	connect = require('connect'),
 	sio = require('socket.io'),
 	_ = require('underscore'),
-	static = require('node-static'),
 	issueDb = require('./lib/issueDb'),
 	oe = require('./public/js/omegaEvent'),
 	ET = oe.OmegaEvent.Type;
@@ -30,15 +30,13 @@ var www_public = argv.optimized ? '/public-built' : '/public';
 
 var PORT = process.env.app_port || argv.port;
 var issuesJson = argv.issues;
-
 issueDb.setIssueFile(issuesJson);
 
-var fileServer = new static.Server(__dirname + www_public);
-var server = http.createServer(function (request, response) {
-	request.addListener('end', function () {
-		fileServer.serve(request, response);
-	});
-});
+var server = connect(
+	connect.logger(),
+	connect.static(__dirname + www_public)
+ 	//main
+);
 server.listen(PORT);
 
 console.log('Server running at http://127.0.0.1:' + PORT);

@@ -15,24 +15,16 @@ var argv = require('optimist')
 		alias: 'p',
 		default: 1337
 	})
-	.options('issues', {
-		alias: 'db',
-		default: 'issues.json'
-	})
 	.options('optimized', {
 		alias: 'opt',
 		default: false
 	})
 	.argv;
 
+var PORT = process.env.app_port || argv.port;
 // run with --optimized to use 'public-built/' directory
 // built 'public-built/' using 'node r.js -o app.build.js'
 var www_public = argv.optimized ? '/public-built' : '/public';
-
-var PORT = process.env.app_port || argv.port;
-var issuesJson = argv.issues;
-issueDb.setIssueFile(issuesJson);
-
 
 var app = express.createServer(
 	express.logger(),
@@ -69,7 +61,6 @@ var MAX_HISTORY_ITEMS = 100;
 var RESERVED_USERNAMES = [UNASSIGNED, CURRENT_USER];
 
 var usernames = {};
-var issues = issueDb.load();
 var history = [];
 
 var io = sio.listen(app);
@@ -77,7 +68,19 @@ io.configure(function () {
 	// excluded websocket due to Chrome bug: https://github.com/LearnBoost/socket.io/issues/425
 	io.set('transports', ['htmlfile', 'xhr-polling', 'jsonp-polling']);
 });
-io.sockets.on('connection', function(socket) {
+
+initProjects();
+
+function initProjects() {
+	var projects = projectDao.findAll();
+	_.each(projects, function (project) {
+		io.of('/' + project.slug).on('connection', _.bind(handleProjectConnect, this, project));
+	});
+}
+
+function handleProjectConnect(project, socket) {
+	var issues = issueDb.load(project);
+
 	applyIssueDefaults();
 	socket.emit('issues', issues);
 	socket.emit('usernames', usernames);
@@ -93,12 +96,12 @@ io.sockets.on('connection', function(socket) {
 		socket.nickname = name;
 		// keep track of duplicate usernames
 		usernames[name] = (usernames[name] || 0) + 1;
-		io.sockets.emit('usernames', usernames);
+		socket.emit('usernames', usernames);
 	});
 
 	socket.on('user message', function(msg) {
 		var event = recordEvent(ET.UserMessage, {message: msg, speaker: socket.nickname});
-		io.sockets.emit('user message', event);
+		socket.emit('user message', event);
 	});
 
 	socket.on('new issue', function(desc) {
@@ -113,10 +116,10 @@ io.sockets.on('connection', function(socket) {
 			createdDate: new Date()
 		};
 		issues.push(newIssue);
-		issueDb.write(issues);
+		issueDb.write(project, issues);
 
 		var event = recordEvent(ET.NewIssue, {issue: newIssue});
-		io.sockets.emit('issue created', event);
+		socket.emit('issue created', event);
 	});
 
 	socket.on('assign issue', function(id, specifiedAssignee) {
@@ -126,20 +129,20 @@ io.sockets.on('connection', function(socket) {
 		}
 		var issue = issues[id-1];
 		issue.assignee = assignee;
-		issueDb.write(issues);
+		issueDb.write(project, issues);
 
 		var event = recordEvent(ET.AssignIssue, {assigner: socket.nickname, issue: issue});
-		io.sockets.emit('issue assigned', event);
+		socket.emit('issue assigned', event);
 	});
 
 	socket.on('close issue', function(id) {
 		var issue = issues[id-1];
 		issue.closed = true;
-		issueDb.write(issues);
+		issueDb.write(project, issues);
 		issue.closer = socket.nickname;
 
 		var event = recordEvent(ET.CloseIssue, {issue: issue});
-		io.sockets.emit('issue closed', event);
+		socket.emit('issue closed', event);
 	});
 
 	socket.on('update issue', function(id, props) {
@@ -148,25 +151,25 @@ io.sockets.on('connection', function(socket) {
 		for (key in props) {
 			issue[key] = props[key];
 		}
-		issueDb.write(issues);
+		issueDb.write(project, issues);
 
 		var event = recordEvent(ET.UpdateIssue, {updater: socket.nickname, issue: issue});
-		io.sockets.emit('issue updated', props, event);
+		socket.emit('issue updated', props, event);
 	});
 
 	socket.on('prioritize issue', function(id) {
 		var issue = issues[id-1];
 		issue.critical = !issue.critical;
-		issueDb.write(issues);
+		issueDb.write(project, issues);
 
 		var event = recordEvent(ET.PrioritizeIssue, {updater: socket.nickname, issue: issue});
-		io.sockets.emit('issue prioritized', {critical: issue.critical}, event);
+		socket.emit('issue prioritized', {critical: issue.critical}, event);
 	});
 
 	socket.on('reset issues', function() {
 		issues = [];
-		issueDb.write(issues);
-		io.sockets.emit('issues', issues);
+		issueDb.write(project, issues);
+		socket.emit('issues', issues);
 		history = [];
 		socket.emit('history', history);
 	});
@@ -190,7 +193,7 @@ io.sockets.on('connection', function(socket) {
 			usernames[socket.nickname]--;
 		}
 		delete socket.nickname;
-		io.sockets.emit('usernames', usernames);
+		socket.emit('usernames', usernames);
 	}
 
 	function applyIssueDefaults() {
@@ -201,4 +204,4 @@ io.sockets.on('connection', function(socket) {
 
 	socket.on('disconnect', removeCurrentUser);
 	socket.on('logout', removeCurrentUser);
-});
+}

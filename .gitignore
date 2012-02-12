@@ -4,3 +4,5 @@
 .settings/
 node_modules/
 issues.json
+db/
+public-built/

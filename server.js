@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 
 var http = require('http'),
-	connect = require('connect'),
+	express = require('express'),
 	sio = require('socket.io'),
 	_ = require('underscore'),
 	issueDb = require('./lib/issueDb'),
+	projectDao = require('./lib/projectDao'),
 	oe = require('./public/js/omegaEvent'),
 	ET = oe.OmegaEvent.Type;
 
@@ -32,14 +33,34 @@ var PORT = process.env.app_port || argv.port;
 var issuesJson = argv.issues;
 issueDb.setIssueFile(issuesJson);
 
-var server = connect(
-	connect.logger(),
-	connect.static(__dirname + www_public)
- 	//main
-);
-server.listen(PORT);
 
-console.log('Server running at http://127.0.0.1:' + PORT);
+var app = express.createServer(
+	express.logger(),
+	express.static(__dirname + www_public)
+);
+app.register('.html', require('ejs')); // call our views html
+app.use(app.router);
+app.listen(PORT);
+
+app.get('/', function (req, res) {
+	res.end('intro page where you create projects etc');
+});
+app.get('/project', function(req, res) {
+	res.end('Projects are unlisted. Try /project/<name>');
+});
+app.get('/project/:slug', function(req, res) {
+	var project = projectDao.find(req.params.slug);
+	if (project) {
+		res.render('project.html', { title: project.name, layout: false });
+	} else {
+		res.writeHead(404);
+		res.end('No such project');
+	}
+});
+
+console.log('App running at http://127.0.0.1:' + PORT);
+
+// TODO: extract
 
 var UNASSIGNED = "nobody";
 var CURRENT_USER = "me";
@@ -51,7 +72,7 @@ var usernames = {};
 var issues = issueDb.load();
 var history = [];
 
-var io = sio.listen(server);
+var io = sio.listen(app);
 io.configure(function () {
 	// excluded websocket due to Chrome bug: https://github.com/LearnBoost/socket.io/issues/425
 	io.set('transports', ['htmlfile', 'xhr-polling', 'jsonp-polling']);
@@ -60,7 +81,7 @@ io.sockets.on('connection', function(socket) {
 	applyIssueDefaults();
 	socket.emit('issues', issues);
 	socket.emit('usernames', usernames);
-	
+
 	socket.emit('history', _.last(history, HISTORY_ITEMS_TO_SHOW));
 
 	socket.on('login user', function(name, callback) {
@@ -74,12 +95,12 @@ io.sockets.on('connection', function(socket) {
 		usernames[name] = (usernames[name] || 0) + 1;
 		io.sockets.emit('usernames', usernames);
 	});
-	
+
 	socket.on('user message', function(msg) {
 		var event = recordEvent(ET.UserMessage, {message: msg, speaker: socket.nickname});
 		io.sockets.emit('user message', event);
 	});
-	
+
 	socket.on('new issue', function(desc) {
 		var newIssue = {
 			id: issues.length+1,
@@ -93,7 +114,7 @@ io.sockets.on('connection', function(socket) {
 		};
 		issues.push(newIssue);
 		issueDb.write(issues);
-		
+
 		var event = recordEvent(ET.NewIssue, {issue: newIssue});
 		io.sockets.emit('issue created', event);
 	});
@@ -104,23 +125,23 @@ io.sockets.on('connection', function(socket) {
 			assignee = socket.nickname;
 		}
 		var issue = issues[id-1];
-		issue.assignee = assignee; 
+		issue.assignee = assignee;
 		issueDb.write(issues);
-		
+
 		var event = recordEvent(ET.AssignIssue, {assigner: socket.nickname, issue: issue});
 		io.sockets.emit('issue assigned', event);
 	});
-	
+
 	socket.on('close issue', function(id) {
-		var issue = issues[id-1]; 
+		var issue = issues[id-1];
 		issue.closed = true;
 		issueDb.write(issues);
 		issue.closer = socket.nickname;
-		
+
 		var event = recordEvent(ET.CloseIssue, {issue: issue});
 		io.sockets.emit('issue closed', event);
 	});
-	
+
 	socket.on('update issue', function(id, props) {
 		var issue = issues[id-1];
 		delete props['id'];
@@ -128,20 +149,20 @@ io.sockets.on('connection', function(socket) {
 			issue[key] = props[key];
 		}
 		issueDb.write(issues);
-		
+
 		var event = recordEvent(ET.UpdateIssue, {updater: socket.nickname, issue: issue});
 		io.sockets.emit('issue updated', props, event);
 	});
 
 	socket.on('prioritize issue', function(id) {
-		var issue = issues[id-1]; 
+		var issue = issues[id-1];
 		issue.critical = !issue.critical;
 		issueDb.write(issues);
-		
+
 		var event = recordEvent(ET.PrioritizeIssue, {updater: socket.nickname, issue: issue});
 		io.sockets.emit('issue prioritized', {critical: issue.critical}, event);
 	});
-	
+
 	socket.on('reset issues', function() {
 		issues = [];
 		issueDb.write(issues);
@@ -158,7 +179,7 @@ io.sockets.on('connection', function(socket) {
 		}
 		return event;
 	}
-	
+
 	function removeCurrentUser() {
 		if (!socket.nickname) {
 			return;

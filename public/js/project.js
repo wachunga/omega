@@ -1,3 +1,5 @@
+var tracker; // for debugging only
+
 require.config({
 	paths: {
 		'jquery': 'http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min',
@@ -7,7 +9,10 @@ require.config({
 	}
 });
 
-require(['jquery'], function ($) {
+
+require(['jquery', 'Tracker'], function ($, Tracker) {
+
+	var socket = io.connect(); // would love to push this into module, but causes odd race condition in some browser
 
 	$(function () {
 		if (!isLocalStorageSupported) {
@@ -15,7 +20,7 @@ require(['jquery'], function ($) {
 			return;
 		}
 
-		console.log('started');
+		tracker = new Tracker($("#nameInput"), $("#messageInput"), $("#form"), $("#messages"), socket);
 	});
 	
 	function isLocalStorageSupported() {

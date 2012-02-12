@@ -5,60 +5,18 @@
 	<title>Omega Issue Tracker</title>
 	<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans" type="text/css">
 	<link rel="stylesheet" href="css/omega.css" type="text/css">
-	<script src="/socket.io/socket.io.js"></script>
 	<script data-main="js/main" src="js/require.js"></script>
 </head>
 <body>
 <div id="header">
 	<h1>Ω</h1><div id="loggedInUser" data-bind="visible: userManager.current()">welcome, <strong data-bind="text: userManager.current"></strong> | <span class="notificationToggle" data-bind="text: notifier.webNotifyEnabled() ? '⚑' : '⚐', click: notifier.requestNotificationPermission, attr: { title: notifier.statusMessage }"></span> | <a href="#" data-bind="click: userManager.logout">kthxbye</a></div>
 </div>
-<ul id="messages" data-bind="foreach: { data: messageList.messages, beforeRemove: function(elem) { $(elem).fadeOut() }, afterAdd: function(elem) { $(elem).hide().fadeIn('fast') } }">
-	<li data-bind="css: { system: !speaker }">
-		<span class="speaker" data-bind="text: speaker ? speaker + ': ' : ''"></span><span class="message" data-bind="html: message"></span>
-		<!-- ko if: date --><span class="details subtle" data-bind="text: '(' + $.timeago(date) + ')'"></span><!-- /ko -->
-	</li>
-</ul>
-<div id="onlineUsers">
-	online:
-	<!-- ko template: { name: 'onlineUsersTemplate', foreach: userManager.onlineUsers } --><!-- /ko -->
-	<!-- ko if: !userManager.onlineUsers().length -->
-	<span class="subtle">nobody</span>
-	<!-- /ko -->
-</div>
-<form id="form" autocomplete="off" data-bind="submit: handleInput">
-	<label style="display: none;" data-bind="visible: userManager.noUser">You're not signed in. Who are you? <input id="nameInput" type="text" data-bind="attr: { placeholder: userManager.namePlaceholder }"/></label>
-	<span style="display: none;" class="invalidName loud" data-bind="fadeVisible: userManager.invalidName">I don't think so. Try again.</span>
 
-	<input style="display: none;" id="messageInput" data-bind="visible: !userManager.noUser()" type="text" tabindex="1" placeholder="Type commands (like '/help') or just chat it up"/>
-	<input class="offscreen" type="submit"/>
+<section>
+	<header><h3>Welcome</h3></header>
 
-	<h3 style="display: none;" class="warningMessage loud" data-bind="visible: disconnected() && !loading()">Warning: disconnected from server</h3>
-</form>
-<dl id="commandList" class="hidden" data-bind="fadeVisible: helpOpen, click: function() { helpOpen(false); $messageInput.focus(); }">
-	<dt>/create &lt;description&gt;</dt>
-	<dt>/critical &lt;id&gt;</dt>
-	<dt>/assign &lt;id&gt; [&lt;user&gt;]</dt>
-	<dt>/unassign &lt;id&gt;</dt>
-	<dt>/edit &lt;id&gt; &lt;description&gt;</dt>
-	<dt>/close &lt;id&gt;</dt>
-	<dt>/reopen &lt;id&gt;</dt>
-	<dt>/reset</dt>
-</dl>
+</section>
 
-<div id="issuesContainer">
-	<label class="hideIssues"><input type="checkbox" data-bind="checked: hideClosed"/> hide closed</label>
-	<label class="hideIssues"><input type="checkbox" data-bind="checked: hideAssigned"/> hide assigned</label>
-	<h2>Issues <span data-bind="fadeVisible: issueManager.issues().length >= 3" class="issueCounts subtle">(<var data-bind="text: issueManager.openIssuesCount"></var> open, <var data-bind="text: issueManager.closedIssuesCount"></var> closed)</span></h2>
-
-	<p class="noneMessage subtle" data-bind="fadeVisible: !issueManager.issues().length || (hideClosed() && issueManager.openIssuesCount() == 0)">No open issues. w00t!</p>
-	<ul class="issuesList" data-bind="foreach: { data: issueManager.sortedIssues, afterRender: applyTimeago }">
-		<li data-bind="attr: { id: id }, fadeVisible: !($root.hideClosed() && closed()) && !($root.hideAssigned() && assignee() != 'nobody'), css: { closed: closed, highlighted: id === $root.issueManager.highlightedIssue() }"><a data-bind="attr: { href: '#' + id }, text: id" title="Permalink" class="issueId"></a>:&nbsp;<span class="loud" data-bind="text: critical() ? '★ ' : ''"></span>
-			<span class="assignee" data-bind="css: { myself: $root.userManager.isCurrentUser(assignee()) }, text: assigneeLabel"></span>
-			&nbsp;<span class="description" data-bind="html: $root.addHtmlLinks(description)"></span>
-			<span class="details subtle">(created by <span data-bind="text: creator"></span> <time data-bind="attr: { datetime: createdDate }"></time>)</span>
-		</li>
-	</ul>
-</div>
 <div class="footer subtle">
 	Powered by node.js | <a href="https://github.com/wachunga/omega">Hosted</a> on GitHub | Version 0.9.1</span>
 </div>

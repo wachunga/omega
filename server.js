@@ -6,6 +6,7 @@ var http = require('http'),
 	_ = require('underscore'),
 	issueDb = require('./lib/issueDb'),
 	projectDao = require('./lib/projectDao'),
+	Issue = require('./lib/Issue'),
 	oe = require('./public/js/omegaEvent'),
 	ET = oe.OmegaEvent.Type;
 
@@ -54,14 +55,10 @@ console.log('App running at http://127.0.0.1:' + PORT);
 
 // TODO: extract
 
-var UNASSIGNED = "nobody";
 var CURRENT_USER = "me";
 var HISTORY_ITEMS_TO_SHOW = 10;
 var MAX_HISTORY_ITEMS = 100;
-var RESERVED_USERNAMES = [UNASSIGNED, CURRENT_USER];
-
-var usernames = {};
-var history = [];
+var RESERVED_USERNAMES = [Issue.UNASSIGNED, CURRENT_USER];
 
 var io = sio.listen(app);
 io.configure(function () {
@@ -78,13 +75,21 @@ function initProjects() {
 	});
 }
 
+var historyMap = {};
+var usernameMap = {};
+
 function handleProjectConnect(project, socket) {
-	var issues = issueDb.load(project);
 
-	applyIssueDefaults();
-	socket.emit('issues', issues);
+	historyMap[project.slug] = historyMap[project.slug] || [];
+	var history = historyMap[project.slug];
+
+	usernameMap[project.slug] = usernameMap[project.slug] || {};
+	var usernames = usernameMap[project.slug];
+
+	var projectSocket = io.of('/' + project.slug);
+
+	socket.emit('issues', issueDb.load(project));
 	socket.emit('usernames', usernames);
-
 	socket.emit('history', _.last(history, HISTORY_ITEMS_TO_SHOW));
 
 	socket.on('login user', function(name, callback) {
@@ -96,30 +101,18 @@ function handleProjectConnect(project, socket) {
 		socket.nickname = name;
 		// keep track of duplicate usernames
 		usernames[name] = (usernames[name] || 0) + 1;
-		socket.emit('usernames', usernames);
+		projectSocket.emit('usernames', usernames);
 	});
 
 	socket.on('user message', function(msg) {
 		var event = recordEvent(ET.UserMessage, {message: msg, speaker: socket.nickname});
-		socket.emit('user message', event);
+		projectSocket.emit('user message', event);
 	});
 
-	socket.on('new issue', function(desc) {
-		var newIssue = {
-			id: issues.length+1,
-			description: desc,
-			critical: false,
-			creator: socket.nickname,
-			closer: UNASSIGNED,
-			assignee: UNASSIGNED,
-			closed: false,
-			createdDate: new Date()
-		};
-		issues.push(newIssue);
-		issueDb.write(project, issues);
-
+	socket.on('new issue', function(description) {
+		var newIssue = issueDb.add(new Issue(description, socket.nickname), project);
 		var event = recordEvent(ET.NewIssue, {issue: newIssue});
-		socket.emit('issue created', event);
+		projectSocket.emit('issue created', event);
 	});
 
 	socket.on('assign issue', function(id, specifiedAssignee) {
@@ -127,51 +120,50 @@ function handleProjectConnect(project, socket) {
 		if (!specifiedAssignee || specifiedAssignee === CURRENT_USER) {
 			assignee = socket.nickname;
 		}
-		var issue = issues[id-1];
+		var issue = issueDb.find(id, project);
 		issue.assignee = assignee;
-		issueDb.write(project, issues);
+		issueDb.update(issue, project);
 
 		var event = recordEvent(ET.AssignIssue, {assigner: socket.nickname, issue: issue});
-		socket.emit('issue assigned', event);
+		projectSocket.emit('issue assigned', event);
 	});
 
 	socket.on('close issue', function(id) {
-		var issue = issues[id-1];
+		var issue = issueDb.find(id, project);
 		issue.closed = true;
-		issueDb.write(project, issues);
 		issue.closer = socket.nickname;
+		issueDb.update(issue, project);
 
 		var event = recordEvent(ET.CloseIssue, {issue: issue});
-		socket.emit('issue closed', event);
+		projectSocket.emit('issue closed', event);
 	});
 
 	socket.on('update issue', function(id, props) {
-		var issue = issues[id-1];
+		var issue = issueDb.find(id, project);
 		delete props['id'];
 		for (key in props) {
 			issue[key] = props[key];
 		}
-		issueDb.write(project, issues);
+		issueDb.update(issue, project);
 
 		var event = recordEvent(ET.UpdateIssue, {updater: socket.nickname, issue: issue});
-		socket.emit('issue updated', props, event);
+		projectSocket.emit('issue updated', props, event);
 	});
 
 	socket.on('prioritize issue', function(id) {
-		var issue = issues[id-1];
+		var issue = issueDb.find(id, project);
 		issue.critical = !issue.critical;
-		issueDb.write(project, issues);
+		issueDb.update(issue, project);
 
 		var event = recordEvent(ET.PrioritizeIssue, {updater: socket.nickname, issue: issue});
-		socket.emit('issue prioritized', {critical: issue.critical}, event);
+		projectSocket.emit('issue prioritized', {critical: issue.critical}, event);
 	});
 
 	socket.on('reset issues', function() {
-		issues = [];
-		issueDb.write(project, issues);
-		socket.emit('issues', issues);
+		issueDb.reset(project);
+		projectSocket.emit('issues', []);
 		history = [];
-		socket.emit('history', history);
+		projectSocket.emit('history', history);
 	});
 
 	function recordEvent(type, details) {
@@ -193,13 +185,7 @@ function handleProjectConnect(project, socket) {
 			usernames[socket.nickname]--;
 		}
 		delete socket.nickname;
-		socket.emit('usernames', usernames);
-	}
-
-	function applyIssueDefaults() {
-		_.each(issues, function (issue) {
-			_.defaults(issue, { critical: false, closer: UNASSIGNED });
-		});
+		projectSocket.emit('usernames', usernames);
 	}
 
 	socket.on('disconnect', removeCurrentUser);

@@ -24,7 +24,7 @@ define(['ko', 'underscore'], function (ko, _) {
 			return;
 		}
 
-		var popup = window.webkitNotifications.createNotification("favicon.ico", event.notification.title, event.notification.body);
+		var popup = window.webkitNotifications.createNotification("/favicon.ico", event.notification.title, event.notification.body);
 		popup.show();
 		setInterval(function () { popup.cancel(); }, NOTIFICATION_DURATION);
 	};

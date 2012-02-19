@@ -49,13 +49,23 @@ pre {
 #header {
 	position: relative;	
 }
-#header h1 {
+#header h1,
+#header h2 {
 	display: inline;
 	margin: 0;
+}
+#header h1 {
 	font-family: georgia, serif;
 	font-size: 5em;
 	text-shadow: #ddd 2px 0 2px;
 	line-height: 0;
+}
+#header h2,
+#header .switchProject {
+	margin-left: 0.5em;
+}
+#header .switchProject {
+	font-size: small;
 }
 #loggedInUser {
 	position: absolute;

@@ -11,7 +11,8 @@
 <body>
 <div id="header">
 	<h1>Ω</h1>
-	<h2><%= title %> <a href="/">switch</a></h2>
+	<h2><%= title %></h2>
+	<a class="switchProject" href="/">switch</a>
 	<div id="loggedInUser" data-bind="visible: userManager.current()">welcome, <strong data-bind="text: userManager.current"></strong> | <span class="notificationToggle" data-bind="text: notifier.webNotifyEnabled() ? '⚑' : '⚐', click: notifier.requestNotificationPermission, attr: { title: notifier.statusMessage }"></span> | <a href="#" data-bind="click: userManager.logout">kthxbye</a></div>
 </div>
 <ul id="messages" data-bind="foreach: { data: messageList.messages, beforeRemove: function(elem) { $(elem).fadeOut() }, afterAdd: function(elem) { $(elem).hide().fadeIn('fast') } }">

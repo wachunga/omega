@@ -2,7 +2,8 @@
 
 var express = require('express'),
 	_ = require('underscore'),
-	projectDao = require('./lib/projectDao');
+	projectDao = require('./lib/projectDao'),
+	tracker = require('./lib/tracker');
 
 // command line parameters
 var argv = require('optimist')
@@ -23,7 +24,8 @@ var www_public = argv.optimized ? '/public-built' : '/public';
 
 var app = express.createServer(
 	express.logger(),
-	express.static(__dirname + www_public)
+	express.static(__dirname + www_public),
+	express.bodyParser()
 );
 app.register('.html', require('ejs')); // call our views html
 app.use(app.router);
@@ -31,6 +33,23 @@ app.listen(PORT);
 
 app.get('/', function (req, res) {
 	res.end('intro page where you create projects etc');
+});
+app.post('/project', function (req, res) {
+	console.log('body', req.body, req.body.projectName);
+	var name = req.body.projectName;
+	if (!name) {
+		console.error('Cannot check if project exists with empty name');
+		res.end(); // TODO: error
+		return;
+	}
+
+	if (projectDao.exists(name)) {
+		res.json('Project with that name already exists', 500); // TODO: more specific?
+	} else {
+		var created = projectDao.create(name);
+		tracker.listen(created);
+		res.json({ url: '/project/' + created.slug });
+	}
 });
 app.get('/project', function(req, res) {
 	res.end('Projects are unlisted. Try /project/<name>');
@@ -45,6 +64,7 @@ app.get('/project/:slug', function(req, res) {
 	}
 });
 
-console.log('App running at http://127.0.0.1:' + PORT);
+tracker.init(app);
 
-require('./lib/tracker').init(app);
+console.log('Ω running on port ' + PORT);
+

@@ -7,7 +7,7 @@ require.config({
 	}
 });
 
-require(['jquery'], function ($) {
+require(['jquery', 'ko'], function ($, ko) {
 
 	$(function () {
 		if (!isLocalStorageSupported) {
@@ -15,7 +15,22 @@ require(['jquery'], function ($) {
 			return;
 		}
 
-		console.log('started');
+		var viewModel = {
+			projectName: ko.observable(),
+			unlisted: ko.observable(false),
+			error: ko.observable(''),
+//			preview: ko.computed(function () {
+//				return 'http://' + this.projectName()
+//			}, this),
+			submitForm: function (form) {
+				$.post('/project', $(form).serialize(), function (result) {
+					window.location = result.url;
+				}).error(function (result) {
+					viewModel.error(result.responseText);
+				});
+			}
+		}
+		ko.applyBindings(viewModel);
 	});
 	
 	function isLocalStorageSupported() {

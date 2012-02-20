@@ -35,16 +35,14 @@ app.get('/', function (req, res) {
 	res.end('intro page where you create projects etc');
 });
 app.post('/project', function (req, res) {
-	console.log('body', req.body, req.body.projectName);
 	var name = req.body.projectName;
 	if (!name) {
-		console.error('Cannot check if project exists with empty name');
-		res.end(); // TODO: error
+		res.json({ error: 'empty' }, 400);
 		return;
 	}
 
 	if (projectDao.exists(name)) {
-		res.json('Project with that name already exists', 500); // TODO: more specific?
+		res.json({ error: 'exists', url: '/project/'  + projectDao.getSlug(name) }, 409);
 	} else {
 		var created = projectDao.create(name);
 		tracker.listen(created);

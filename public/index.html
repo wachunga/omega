@@ -15,17 +15,16 @@
 </div>
 
 <div>
-	<h3>Welcome</h3>
+	<h2>Welcome</h2>
 	<p>Ω is a real-time issue tracker optimized for small teams. <a href="http://github.com/wachunga/omega">Learn more</a></p>
 </div>
 <div>
-	<h3>What are you working on?</h3>
-	<form class="newProject" data-bind="submit: submitForm">
-		<input type="text" id="projectNameInput" name="projectName" required data-bind="value: projectName" placeholder="Project name">
-		<span data-bind="visible: !!error(), text: error"></span>
+	<h2>What are you working on?</h2>
+	<form class="newProject" data-bind="submit: submitForm.bind($data)">
+		<input type="text" id="projectNameInput" tabindex="1" name="projectName" required data-bind="value: projectName" placeholder="My awesome project">
+		<span class="loud" data-bind="visible: !!error(), html: error"></span>
 		<!--<input type="checkbox" name="unlisted" data-bind="checked: unlisted" />-->
 		<input type="submit" class="offscreen">
-		<!--<p data-bind="text: preview"></p>-->
 	</form>
 </div>
 

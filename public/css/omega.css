@@ -197,13 +197,6 @@ input[type='text']:focus {
 #issuesContainer .closed .assignee {
 	text-decoration: line-through;
 }
-/* darken placeholder text */
-input::-webkit-input-placeholder {
-    color: #333;
-}
-input:-moz-placeholder {
-    color: #333;
-}
 .footer {
 	font-size: small;
 	text-align: center;
@@ -211,4 +204,5 @@ input:-moz-placeholder {
 }
 #projectNameInput {
 	width: 20em;
+	margin-right: 0.5em;
 }

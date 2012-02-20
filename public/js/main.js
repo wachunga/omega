@@ -17,16 +17,25 @@ require(['jquery', 'ko'], function ($, ko) {
 
 		var viewModel = {
 			projectName: ko.observable(),
-			unlisted: ko.observable(false),
-			error: ko.observable(''),
-//			preview: ko.computed(function () {
-//				return 'http://' + this.projectName()
-//			}, this),
+//			unlisted: ko.observable(false),
+			error: ko.observable(),
 			submitForm: function (form) {
+				var name = $('#projectNameInput').val().trim();
+				if (!name || name.length < 3) {
+					this.error('You can do better.');
+					return false;
+				}
+
+				var that = this;
 				$.post('/project', $(form).serialize(), function (result) {
 					window.location = result.url;
 				}).error(function (result) {
-					viewModel.error(result.responseText);
+					result = JSON.parse(result.responseText);
+					if (result.error === 'exists') {
+						that.error('A <a href="' + result.url + '">project with that name</a> already exists.');
+					} else if (result.error === 'empty') {
+						that.error('Empty project name.');
+					}
 				});
 			}
 		}

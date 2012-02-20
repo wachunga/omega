@@ -32,10 +32,12 @@ app.use(app.router);
 app.listen(PORT);
 
 app.get('/', function (req, res) {
-	res.end('intro page where you create projects etc');
+	var unlistedCount = projectDao.findUnlisted().length;
+	res.render('index.html', { projects: projectDao.findListed(), unlisted: unlistedCount, layout: false });
 });
 app.post('/project', function (req, res) {
 	var name = req.body.projectName;
+	var unlisted = req.body.unlisted;
 	if (!name) {
 		res.json({ error: 'empty' }, 400);
 		return;
@@ -44,13 +46,13 @@ app.post('/project', function (req, res) {
 	if (projectDao.exists(name)) {
 		res.json({ error: 'exists', url: '/project/'  + projectDao.getSlug(name) }, 409);
 	} else {
-		var created = projectDao.create(name);
+		var created = projectDao.create(name, unlisted);
 		tracker.listen(created);
 		res.json({ url: '/project/' + created.slug });
 	}
 });
 app.get('/project', function(req, res) {
-	res.end('Projects are unlisted. Try /project/<name>');
+	res.end('Nothing to see here. Try /project/<name>');
 });
 app.get('/project/:slug', function(req, res) {
 	var project = projectDao.find(req.params.slug);

@@ -10,8 +10,6 @@
 <body>
 <div id="header">
 	<h1>Ω</h1>
-	<!--<div id="loggedInUser" data-bind="visible: userManager.current()">welcome, <strong data-bind="text: userManager.current"></strong>-->
-	</div>
 </div>
 
 <div>
@@ -21,18 +19,33 @@
 <div>
 	<h2>What are you working on?</h2>
 	<form class="newProject" data-bind="submit: submitForm.bind($data)">
-		<input type="text" id="projectNameInput" tabindex="1" name="projectName" required data-bind="value: projectName" placeholder="My awesome project">
-		<span class="loud" data-bind="visible: !!error(), html: error"></span>
-		<!--<input type="checkbox" name="unlisted" data-bind="checked: unlisted" />-->
-		<input type="submit" class="offscreen">
+		<fieldset>
+			<input type="text" id="projectNameInput" tabindex="1" name="projectName" required placeholder="My awesome project">
+			<label class="unlistedBox"><input type="checkbox" name="unlisted" /> unlisted</label>
+		</fieldset>
+		<div class="submitContainer">
+			<input type="submit" class="submit" value="Go">
+			<span class="loud" data-bind="visible: !!error(), html: error"></span>
+		</div>
 	</form>
+
+	<% if (projects.length > 0) { %>
+	<p>Or maybe one of these projects?</p>
+	<ul>
+	<% for(var i = 0; i < projects.length; i++) { %>
+		<li><a href="<%= projects[i].url %>"><%= projects[i].name %></a></li>
+	<% } %>
+	</ul>
+	<% } %>
+
+	<% if (unlisted > 0) { %>
+	<p>Or maybe an unlisted project? (<%= unlisted %> total)</p>
+	<% } %>
 </div>
 
 <div class="footer subtle">
 	Powered by node.js | <a href="https://github.com/wachunga/omega">Hosted</a> on GitHub | Version 1.0.0pre</span>
 </div>
-
-<script type="text/html" id="onlineUsersTemplate"><span class="onlineUser"><span data-bind="text: name"></span><!-- ko if: count > 1 --> <span class="subtle" data-bind="text: '(' + count + ')'"></span><!-- /ko --></span></script>
 
 </body>
 </html>

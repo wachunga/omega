@@ -202,7 +202,30 @@ input[type='text']:focus {
 	text-align: center;
 	margin-top: 4em;
 }
-#projectNameInput {
+
+.newProject fieldset {
 	width: 20em;
-	margin-right: 0.5em;
+	padding: 0;
+	border: none;
+	display: inline-block;
 }
+#projectNameInput {
+	width: 100%;
+	box-sizing: border-box;
+}
+.unlistedBox {
+	font-size: small;
+	float: right;
+	display: block;
+}
+.newProject .submitContainer {
+	vertical-align: top;
+	padding-top: 0.6em;
+	display: inline-block;
+}
+.newProject .submit {
+	margin-right: 0.5em;
+	margin-left: 0.5em;
+}
+
+

@@ -16,8 +16,6 @@ require(['jquery', 'ko'], function ($, ko) {
 		}
 
 		var viewModel = {
-			projectName: ko.observable(),
-//			unlisted: ko.observable(false),
 			error: ko.observable(),
 			submitForm: function (form) {
 				var name = $('#projectNameInput').val().trim();

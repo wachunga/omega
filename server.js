@@ -37,16 +37,17 @@ app.get('/', function (req, res) {
 });
 app.post('/project', function (req, res) {
 	var name = req.body.projectName;
-	var unlisted = req.body.unlisted;
 	if (!name) {
 		res.json({ error: 'empty' }, 400);
 		return;
+	} else if (name === projectDao.filename) {
+		res.json({ error: 'invalid' }, 400);
 	}
 
 	if (projectDao.exists(name)) {
 		res.json({ error: 'exists', url: '/project/'  + projectDao.getSlug(name) }, 409);
 	} else {
-		var created = projectDao.create(name, unlisted);
+		var created = projectDao.create(name, req.body.unlisted);
 		tracker.listen(created);
 		res.json({ url: '/project/' + created.slug });
 	}

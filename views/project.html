@@ -3,6 +3,10 @@
 	<script data-main="/js/project" src="/js/require.js"></script>
 </head>
 <body>
+<% if (flash) { %>
+<div class="flash hidden"><span><%- flash %></span></div>
+<% } %>
+
 <div id="header">
 	<h1>Ω</h1>
 	<h2><%= title %></h2>

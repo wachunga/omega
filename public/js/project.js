@@ -21,6 +21,11 @@ require(['jquery', 'Tracker'], function ($, Tracker) {
 			return;
 		}
 
+		function hideFlashMessages() {
+			$(this).fadeOut();
+		}
+		$('.flash').click(hideFlashMessages).delay(500).fadeIn().delay(8000).fadeOut();
+
 		tracker = new Tracker($("#nameInput"), $("#messageInput"), $("#form"), $("#messages"), socket);
 	});
 	

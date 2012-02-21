@@ -24,6 +24,8 @@ var www_public = argv.optimized ? '/public-built' : '/public';
 
 var app = express.createServer(
 	express.logger(),
+	express.cookieParser(),
+	express.session({ secret: 'nyan cat' }), // for flash messages
 	express.static(__dirname + www_public),
 	express.bodyParser()
 );
@@ -47,8 +49,10 @@ app.post('/project', function (req, res) {
 	if (projectDao.exists(name)) {
 		res.json({ error: 'exists', url: '/project/'  + projectDao.getSlug(name) }, 409);
 	} else {
-		var created = projectDao.create(name, req.body.unlisted);
+		var created = projectDao.create(name, !!req.body.unlisted);
 		tracker.listen(created);
+		var message = created.unlisted ? "Here's your project. Remember: it's unlisted, so nobody'll find it unless you share the address." : "Here's your project. Love, Ω";
+		req.flash('info', message);
 		res.json({ url: '/project/' + created.slug });
 	}
 });
@@ -58,7 +62,10 @@ app.get('/project', function(req, res) {
 app.get('/project/:slug', function(req, res) {
 	var project = projectDao.find(req.params.slug);
 	if (project) {
-		res.render('project.html', { title: project.name });
+		var flash = req.flash('info');
+		var message = flash.length ? _.first(flash) : null;
+
+		res.render('project.html', { title: project.name, flash: message });
 	} else {
 		res.writeHead(404);
 		res.end('No such project');

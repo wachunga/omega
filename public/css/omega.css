@@ -18,6 +18,21 @@ pre {
 	font-style: normal;
 }
 
+.flash {
+	position: absolute;
+	top: 10px;
+	left: 0;
+	z-index: 1001;
+	width: 100%;
+	text-align: center;
+}
+.flash span {
+	padding: 5px 10px;
+	background: #E2E9E5;
+	box-shadow: 0 0 1px rgba(0,0,0,0.1);
+	border-radius: 0.4em;
+	border: 1px solid #999;
+}
 .hidden {
 	display: none;
 }

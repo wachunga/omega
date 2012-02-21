@@ -1,10 +1,4 @@
-<!DOCTYPE html>
-<html>
-<head>
-	<meta charset="utf-8"/>
 	<title><%= title %> - Omega Issue Tracker</title>
-	<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans" type="text/css">
-	<link rel="stylesheet" href="/css/omega.css" type="text/css">
 	<script src="/socket.io/socket.io.js"></script>
 	<script data-main="/js/project" src="/js/require.js"></script>
 </head>
@@ -62,11 +56,6 @@
 		</li>
 	</ul>
 </div>
-<div class="footer subtle">
-	Powered by node.js | <a href="https://github.com/wachunga/omega">Hosted</a> on GitHub | Version 1.0.0pre</span>
-</div>
 
 <script type="text/html" id="onlineUsersTemplate"><span class="onlineUser"><span data-bind="text: name"></span><!-- ko if: count > 1 --> <span class="subtle" data-bind="text: '(' + count + ')'"></span><!-- /ko --></span></script>
 
-</body>
-</html>

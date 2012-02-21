@@ -33,7 +33,7 @@ app.listen(PORT);
 
 app.get('/', function (req, res) {
 	var unlistedCount = projectDao.findUnlisted().length;
-	res.render('index.html', { projects: projectDao.findListed(), unlisted: unlistedCount, layout: false });
+	res.render('index.html', { projects: projectDao.findListed(), unlisted: unlistedCount });
 });
 app.post('/project', function (req, res) {
 	var name = req.body.projectName;
@@ -57,7 +57,7 @@ app.get('/project', function(req, res) {
 app.get('/project/:slug', function(req, res) {
 	var project = projectDao.find(req.params.slug);
 	if (project) {
-		res.render('project.html', { title: project.name, layout: false });
+		res.render('project.html', { title: project.name });
 	} else {
 		res.writeHead(404);
 		res.end('No such project');

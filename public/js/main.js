@@ -10,10 +10,6 @@ require.config({
 require(['jquery', 'ko'], function ($, ko) {
 
 	$(function () {
-		if (!isLocalStorageSupported) {
-			alert("Your browser is very out of date. To use Ω, please use a newer browser."); // TODO: graceful degradation
-			return;
-		}
 
 		var viewModel = {
 			error: ko.observable(),
@@ -37,16 +33,9 @@ require(['jquery', 'ko'], function ($, ko) {
 				});
 			}
 		}
+
 		ko.applyBindings(viewModel);
 	});
 	
-	function isLocalStorageSupported() {
-		try {
-			return 'localStorage' in window && window['localStorage'] !== null;
-		} catch (e) {
-			return false;
-		}
-	}
-
 });
 

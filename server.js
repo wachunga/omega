@@ -34,6 +34,7 @@ var app = express.createServer(
 	express.bodyParser(),
 	express.methodOverride()
 );
+app.set('views', __dirname + '/views');
 app.register('.html', require('ejs')); // call our views html
 app.use(app.router);
 app.listen(PORT);

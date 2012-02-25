@@ -2,6 +2,7 @@
 
 var express = require('express'),
 	_ = require('underscore'),
+	issueDao = require('./lib/issueDao'),
 	projectDao = require('./lib/projectDao'),
 	tracker = require('./lib/tracker');
 
@@ -26,6 +27,13 @@ var PORT = process.env.app_port || argv.port;
 // build 'public-built/' using 'node r.js -o app.build.js'
 var www_public = argv.optimized ? '/public-built' : '/public';
 
+var db_dir = __dirname + '/db/';
+if (process.env['NODE_ENV'] === 'nodester') {
+	db_dir = __dirname + '/'; // override due to https://github.com/nodester/nodester/issues/313
+}
+projectDao.init(db_dir);
+issueDao.init(db_dir);
+
 var app = express.createServer(
 	express.logger(),
 	express.cookieParser(),
@@ -48,8 +56,9 @@ app.post('/project', function (req, res) {
 	if (!name) {
 		res.json({ error: 'empty' }, 400);
 		return;
-	} else if (name === projectDao.filename) {
+	} else if (!projectDao.isValidName(name)) {
 		res.json({ error: 'invalid' }, 400);
+		return;
 	}
 
 	if (projectDao.exists(name)) {

@@ -16,12 +16,15 @@ Features
     * optional growl-like **notifications** even outside the browser (Chrome only, [for now](http://caniuse.com/#feat=notifications))
 
 * minimalist
-    * single page
+    * everything you need on a single page
+    * no need to sign up for accounts etc
     * workflow: open, assign, close
     * priority: critical or not
     * if you need metadata, like component or severity, just include it in the description
 
-Coming soon: support for multiple projects on a single instance of Ω.
+* projects
+    * create as many as you need
+    * unlisted if you want some privacy (for total security, host Ω behind your firewall)
 
 Installation
 ---
@@ -33,11 +36,11 @@ Usage
 
 Start the server:
 
-    omega [-p <port>] [-db <file>]
+    omega [-port <port>] [-pass <password>]
 
 `<port>` - Where the server listens for connections. Defaults to 1337.
 
-`<file>` - Where issues are persisted as json. Defaults to "issues".
+`<password>` - Password required for accessing project admin section.
 
 Then just open a browser to http://localhost:1337 or wherever.
 

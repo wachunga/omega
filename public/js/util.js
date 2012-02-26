@@ -29,7 +29,11 @@ define(['ko'], function (ko) {
 		},
 		update: function(element, valueAccessor) {
 			var value = valueAccessor();
-			ko.utils.unwrapObservable(value) ? $(element).fadeIn('fast') : $(element).fadeOut('fast');
+			if (ko.utils.unwrapObservable(value)) {
+				$(element).fadeIn('fast');
+			} else {
+				$(element).fadeOut('fast');
+			}
 		}
 	};
 
@@ -40,5 +44,5 @@ define(['ko'], function (ko) {
 	return {
 		addHtmlLinks: addHtmlLinks,
 		getRandomItem: getRandomItem
-	}
+	};
 });

@@ -71,10 +71,10 @@ app.post('/project', function (req, res) {
 		res.json({ url: '/project/' + created.slug });
 	}
 });
-app.get('/project', function(req, res) {
+app.get('/project', function (req, res) {
 	res.end('Nothing to see here. Try /project/<name>');
 });
-app.get('/project/:slug', function(req, res) {
+app.get('/project/:slug', function (req, res) {
 	var project = projectDao.find(req.params.slug);
 	if (project && !project.deleted) {
 		var flash = req.flash('info');
@@ -92,13 +92,13 @@ app.get('/project/:slug', function(req, res) {
 
 var auth = express.basicAuth('admin', argv.password);
 
-app.delete('/project/:slug', auth, function(req, res) {
+app.delete('/project/:slug', auth, function (req, res) {
 	console.log('trying to delete ' + req.params.slug);
 	projectDao.remove(req.params.slug);
 	res.redirect('back');
 });
 
-app.get('/admin', auth, function(req, res) {
+app.get('/admin', auth, function (req, res) {
 	res.render('admin.html', { projects: JSON.stringify(projectDao.findAll()) });
 });
 

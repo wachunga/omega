@@ -18,9 +18,9 @@ var isNode = (typeof exports !== 'undefined');
 			this.notification = {
 				title: _.template(type.notificationTitle, details),
 				body: _.template(type.notificationBody, details)
-			};			
+			};
 		}
-	};
+	}
 	
 	function OmegaEventType(name, message, notificationTitle, notificationBody) {
 		this.name = name;
@@ -44,4 +44,4 @@ var isNode = (typeof exports !== 'undefined');
 	
 	exports.OmegaEvent = OmegaEvent;
 
-})(isNode ? exports : (OmegaIssueTracker = OmegaIssueTracker || {}));
+}(isNode ? exports : (OmegaIssueTracker = OmegaIssueTracker || {})));

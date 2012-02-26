@@ -58,7 +58,7 @@ function ($, _, ko, timeago, util, Issue, Notifier, UserManager, MessageList, Is
 	function requireArgument() {
 		_.each(arguments, function (arg) {
 			if (!arg) {
-				throw "Invalid or missing argument.";	
+				throw "Invalid or missing argument.";
 			}
 		});
 	}
@@ -95,9 +95,11 @@ function ($, _, ko, timeago, util, Issue, Notifier, UserManager, MessageList, Is
 		}
 
 		try {
-			var matches = input.match(/[:\/]([\S]+)(?:\s+(.*))?/); 
+			var matches = input.match(/[:\/]([\S]+)(?:\s+(.*))?/);
 			var cmd = matches[1] && matches[1].trim();
 			var rest = matches[2] && matches[2].trim();
+
+			var id;
 			switch (cmd.toLowerCase()) {
 				case 'help':
 				case '?':
@@ -113,23 +115,23 @@ function ($, _, ko, timeago, util, Issue, Notifier, UserManager, MessageList, Is
 					break;
 				case 'close':
 				case 'resolve':
-					var id = parseInt(rest, 10);
+					id = parseInt(rest, 10);
 					requireArgument(id);
 					this.issueManager.closeIssue(id);
 					break;
 				case 'reopen':
-					var id = parseInt(rest, 10);
+					id = parseInt(rest, 10);
 					requireArgument(id);
 					this.issueManager.updateIssue(id, { closed: false });
 					break;
 				case 'unassign':
-					var id = parseInt(rest, 10);
+					id = parseInt(rest, 10);
 					requireArgument(id);
 					this.issueManager.assignIssue(id, 'nobody');
 					break;
 				case 'assign':
 				case '@':
-					var id = parseInt(getArgument(rest, 1), 10);
+					id = parseInt(getArgument(rest, 1), 10);
 					var assignee = getArgument(rest, 2);
 					requireArgument(id);
 					this.issueManager.assignIssue(id, assignee);
@@ -139,14 +141,14 @@ function ($, _, ko, timeago, util, Issue, Notifier, UserManager, MessageList, Is
 				case '!':
 				case '*':
 				case 'star':
-					var id = parseInt(getArgument(rest, 1), 10);
+					id = parseInt(getArgument(rest, 1), 10);
 					requireArgument(id);
 					this.issueManager.prioritizeIssue(id);
 					break;
 				case 'edit':
 				case 'update':
 					// only allow editing the description
-					var id = parseInt(getArgument(rest, 1), 10);
+					id = parseInt(getArgument(rest, 1), 10);
 					var desc = getArgument(rest, 2);
 					requireArgument(id, desc);
 					this.issueManager.updateIssue(id, { description: desc });

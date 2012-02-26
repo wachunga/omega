@@ -12,7 +12,7 @@ require.config({
 
 require(['jquery', 'Tracker'], function ($, Tracker) {
 
-	var project = location.pathname.match(/project\/([^/]+)/)[1];
+	var project = location.pathname.match(/project\/([^\/]+)/)[1];
 	var socket = io.connect('/' + project); // would love to push this into module, but causes odd race condition in some browser
 
 	$(function () {

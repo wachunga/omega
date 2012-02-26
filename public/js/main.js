@@ -32,7 +32,7 @@ require(['jquery', 'ko'], function ($, ko) {
 					}
 				});
 			}
-		}
+		};
 
 		ko.applyBindings(viewModel);
 	});

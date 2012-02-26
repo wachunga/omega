@@ -14,7 +14,7 @@ function ($, _, ko, timeago, util, Issue, Notifier, UserManager, MessageList, Is
 		'These are not the droids you\'re looking for.'
 	];
 
-	var Tracker = function ($nameInput, $messageInput, $form, $messageList, socket) {
+	var ProjectView = function ($nameInput, $messageInput, $form, $messageList, socket) {
 		var that = this;
 
 		this.socket = socket;
@@ -69,11 +69,12 @@ function ($, _, ko, timeago, util, Issue, Notifier, UserManager, MessageList, Is
 	}
 	
 	// @VisibleForTesting
-	Tracker.prototype.notifyOfBadCommand = function () {
+	ProjectView.prototype.notifyOfBadCommand = function () {
 		window.alert(util.getRandomItem(BAD_COMMAND_RESPONSES) + ' Try /help.'); // TODO: style
 	};
 
-	Tracker.prototype.handleInput = function () {
+	// TODO: extract command parsing etc.
+	ProjectView.prototype.handleInput = function () {
 		if (this.userManager.noUser()) {
 			this.userManager.attemptLogin();
 			return;
@@ -165,11 +166,11 @@ function ($, _, ko, timeago, util, Issue, Notifier, UserManager, MessageList, Is
 		}
 	};
 
-	Tracker.prototype.send = function (message) {
+	ProjectView.prototype.send = function (message) {
 		this.socket.emit('user message', message);
 	};
 
-	Tracker.prototype.reset = function () {
+	ProjectView.prototype.reset = function () {
 		if (window.confirm('Warning: this will completely delete all issues from the server.')) {
 			if (window.confirm('I have a bad feeling about this. Are you absolutely sure?')) {
 				this.socket.emit('reset issues');
@@ -178,7 +179,7 @@ function ($, _, ko, timeago, util, Issue, Notifier, UserManager, MessageList, Is
 	};
 
 	// doesn't highlight if filtering issues, but not a big deal
-	Tracker.prototype.checkHashForBookmark = function () {
+	ProjectView.prototype.checkHashForBookmark = function () {
 		var bookmarked = parseInt(window.location.hash.substring(1), 10);
 		var found = this.issueManager.findIssue(bookmarked);
 		if (!found) {
@@ -194,7 +195,7 @@ function ($, _, ko, timeago, util, Issue, Notifier, UserManager, MessageList, Is
 		}
 	};
 
-	Tracker.prototype.applyTimeago = function (elements) {
+	ProjectView.prototype.applyTimeago = function (elements) {
 		_.each(elements, function (element) {
 			var $time = $(element).find("time");
 			if ($time && $time.length) {
@@ -203,6 +204,6 @@ function ($, _, ko, timeago, util, Issue, Notifier, UserManager, MessageList, Is
 		});
 	};
 	
-	return Tracker;
+	return ProjectView;
 	
 });

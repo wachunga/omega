@@ -1,6 +1,6 @@
 require.config({
 	paths: {
-		'jquery': 'http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min',
+		'jquery': 'lib/jquery-1.7.1.min',
 		'ko': 'lib/knockout-2.0.0.min',
 		'underscore': 'lib/underscore-1.2.2.min',
 		'timeago': 'lib/jquery.timeago'

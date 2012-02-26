@@ -22,7 +22,8 @@ var argv = require('optimist')
 	})
 	.argv;
 
-var PORT = process.env.app_port || argv.port;
+var port = process.env.app_port || argv.port;
+var password = process.env.admin_pass || argv.password;
 // run with --optimized to use 'public-built/' directory
 // build 'public-built/' using 'node r.js -o app.build.js'
 var www_public = argv.optimized ? '/public-built' : '/public';
@@ -45,7 +46,7 @@ var app = express.createServer(
 app.set('views', __dirname + '/views');
 app.register('.html', require('ejs')); // call our views html
 app.use(app.router);
-app.listen(PORT);
+app.listen(port);
 
 app.get('/', function (req, res) {
 	var unlistedCount = projectDao.findUnlisted().length;
@@ -90,7 +91,7 @@ app.get('/project/:slug', function (req, res) {
 	}
 });
 
-var auth = express.basicAuth('admin', argv.password);
+var auth = express.basicAuth('admin', password);
 
 app.delete('/project/:slug', auth, function (req, res) {
 	console.log('trying to delete ' + req.params.slug);
@@ -104,5 +105,5 @@ app.get('/admin', auth, function (req, res) {
 
 tracker.init(app);
 
-console.log('Ω running on port ' + PORT);
+console.log('Ω running on port ' + port);
 

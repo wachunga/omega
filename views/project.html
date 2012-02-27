@@ -13,10 +13,10 @@
 	<a class="switchProject" href="/">switch</a>
 	<div id="loggedInUser" data-bind="visible: userManager.current()">welcome, <strong data-bind="text: userManager.current"></strong> | <span class="notificationToggle" data-bind="text: notifier.webNotifyEnabled() ? '⚑' : '⚐', click: notifier.requestNotificationPermission, attr: { title: notifier.statusMessage }"></span> | <a href="#" data-bind="click: userManager.logout">kthxbye</a></div>
 </div>
-<ul id="messages" data-bind="foreach: { data: messageList.messages, beforeRemove: function(elem) { $(elem).fadeOut() }, afterAdd: function(elem) { $(elem).hide().fadeIn('fast') } }">
+<ul id="messages" data-bind="foreach: { data: messageList.messages, beforeRemove: function(elem) { $(elem).fadeOut() }, afterAdd: function(elem) { $(elem).hide().fadeIn('fast') }, afterRender: applyTimeago }">
 	<li data-bind="css: { system: !speaker }">
 		<span class="speaker" data-bind="text: speaker ? speaker + ': ' : ''"></span><span class="message" data-bind="html: message"></span>
-		<!-- ko if: date --><span class="details subtle" data-bind="text: '(' + $.timeago(date) + ')'"></span><!-- /ko -->
+		<!-- ko if: date --><span class="details subtle">(<time data-bind="attr: { datetime: date }"></time>)</span><!-- /ko -->
 	</li>
 </ul>
 <div id="onlineUsers">

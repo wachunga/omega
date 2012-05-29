@@ -137,6 +137,12 @@ function ($, _, ko, timeago, util, Issue, Notifier, UserManager, MessageList, Is
 					requireArgument(id);
 					this.issueManager.assignIssue(id, assignee);
 					break;
+				case 'tag':
+					id = parseInt(getArgument(rest, 1), 10); // TODO: comma separated ids
+					var tag = getArgument(rest, 2);
+					requireArgument(id, tag);
+					this.issueManager.tagIssue(id, tag);
+					break;
 				case 'critical':
 				case 'urgent':
 				case '!':

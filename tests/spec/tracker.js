@@ -194,6 +194,14 @@ describe("omega", function () {
 			tracker.handleInput();
 			expect(tracker.issueManager.prioritizeIssue).toHaveBeenCalledWith(5);
 		});
+
+		it ("can tag issues", function () {
+			messageInput.val = function () { return "/tag 5 later"; };
+
+			spyOn(tracker.issueManager, 'tagIssue');
+			tracker.handleInput();
+			expect(tracker.issueManager.tagIssue).toHaveBeenCalledWith(5, 'later');
+		});
 		
 		it("can assign multi-digit issues", function () {
 			messageInput.val = function () { return "/assign 50"; };

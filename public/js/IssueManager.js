@@ -31,6 +31,10 @@ define(['ko', 'underscore', 'jquery', 'Issue'], function (ko, _, $, Issue) {
 			var issue = that.findIssue(event.issue.id);
 			issue.assignee(event.issue.assignee);
 		});
+		this.socket.on('issue tagged', function (event) {
+			var issue = that.findIssue(event.issue.id);
+			issue.tags(event.issue.tags);
+		});
 		this.socket.on('issue updated', _.bind(this.refreshIssue, this));
 		this.socket.on('issue prioritized', _.bind(this.refreshIssue, this));
 		this.socket.on('issue closed', function (event) {
@@ -53,6 +57,10 @@ define(['ko', 'underscore', 'jquery', 'Issue'], function (ko, _, $, Issue) {
 
 	IssueManager.prototype.assignIssue = function (id, assignee) {
 		this.socket.emit('assign issue', id, assignee);
+	};
+
+	IssueManager.prototype.tagIssue = function (id, tag) {
+		this.socket.emit('tag issue', id, tag);
 	};
 
 	IssueManager.prototype.closeIssue = function (id) {

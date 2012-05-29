@@ -11,6 +11,7 @@ define(['underscore', 'ko'], function (_, ko) {
 			}
 		}, this);
 
+		this.filtered = ko.observable(false);
 		this.assigneeLabel = ko.computed(function () {
 			return this.assignee().toLowerCase() !== 'nobody' ? '(@' + this.assignee() + ')' : '';
 		}, this);

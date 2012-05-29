@@ -49,11 +49,12 @@
 <div id="issuesContainer">
 	<label class="hideIssues"><input type="checkbox" data-bind="checked: hideClosed"/> hide closed</label>
 	<label class="hideIssues"><input type="checkbox" data-bind="checked: hideAssigned"/> hide assigned</label>
-	<h2>Issues <span data-bind="fadeVisible: issueManager.issues().length >= 3" class="issueCounts subtle">(<var data-bind="text: issueManager.openIssuesCount"></var> open, <var data-bind="text: issueManager.closedIssuesCount"></var> closed)</span></h2>
+	<label class="hideIssues"><input id="issueFilter" type="text" data-bind="value: issueManager.issueFilterInstant, valueUpdate: 'afterkeydown'" placeholder="Filter"></label>
+	<h2>Issues <span data-bind="fadeVisible: issueManager.allIssues().length >= 3" class="issueCounts subtle">(<var data-bind="text: issueManager.openIssuesCount"></var> open, <var data-bind="text: issueManager.closedIssuesCount"></var> closed)</span></h2>
 
-	<p class="noneMessage subtle" data-bind="fadeVisible: !issueManager.issues().length || (hideClosed() && issueManager.openIssuesCount() == 0)">No open issues. w00t!</p>
+	<p class="noneMessage subtle" data-bind="fadeVisible: !issueManager.allIssues().length || (hideClosed() && issueManager.openIssuesCount() == 0)">No open issues. w00t!</p>
 	<ul class="issuesList" data-bind="foreach: { data: issueManager.sortedIssues, afterRender: applyTimeago }">
-		<li data-bind="attr: { id: id }, fadeVisible: !($root.hideClosed() && closed()) && !($root.hideAssigned() && assignee() != 'nobody'), css: { closed: closed, highlighted: id === $root.issueManager.highlightedIssue() }"><a data-bind="attr: { href: '#' + id }, text: id" title="Permalink" class="issueId"></a>:&nbsp;<span class="loud" data-bind="text: critical() ? '★ ' : ''"></span>
+		<li data-bind="attr: { id: id }, fadeVisible: !filtered() && !($root.hideClosed() && closed()) && !($root.hideAssigned() && assignee() != 'nobody'), css: { closed: closed, highlighted: id === $root.issueManager.highlightedIssue() }"><a data-bind="attr: { href: '#' + id }, text: id" title="Permalink" class="issueId"></a>:&nbsp;<span class="loud" data-bind="text: critical() ? '★ ' : ''"></span>
 			<span class="assignee" data-bind="css: { myself: $root.userManager.isCurrentUser(assignee()) }, text: assigneeLabel"></span>
 			&nbsp;<span class="description" data-bind="html: $root.addHtmlLinks(description)"></span>
 			<!-- ko foreach: tags -->

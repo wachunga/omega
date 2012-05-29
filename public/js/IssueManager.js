@@ -3,29 +3,35 @@ define(['ko', 'underscore', 'jquery', 'Issue'], function (ko, _, $, Issue) {
 	function IssueManager(socket) {
 		this.socket = socket;
 
-		this.issues = ko.observableArray();
+		this.allIssues = ko.observableArray();
 		this.sortedIssues = ko.computed(function () {
-			return this.issues().sort(Issue.sort);
+			return this.allIssues().sort(Issue.sort);
 		}, this);
 		this.openIssuesCount = ko.computed(function () {
-			return _.select(this.issues(), function (issue) {
+			return _.select(this.allIssues(), function (issue) {
 				return !issue.closed();
 			}).length;
 		}, this);
 		this.closedIssuesCount = ko.computed(function () {
-			return this.issues().length - this.openIssuesCount();
+			return this.allIssues().length - this.openIssuesCount();
 		}, this);
 		this.highlightedIssue = ko.observable();
 
+		this.issueFilterInstant = ko.observable();
+		this.issueFilter = ko.computed(this.issueFilterInstant).extend({ throttle: 400 });
+
+		this.filteredIssues = ko.observableArray([]);
+		this.issueFilter.subscribe(this.filterIssueList, this);
+
 		var that = this;
 		this.socket.on('issues', function (issues) {
-			that.issues(_.map(issues, function (issue) {
+			that.allIssues(_.map(issues, function (issue) {
 				return new Issue(issue.id, issue);
 			}));
 		});
 
 		this.socket.on('issue created', function (event) {
-			that.issues.push(new Issue(event.issue.id, event.issue));
+			that.allIssues.push(new Issue(event.issue.id, event.issue));
 		});
 		this.socket.on('issue assigned', function (event) {
 			var issue = that.findIssue(event.issue.id);
@@ -45,8 +51,21 @@ define(['ko', 'underscore', 'jquery', 'Issue'], function (ko, _, $, Issue) {
 
 	}
 
+	IssueManager.prototype.filterIssueList = function (filterValue) {
+		var regex = new RegExp(filterValue, 'mi');
+
+		_.each(this.sortedIssues(), function (issue) {
+			var tags = issue.tags().join(' ');
+			if (!filterValue || regex.test(issue.description() + tags)) {
+				issue.filtered(false);
+			} else {
+				issue.filtered(true); // no match, so hide
+			}
+		});
+	};
+
 	IssueManager.prototype.findIssue = function (id) {
-		return _.find(this.issues(), function (issue) {
+		return _.find(this.allIssues(), function (issue) {
 			return issue.id === id;
 		});
 	};

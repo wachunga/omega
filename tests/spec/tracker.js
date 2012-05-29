@@ -1,7 +1,7 @@
 define([
-	'jquery', 'Tracker', 'util'
+	'jquery', 'ProjectView', 'util'
 ],
-function ($, Tracker, util) {
+function ($, ProjectView, util) {
 	
 describe("omega", function () {
 
@@ -19,7 +19,7 @@ describe("omega", function () {
 	var tracker;
 
 	beforeEach(function () {
-		tracker = new Tracker(name, messageInput, form, messagesElement, socket);
+		tracker = new ProjectView(name, messageInput, form, messagesElement, socket);
 		tracker.userManager.current("norris");
 		tracker.userManager.loggedIn(true);
 	});
@@ -34,7 +34,7 @@ describe("omega", function () {
 			
 			tracker.messageList.processHistory(omegaEvents);
 			expect(tracker.messageList.messages().length).toBe(3);
-			expect(tracker.messageList.messages()[0]).toEqual({msg: "test1"});
+			expect(tracker.messageList.messages()[0].message).toEqual("test1");
 		});
 		
 		it("shows consistent history by overwriting existing messages", function () {
@@ -47,7 +47,7 @@ describe("omega", function () {
 			
 			tracker.messageList.processHistory(omegaEvents);
 			expect(tracker.messageList.messages().length).toBe(3);
-			expect(tracker.messageList.messages()[0]).toEqual({msg: "test1"});
+			expect(tracker.messageList.messages()[0].message).toEqual("test1");
 		});
 
 		it("adds flavour when appropriate", function () {
@@ -56,10 +56,10 @@ describe("omega", function () {
 			tracker.messageList.append(closeEvent);
 			tracker.messageList.append(assignEvent);
 
-			var closeMessage = tracker.messageList.messages()[0].msg;
+			var closeMessage = tracker.messageList.messages()[0].message;
 			expect(closeMessage.length).toBeGreaterThan(closeEvent.message.length);
 
-			var assignMessage = tracker.messageList.messages()[1].msg;
+			var assignMessage = tracker.messageList.messages()[1].message;
 			expect(assignMessage.length).toEqual(assignEvent.message.length);
 		});
 	});

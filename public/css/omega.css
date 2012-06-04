@@ -269,4 +269,7 @@ input[type='text']:focus {
 	padding: 0.3em;
 }
 
+.tooltip {
+	font-size: 0.9em !important;
+}
 

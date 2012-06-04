@@ -52,7 +52,7 @@ define(['ko', 'underscore', 'util', 'flavour'], function (ko, _, util, flavour) 
 	};
 
 	MessageList.prototype.append = function (event) {
-		var text = flavour(event.type.name, util.addHtmlLinks(event.message));
+		var text = flavour(event.type.name, util.addHtml(event.message));
 		this.messages.push(new Message(text, event.speaker, event.timestamp));
 		scrollToBottom(this.$element.get(0));
 	};

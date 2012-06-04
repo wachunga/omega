@@ -1,12 +1,13 @@
-define(['ko'], function (ko) {
+define(['ko', 'underscore'], function (ko, _) {
 	var URL_REGEX = /(\(?\bhttps?:\/\/[-A-Z0-9+&@#\/%?=~_()|!:,.;]*[-A-Z0-9+&@#\/%=~_()|])/ig;
+	var ID_REGEX = /\$id\$(\d+)/g;
 
-	function escapeHtml(text) {
-		return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-	}
-	
 	function addHtmlLinks(text) {
-		text = escapeHtml(ko.utils.unwrapObservable(text));
+		text = _.escape(ko.utils.unwrapObservable(text));
+		return insertLinks(text);
+	}
+
+	function insertLinks(text) {
 		return text.replace(URL_REGEX, function (url) {
 			var parens = false;
 			if (url.charAt(0) === '(' && url.charAt(url.length - 1) === ')') {
@@ -21,7 +22,12 @@ define(['ko'], function (ko) {
 			return htmlLink.join('');
 		});
 	}
-	
+
+	function addHtml(text) {
+		text = addHtmlLinks(text);
+		return text.replace(ID_REGEX, '<a class="id" data-id="$1" href="#$1">$1</a>');
+	}
+
 	ko.bindingHandlers.fadeVisible = {
 		init: function(element, valueAccessor) {
 			var value = valueAccessor();
@@ -42,6 +48,7 @@ define(['ko'], function (ko) {
 	}
 
 	return {
+		addHtml: addHtml,
 		addHtmlLinks: addHtmlLinks,
 		getRandomItem: getRandomItem
 	};

@@ -35,13 +35,13 @@ var isNode = (typeof exports !== 'undefined');
 	// TODO: this should be client only
 	OmegaEvent.Type = {
 		UserMessage: new OmegaEventType("userMessage", "<%= message %>", "<%= speaker %> says...", "<%= message %>"),
-		NewIssue: new OmegaEventType("newIssue", "<%= issue.creator %> created <%= issue.id %>.", "New issue", "<%= issue.description %>"),
-		AssignIssue: new OmegaEventType("assignIssue", "<%= assigner %> assigned <%= issue.id %> to <%= issue.assignee %>."),
-		TagIssue: new OmegaEventType("tagIssue", "<%= updater %> tagged <%= issue.id %> with '<%= tag %>'."),
-		UntagIssue: new OmegaEventType("untagIssue", "<%= updater %> removed tags from <%= issue.id %>."),
-		UpdateIssue: new OmegaEventType("updateIssue", "<%= updater %> updated <%= issue.id %>."),
-		CloseIssue: new OmegaEventType("closeIssue", "<%= issue.closer %> closed <%= issue.id %>.", "Issue closed", "<%= issue.description %>"),
-		PrioritizeIssue: new OmegaEventType("prioritizeIssue", "<%= updater %> marked <%= issue.id %> as<% if (!issue.critical) print(' not'); %> critical.")
+		NewIssue: new OmegaEventType("newIssue", "<%= issue.creator %> created $id$<%= issue.id %>.", "New issue", "<%= issue.description %>"),
+		AssignIssue: new OmegaEventType("assignIssue", "<%= assigner %> assigned $id$<%= issue.id %> to <%= issue.assignee %>."),
+		TagIssue: new OmegaEventType("tagIssue", "<%= updater %> tagged $id$<%= issue.id %> with '<%= tag %>'."),
+		UntagIssue: new OmegaEventType("untagIssue", "<%= updater %> removed tags from $id$<%= issue.id %>."),
+		UpdateIssue: new OmegaEventType("updateIssue", "<%= updater %> updated $id$<%= issue.id %>."),
+		CloseIssue: new OmegaEventType("closeIssue", "<%= issue.closer %> closed $id$<%= issue.id %>.", "Issue closed", "<%= issue.description %>"),
+		PrioritizeIssue: new OmegaEventType("prioritizeIssue", "<%= updater %> marked $id$<%= issue.id %> as<% if (!issue.critical) print(' not'); %> critical.")
 	};
 	
 	exports.OmegaEvent = OmegaEvent;

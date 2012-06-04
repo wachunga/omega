@@ -14,6 +14,7 @@ define(['ko', 'underscore', 'util', 'flavour'], function (ko, _, util, flavour) 
 		socket.on('issue created', _.bind(this.append, this));
 		socket.on('issue assigned', _.bind(this.append, this));
 		socket.on('issue tagged', _.bind(this.append, this));
+		socket.on('issue untagged', _.bind(this.append, this));
 		socket.on('issue updated', _.bind(function (props, event) {
 			this.append(event);
 		}, this));

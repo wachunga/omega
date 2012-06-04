@@ -41,6 +41,10 @@ define(['ko', 'underscore', 'jquery', 'Issue', 'error/NoSuchIssueError'], functi
 			var issue = that.findIssue(event.issue.id);
 			issue.tags(event.issue.tags);
 		});
+		this.socket.on('issue untagged', function (event) {
+			var issue = that.findIssue(event.issue.id);
+			issue.tags([]);
+		});
 		this.socket.on('issue updated', _.bind(this.refreshIssue, this));
 		this.socket.on('issue prioritized', _.bind(this.refreshIssue, this));
 		this.socket.on('issue closed', function (event) {
@@ -86,6 +90,11 @@ define(['ko', 'underscore', 'jquery', 'Issue', 'error/NoSuchIssueError'], functi
 	IssueManager.prototype.tagIssue = function (id, tag) {
 		this.findIssue(id);
 		this.socket.emit('tag issue', id, tag);
+	};
+
+	IssueManager.prototype.untagIssue = function (id) {
+		this.findIssue(id);
+		this.socket.emit('untag issue', id);
 	};
 
 	IssueManager.prototype.closeIssue = function (id) {

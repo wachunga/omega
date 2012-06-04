@@ -1,4 +1,4 @@
-define(['ko', 'underscore', 'jquery', 'Issue'], function (ko, _, $, Issue) {
+define(['ko', 'underscore', 'jquery', 'Issue', 'error/NoSuchIssueError'], function (ko, _, $, Issue, NoSuchIssueError) {
 
 	function IssueManager(socket) {
 		this.socket = socket;
@@ -65,9 +65,13 @@ define(['ko', 'underscore', 'jquery', 'Issue'], function (ko, _, $, Issue) {
 	};
 
 	IssueManager.prototype.findIssue = function (id) {
-		return _.find(this.allIssues(), function (issue) {
+		var issue = _.find(this.allIssues(), function (issue) {
 			return issue.id === id;
 		});
+		if (!issue) {
+			throw new NoSuchIssueError(id);
+		}
+		return issue;
 	};
 
 	IssueManager.prototype.createIssue = function (desc) {
@@ -75,30 +79,36 @@ define(['ko', 'underscore', 'jquery', 'Issue'], function (ko, _, $, Issue) {
 	};
 
 	IssueManager.prototype.assignIssue = function (id, assignee) {
+		this.findIssue(id);
 		this.socket.emit('assign issue', id, assignee);
 	};
 
 	IssueManager.prototype.tagIssue = function (id, tag) {
+		this.findIssue(id);
 		this.socket.emit('tag issue', id, tag);
 	};
 
 	IssueManager.prototype.closeIssue = function (id) {
-		if (this.findIssue(id).closed()) {
+		var issue = this.findIssue(id);
+		if (issue.closed()) {
 			return;
 		}
 		this.socket.emit('close issue', id);
 	};
 
 	IssueManager.prototype.updateIssue = function (id, props) {
+		this.findIssue(id);
 		this.socket.emit('update issue', id, props);
 	};
 
 	IssueManager.prototype.prioritizeIssue = function (id) {
+		this.findIssue(id);
 		this.socket.emit('prioritize issue', id);
 	};
 
-	IssueManager.prototype.highlightIssue = function (issue) {
-		this.highlightedIssue(issue.id);
+	IssueManager.prototype.highlightIssue = function (id) {
+		this.findIssue(id);
+		this.highlightedIssue(id);
 	};
 
 	IssueManager.prototype.refreshIssue = function (props, event) {

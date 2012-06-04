@@ -2,9 +2,9 @@
 
 define([
 	'jquery', 'underscore', 'ko', 'timeago',
-	'util', 'Issue', 'Notifier', 'UserManager', 'MessageList', 'IssueManager'
+	'util', 'Issue', 'Notifier', 'UserManager', 'MessageList', 'IssueManager', 'error/NoSuchIssueError'
 ],
-function ($, _, ko, timeago, util, Issue, Notifier, UserManager, MessageList, IssueManager) {
+function ($, _, ko, timeago, util, Issue, Notifier, UserManager, MessageList, IssueManager, NoSuchIssueError) {
 
 	var BAD_COMMAND_RESPONSES = [
 		'Oops.', 'This is not a Turing test.',
@@ -54,16 +54,24 @@ function ($, _, ko, timeago, util, Issue, Notifier, UserManager, MessageList, Is
 	function isCommand(input) {
 		return input.trim().charAt(0) === "/";
 	}
-	
+
+	function ArgError(message) {
+		this.name = "ArgError";
+		this.message = "Invalid or missing argument.";
+	}
+
 	function requireArgument() {
 		_.each(arguments, function (arg) {
 			if (!arg) {
-				throw "Invalid or missing argument.";
+				throw new ArgError();
 			}
 		});
 	}
 	
 	function getArgument(string, argToReturn) {
+		if (!string) {
+			return null;
+		}
 		var match = string.match(/(\d+)(?:\s+(.+))?/);
 		return match ? match[argToReturn] : null;
 	}
@@ -71,6 +79,9 @@ function ($, _, ko, timeago, util, Issue, Notifier, UserManager, MessageList, Is
 	// @VisibleForTesting
 	ProjectView.prototype.notifyOfBadCommand = function () {
 		window.alert(util.getRandomItem(BAD_COMMAND_RESPONSES) + ' Try /help.'); // TODO: style
+	};
+	ProjectView.prototype.notifyNoSuchIssue = function (error) {
+		window.alert(error.toString());
 	};
 
 	// TODO: extract command parsing etc.
@@ -116,6 +127,7 @@ function ($, _, ko, timeago, util, Issue, Notifier, UserManager, MessageList, Is
 					break;
 				case 'close':
 				case 'resolve':
+				case 'done':
 					id = parseInt(rest, 10);
 					requireArgument(id);
 					this.issueManager.closeIssue(id);
@@ -168,7 +180,13 @@ function ($, _, ko, timeago, util, Issue, Notifier, UserManager, MessageList, Is
 					break;
 			}
 		} catch (e) {
-			this.notifyOfBadCommand();
+			if (e instanceof ArgError) {
+				this.notifyOfBadCommand();
+			} else if (e instanceof NoSuchIssueError) {
+				this.notifyNoSuchIssue(e);
+			} else {
+				throw e;
+			}
 		}
 	};
 
@@ -187,18 +205,21 @@ function ($, _, ko, timeago, util, Issue, Notifier, UserManager, MessageList, Is
 	// doesn't highlight if filtering issues, but not a big deal
 	ProjectView.prototype.checkHashForBookmark = function () {
 		var bookmarked = parseInt(window.location.hash.substring(1), 10);
-		var found = this.issueManager.findIssue(bookmarked);
-		if (!found) {
-			return;
+
+		try {
+			this.issueManager.highlightIssue(bookmarked);
+
+			var $target = $(window.location.hash);
+			if ($target.length) {
+				var pos = $target.offset();
+				window.scrollTo(pos.left, pos.top);
+			}
+		} catch (e) {
+			if (!(e instanceof NoSuchIssueError)) {
+				throw e;
+			}
 		}
 
-		this.issueManager.highlightIssue(found);
-
-		var $target = $(window.location.hash);
-		if ($target.length) {
-			var pos = $target.offset();
-			window.scrollTo(pos.left, pos.top);
-		}
 	};
 
 	ProjectView.prototype.applyTimeago = function (elements) {

@@ -1,11 +1,10 @@
-	<link rel="stylesheet" href="/css/bootstrap.css" type="text/css">
 	<title><%= title %> - Omega Issue Tracker</title>
 	<script src="/socket.io/socket.io.js"></script>
 	<script data-main="/js/mainProject" src="/js/require.js"></script>
 </head>
 <body>
 <% if (flash) { %>
-<div class="flash hidden"><span><%- flash %></span></div>
+<div class="flash hide"><span><%- flash %></span></div>
 <% } %>
 
 <div id="header">
@@ -39,7 +38,7 @@
 	</form>
 </div>
 
-<dl id="commandList" class="hidden" data-bind="fadeVisible: helpOpen, click: function() { helpOpen(false); $messageInput.focus(); }">
+<dl id="commandList" class="hide" data-bind="fadeVisible: helpOpen, click: function() { helpOpen(false); $messageInput.focus(); }">
 	<dt>/create &lt;description&gt;</dt>
 	<dt>/critical &lt;id&gt;</dt>
 	<dt>/assign &lt;id&gt; [&lt;user&gt;]</dt>

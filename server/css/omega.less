@@ -1,18 +1,14 @@
+// TODO: lessify
+
+@baseFontSize: 16px;
+@linkColor: @red;
+@baseLineHeight: 18px;
+
 html {
 	overflow-y: scroll; /* prevent jump */
 }
 body {
 	margin: 3em 3em 1em;
-	font-family: 'Open Sans', sans-serif;
-}
-a {
-	text-decoration: underline;
-	color: #7A6A53;
-}
-a:hover {
-	background-color: #7A6A53;
-	text-decoration: none;
-	color: white;
 }
 pre {
 	font-style: normal;
@@ -32,9 +28,6 @@ pre {
 	box-shadow: 0 0 1px rgba(0,0,0,0.1);
 	border-radius: 0.4em;
 	border: 1px solid #999;
-}
-.hidden {
-	display: none;
 }
 .offscreen {
 	position: absolute;
@@ -69,10 +62,16 @@ pre {
 	display: inline;
 	margin: 0;
 }
+
+.omega {
+	font-family: georgia, serif;
+	font-size: 1.3em;
+}
+
 #header h1 {
 	font-family: georgia, serif;
-	font-size: 5em;
 	text-shadow: #ddd 2px 0 2px;
+	font-size: 5em;
 	line-height: 0;
 }
 #header h2,
@@ -218,42 +217,6 @@ input[type='text']:focus {
 	margin-top: 4em;
 }
 
-.newProject fieldset {
-	width: 20em;
-	padding: 0;
-	border: none;
-	display: inline-block;
-}
-#projectNameInput {
-	width: 100%;
-	box-sizing: border-box;
-}
-.unlistedBox {
-	font-size: small;
-	float: right;
-	display: block;
-}
-.newProject .submitContainer {
-	vertical-align: top;
-	padding-top: 0.6em;
-	display: inline-block;
-}
-.newProject .submit {
-	margin-right: 0.5em;
-	margin-left: 0.5em;
-}
-
-.adminProjectForm {
-	border-bottom: 2px solid #aaa;
-	padding: 15px 0;
-}
-.adminProjectTitle {
-	margin-top: 0;
-}
-.adminProjectForm:first-child {
-	border-top: 2px solid #aaa;
-}
-
 .tag {
 	padding: 0 5px 2px;
 	border-radius: 3px;
@@ -261,7 +224,6 @@ input[type='text']:focus {
 	color: white;
 	background-color: #999;
 	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
-	white-space nowrap;
 	vertical-align: baseline;
 }
 
@@ -283,3 +245,6 @@ input[type='text']:focus {
 	background-image: -webkit-linear-gradient(white 70%, rgba(255,255,255,0));
 }
 
+.error {
+	color: @errorText;
+}

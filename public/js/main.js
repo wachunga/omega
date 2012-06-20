@@ -16,7 +16,7 @@ require(['jquery', 'ko'], function ($, ko) {
 			submitForm: function (form) {
 				var name = $('#projectNameInput').val().trim();
 				if (!name || name.length < 3) {
-					this.error('You can do better.');
+					this.error('Why so terse? You can do better.');
 					return false;
 				}
 

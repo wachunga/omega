@@ -2,37 +2,52 @@
 	<script data-main="js/main" src="js/require.js"></script>
 </head>
 <body>
-<div id="header">
-	<h1>Ω</h1>
+
+<div class="hero-unit">
+	<h1>Welcome to <span class="omega">Ω</span></h1>
+	<p>Real-time issue tracking optimized for small teams.</p>
+	<p><a class="btn btn-inverse" href="http://github.com/wachunga/omega#readme">Learn more</a></p>
 </div>
 
 <div>
-	<h2>Welcome</h2>
-	<p>Ω is a real-time issue tracker optimized for small teams. <a href="http://github.com/wachunga/omega#readme">Learn more</a></p>
-</div>
-<div>
-	<h2>What are you working on?</h2>
-	<form class="newProject" data-bind="submit: submitForm.bind($data)">
-		<fieldset>
-			<input type="text" id="projectNameInput" tabindex="1" name="projectName" required placeholder="My awesome project">
-			<label class="unlistedBox"><input type="checkbox" name="unlisted" /> unlisted</label>
-		</fieldset>
-		<div class="submitContainer">
-			<input type="submit" class="submit" value="Go">
-			<span class="loud" data-bind="visible: !!error(), html: error"></span>
+	<div class="page-header">
+		<h1>What are you working on?</h1>
+	</div>
+	<form class="form-inline" data-bind="submit: submitForm.bind($data)">
+		<input type="text" id="projectNameInput" name="projectName" required placeholder="My awesome project" tabindex="1">
+		<label class="checkbox"><input type="checkbox" name="unlisted" tabindex="2" /> top secret</label>
+		<div style="margin-top: 10px;">
+			<input type="submit" class="btn btn-primary" value="Create" tabindex="3">
+			<span class="error help-inline" data-bind="visible: !!error(), text: error"></span>
 		</div>
 	</form>
 
-	<% if (projects.length > 0) { %>
-	<p>Or maybe one of these projects?</p>
+	<%
+		if (projects.length > 0 || unlisted > 0) {
+	%>
+	<hr>
+	<h3>Existing projects</h3>
+	<%
+		}
+	%>
+
+	<%
+		if (projects.length > 0) {
+	%>
 	<ul>
-	<% for(var i = 0; i < projects.length; i++) { %>
+	<%
+		for (var i = 0; i < projects.length; i++) {
+	%>
 		<li><a href="<%= projects[i].url %>"><%= projects[i].name %></a></li>
-	<% } %>
+	<%
+		}
+	%>
 	</ul>
-	<% } %>
+	<%
+		}
+	%>
 
 	<% if (unlisted > 0) { %>
-	<p>Or maybe an unlisted project? (<%= unlisted %> total)</p>
+	<p class="muted">(<%= unlisted %> top secret)</p>
 	<% } %>
 </div>

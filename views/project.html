@@ -27,15 +27,18 @@
 	<span class="subtle">nobody</span>
 	<!-- /ko -->
 </div>
-<form id="form" autocomplete="off" data-bind="submit: handleInput">
-	<label style="display: none;" data-bind="visible: userManager.noUser">You're not signed in. Who are you? <input id="nameInput" type="text" data-bind="attr: { placeholder: userManager.namePlaceholder }"/></label>
-	<span style="display: none;" class="invalidName loud" data-bind="fadeVisible: userManager.invalidName">I don't think so. Try again.</span>
+<div id="formContainer">
+	<form id="form" autocomplete="off" data-bind="submit: handleInput">
+		<label style="display: none;" data-bind="visible: userManager.noUser">You're not signed in. Who are you? <input id="nameInput" type="text" data-bind="attr: { placeholder: userManager.namePlaceholder }"/></label>
+		<span style="display: none;" class="invalidName loud" data-bind="fadeVisible: userManager.invalidName">I don't think so. Try again.</span>
 
-	<input style="display: none;" id="messageInput" data-bind="visible: !userManager.noUser()" type="text" tabindex="1" placeholder="Type commands (like '/help') or just chat it up"/>
-	<input class="offscreen" type="submit"/>
+		<input style="display: none;" id="messageInput" data-bind="visible: !userManager.noUser()" type="text" tabindex="1" placeholder="Type commands (like '/help') or just chat it up"/>
+		<input class="offscreen" type="submit"/>
 
-	<h3 style="display: none;" class="warningMessage loud" data-bind="visible: disconnected() && !loading()">Warning: disconnected from server</h3>
-</form>
+		<h3 style="display: none;" class="warningMessage loud" data-bind="visible: disconnected() && !loading()">Warning: disconnected from server</h3>
+	</form>
+</div>
+
 <dl id="commandList" class="hidden" data-bind="fadeVisible: helpOpen, click: function() { helpOpen(false); $messageInput.focus(); }">
 	<dt>/create &lt;description&gt;</dt>
 	<dt>/critical &lt;id&gt;</dt>

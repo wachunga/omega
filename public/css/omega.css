@@ -140,7 +140,7 @@ input[type='text']:focus {
 	font-family: monospace;
 	font-size: 0.9em;
 }
-#form {
+#formContainer {
 	height: 3em;
 }
 #nameInput {
@@ -275,11 +275,11 @@ input[type='text']:focus {
 
 .fixed {
 	position: fixed;
-	padding-top: 0.3em;
+	padding: 0.3em 3em 1em;
 	top: 0;
-	left: 3em;
-	right: 3em;
+	left: 0;
+	right: 0;
 	z-index: 1000;
-	/* todo: gradient */
+	background-image: -webkit-linear-gradient(white 70%, rgba(255,255,255,0));
 }
 

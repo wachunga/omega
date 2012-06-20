@@ -14,7 +14,7 @@ function ($, _, ko, timeago, tooltips, util, Issue, Notifier, UserManager, Messa
 		'These are not the droids you\'re looking for.'
 	];
 
-	var ProjectView = function ($nameInput, $messageInput, $form, $messageList, socket) {
+	var ProjectView = function ($nameInput, $messageInput, $messageList, socket) {
 		var that = this;
 
 		this.socket = socket;

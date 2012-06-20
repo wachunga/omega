@@ -20,12 +20,12 @@ require(['jquery', 'ProjectView'], function ($, ProjectView) {
 			return;
 		}
 
-		processScroll();
 		$(window).on('scroll', processScroll);
+		processScroll();
 
 		$('.flash').click(hideFlashMessages).delay(500).fadeIn().delay(8000).fadeOut();
 
-		var projectView = new ProjectView($("#nameInput"), $("#messageInput"), $("#form"), $("#messages"), socket);
+		var projectView = new ProjectView($("#nameInput"), $("#messageInput"), $("#messages"), socket);
 	});
 
 	function hideFlashMessages() {
@@ -40,17 +40,17 @@ require(['jquery', 'ProjectView'], function ($, ProjectView) {
 		}
 	}
 
-	var $toFix = $('#form');
-	var topOffset = $toFix.offset().top;
+	var $fixable = $('#form');
+	var topOffset = $fixable.offset().top;
 	var isFixed = false;
 	function processScroll() {
 		var scrollTop = $(window).scrollTop();
 		if (!isFixed && scrollTop >= topOffset) {
 			isFixed = true;
-			$toFix.addClass('fixed');
+			$fixable.addClass('fixed');
 		} else if (isFixed && scrollTop <= topOffset) {
 			isFixed = false;
-			$toFix.removeClass('fixed');
+			$fixable.removeClass('fixed');
 		}
 	}
 

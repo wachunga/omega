@@ -1836,11 +1836,6 @@ a.badge:hover {
 .invisible {
   visibility: hidden;
 }
-html {
-  overflow-y: scroll;
-  /* prevent jump */
-
-}
 body {
   margin: 3em 3em 1em;
 }
@@ -1872,66 +1867,36 @@ pre {
   color: #666;
 }
 .loud {
-  color: #899FA4;
+  color: #f89406;
 }
-.warningMessage {
-  margin: 0.5em 0 0 0;
-  font-size: 1em;
-  font-weight: normal;
-}
-.notificationToggle {
-  cursor: pointer;
-  color: #7A6A53;
-}
-.notificationToggle:hover {
-  color: #999;
-}
-#header {
+.main-header {
   position: relative;
 }
-#header h1,
-#header h2 {
+.main-header h1,
+.main-header h2 {
   display: inline;
   margin: 0;
+}
+.main-header h1 {
+  text-shadow: #ddd 2px 0 2px;
+  font-size: 5em;
+  line-height: 0;
+}
+.main-header h2,
+.main-header .switchProject {
+  margin-left: 0.5em;
+}
+.main-header .switchProject {
+  font-size: small;
 }
 .omega {
   font-family: georgia, serif;
   font-size: 1.3em;
 }
-#header h1 {
-  font-family: georgia, serif;
-  text-shadow: #ddd 2px 0 2px;
-  font-size: 5em;
-  line-height: 0;
-}
-#header h2,
-#header .switchProject {
-  margin-left: 0.5em;
-}
-#header .switchProject {
-  font-size: small;
-}
-#loggedInUser {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  line-height: 2em;
-}
-input[type='text'] {
-  padding: 0.6em;
-  outline: none;
-}
-input[type='text']:focus {
-  border: 1px solid #aaa;
-  box-shadow: 0 0 3px rgba(0, 0, 0, 0.2);
-}
-#messages,
-input[type='text'] {
+#messages {
   border: 1px solid #ccc;
   border-radius: 0.4em;
   font-size: 0.9em;
-}
-#messages {
   height: 15em;
   list-style-type: none;
   padding: 0.6em;
@@ -1945,36 +1910,14 @@ input[type='text'] {
 #messages .system {
   font-style: italic;
 }
-#messages li:hover .message,
-#issuesContainer .issuesList li:hover .description {
+#messages li:hover .message {
   opacity: 0.5;
 }
-#onlineUsers {
-  font-size: 0.9em;
-  text-align: right;
+.hovered {
+  opacity: 0.5;
 }
-.onlineUser + .onlineUser:before {
-  content: ', ';
-}
-#messageInput {
-  width: 100%;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-}
-#commandList {
-  padding: 0.3em;
-  background-color: #eee;
-  margin: 0;
-}
-#commandList dt {
-  font-family: monospace;
-  font-size: 0.9em;
-}
-#formContainer {
-  height: 3em;
-}
-#nameInput {
-  margin: 0 0.5em;
+#issuesContainer .issuesList li:hover .description {
+  opacity: 0.5;
 }
 #issuesContainer {
   margin-top: 1em;
@@ -1984,6 +1927,7 @@ input[type='text'] {
   border-bottom: 1px solid #ccc;
 }
 #issuesContainer .issueCounts {
+  color: #999999;
   font-size: small;
   font-weight: normal;
 }
@@ -1999,13 +1943,13 @@ input[type='text'] {
   margin-left: 1em;
 }
 #issuesContainer .noneMessage {
+  color: #999999;
   position: absolute;
-  margin-top: 0;
+  margin: 0.5em 0 0 0;
+  padding: 0;
 }
-#issuesContainer .noneMessage,
 #issuesContainer .issuesList {
   margin: 0.5em 0 0 0;
-  list-style-type: none;
   padding: 0;
 }
 #messages li,
@@ -2024,6 +1968,7 @@ input[type='text'] {
 }
 #messages .details,
 #issuesContainer .issuesList .details {
+  color: #555555;
   display: none;
   padding-left: 0.5em;
   font-size: small;
@@ -2042,10 +1987,81 @@ input[type='text'] {
 #issuesContainer .closed .assignee {
   text-decoration: line-through;
 }
+.tooltip {
+  font-size: 0.9em !important;
+}
+.error {
+  color: #b94a48;
+}
 .footer {
+  color: #555555;
   font-size: small;
   text-align: center;
   margin-top: 4em;
+}
+html {
+  overflow-y: scroll;
+  /* prevent jump */
+
+}
+.alert {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1001;
+  width: 100%;
+  text-align: center;
+}
+.issue-critical {
+  color: #f89406;
+}
+.notificationToggle {
+  cursor: pointer;
+  color: #7A6A53;
+}
+.notificationToggle:hover {
+  color: #999;
+}
+#loggedInUser {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  line-height: 2em;
+}
+#commandList {
+  padding: 0.3em;
+  background-color: #eee;
+  margin: 0;
+}
+#commandList dt {
+  font-family: monospace;
+  font-size: 0.9em;
+}
+#onlineUsers {
+  font-size: 0.9em;
+  text-align: right;
+}
+.onlineUser + .onlineUser:before {
+  content: ', ';
+}
+#messageInput {
+  display: block;
+  width: 100%;
+  min-height: 28px;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+  box-sizing: border-box;
+  font-size: 0.9em;
+}
+#nameInput {
+  margin: 0 0.5em;
+}
+#formContainer {
+  height: 3em;
+}
+#formContainer #form {
+  margin: 0;
 }
 .tag {
   padding: 0 5px 2px;
@@ -2059,9 +2075,6 @@ input[type='text'] {
 #issueFilter {
   padding: 0.3em;
 }
-.tooltip {
-  font-size: 0.9em !important;
-}
 .fixed {
   position: fixed;
   padding: 0.3em 3em 1em;
@@ -2070,7 +2083,4 @@ input[type='text'] {
   right: 0;
   z-index: 1000;
   background-image: -webkit-linear-gradient(#ffffff 70%, rgba(255, 255, 255, 0));
-}
-.error {
-  color: #b94a48;
 }

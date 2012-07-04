@@ -1,0 +1,92 @@
+html {
+	overflow-y: scroll; /* prevent jump */
+}
+
+.alert {
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 1001;
+	width: 100%;
+	text-align: center;
+}
+
+.issue-critical {
+	color: @orange;
+}
+
+.notificationToggle {
+	cursor: pointer;
+	color: #7A6A53;
+
+	&:hover {
+		color: #999;
+	}
+}
+
+#loggedInUser {
+	position: absolute;
+	right: 0;
+	bottom: 0;
+	line-height: 2em;
+}
+
+#commandList {
+	padding: 0.3em;
+	background-color: #eee;
+	margin: 0;
+
+	dt {
+		font-family: monospace;
+		font-size: 0.9em;
+	}
+}
+
+#onlineUsers {
+	font-size: 0.9em;
+	text-align: right;
+}
+.onlineUser + .onlineUser:before {
+	content: ', ';
+}
+
+#messageInput {
+	.input-block-level;
+	font-size: 0.9em;
+}
+
+#nameInput {
+	margin: 0 0.5em;
+}
+
+#formContainer {
+	height: 3em;
+
+	#form {
+		margin: 0;
+	}
+}
+
+.tag {
+	padding: 0 5px 2px;
+	border-radius: 3px;
+	font-size: small;
+	color: white;
+	background-color: #999;
+	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+	vertical-align: baseline;
+}
+
+#issueFilter {
+	padding: 0.3em;
+}
+
+.fixed {
+	position: fixed;
+	padding: 0.3em 3em 1em;
+	top: 0;
+	left: 0;
+	right: 0;
+	z-index: 1000;
+	background-image: -webkit-linear-gradient(white 70%, rgba(255,255,255,0));
+}

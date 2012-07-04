@@ -7,23 +7,25 @@
 <div class="flash hide"><span><%- flash %></span></div>
 <% } %>
 
-<div id="header">
-	<h1>Ω</h1>
+<div style="display: none;" class="alert alert-danger" data-bind="visible: disconnected() && !loading()">Warning: disconnected from server</div>
+
+<header class="main-header">
+	<h1 class="omega">Ω</h1>
 	<h2><%= title %></h2>
 	<a class="switchProject" href="/">switch</a>
-	<div id="loggedInUser" data-bind="visible: userManager.current()">welcome, <strong data-bind="text: userManager.current"></strong> | <span class="notificationToggle" data-bind="text: notifier.webNotifyEnabled() ? '⚑' : '⚐', click: notifier.requestNotificationPermission, attr: { title: notifier.statusMessage }"></span> | <a href="#" data-bind="click: userManager.logout">kthxbye</a></div>
-</div>
+	<div id="loggedInUser" data-bind="visible: !loading() && userManager.current()">welcome, <strong data-bind="text: userManager.current"></strong> | <span class="notificationToggle" data-bind="text: notifier.webNotifyEnabled() ? '⚑' : '⚐', click: notifier.requestNotificationPermission, attr: { title: notifier.statusMessage }"></span> | <a href="#" data-bind="click: userManager.logout">kthxbye</a></div>
+</header>
 <ul id="messages" data-bind="foreach: { data: messageList.messages, beforeRemove: function(elem) { $(elem).fadeOut() }, afterAdd: function(elem) { $(elem).hide().fadeIn('fast') }, afterRender: applyTimeago }">
 	<li data-bind="css: { system: !speaker }">
 		<span class="speaker" data-bind="text: speaker ? speaker + ': ' : ''"></span><span class="message" data-bind="html: message"></span>
-		<!-- ko if: date --><span class="details subtle">(<time data-bind="attr: { datetime: date }"></time>)</span><!-- /ko -->
+		<!-- ko if: date --><span class="details">(<time data-bind="attr: { datetime: date }"></time>)</span><!-- /ko -->
 	</li>
 </ul>
 <div id="onlineUsers">
 	online:
 	<!-- ko template: { name: 'onlineUsersTemplate', foreach: userManager.onlineUsers } --><!-- /ko -->
 	<!-- ko if: !userManager.onlineUsers().length -->
-	<span class="subtle">nobody</span>
+	<span class="muted">nobody</span>
 	<!-- /ko -->
 </div>
 <div id="formContainer">
@@ -33,8 +35,6 @@
 
 		<input style="display: none;" id="messageInput" data-bind="visible: !userManager.noUser()" type="text" tabindex="1" placeholder="Type commands (like '/help') or just chat it up"/>
 		<input class="offscreen" type="submit"/>
-
-		<h3 style="display: none;" class="warningMessage loud" data-bind="visible: disconnected() && !loading()">Warning: disconnected from server</h3>
 	</form>
 </div>
 
@@ -52,21 +52,21 @@
 <div id="issuesContainer">
 	<label class="hideIssues"><input type="checkbox" data-bind="checked: hideClosed"/> hide closed</label>
 	<label class="hideIssues"><input type="checkbox" data-bind="checked: hideAssigned"/> hide assigned</label>
-	<label class="hideIssues"><input id="issueFilter" type="text" data-bind="value: issueManager.issueFilterInstant, valueUpdate: 'afterkeydown'" placeholder="Filter"></label>
-	<h2>Issues <span data-bind="fadeVisible: issueManager.allIssues().length >= 3" class="issueCounts subtle">(<var data-bind="text: issueManager.openIssuesCount"></var> open, <var data-bind="text: issueManager.closedIssuesCount"></var> closed)</span></h2>
+	<label class="hideIssues"><input id="issueFilter" class="input-medium" type="search" data-bind="value: issueManager.issueFilterInstant, valueUpdate: 'afterkeydown'" placeholder="Filter"></label>
+	<h2>Issues <span data-bind="fadeVisible: !loading() && issueManager.allIssues().length >= 3" class="issueCounts">(<var data-bind="text: issueManager.openIssuesCount"></var> open, <var data-bind="text: issueManager.closedIssuesCount"></var> closed)</span></h2>
 
-	<p class="noneMessage subtle" data-bind="fadeVisible: !issueManager.allIssues().length || (hideClosed() && issueManager.openIssuesCount() == 0)">No open issues. w00t!</p>
-	<ul class="issuesList" data-bind="foreach: { data: issueManager.sortedIssues, afterRender: applyTimeago }">
-		<li data-bind="attr: { id: id }, fadeVisible: !filtered() && !($root.hideClosed() && closed()) && !($root.hideAssigned() && assignee() != 'nobody'), css: { closed: closed, highlighted: id === $root.issueManager.highlightedIssue() }"><a data-bind="attr: { href: '#' + id }, text: id" title="Permalink" class="issueId"></a>:&nbsp;<span class="loud" data-bind="text: critical() ? '★ ' : ''"></span>
+	<p class="noneMessage" data-bind="fadeVisible: !issueManager.allIssues().length || (hideClosed() && issueManager.openIssuesCount() == 0)">No open issues. w00t!</p>
+	<ul class="issuesList unstyled" data-bind="foreach: { data: issueManager.sortedIssues, afterRender: applyTimeago }">
+		<li data-bind="attr: { id: id }, fadeVisible: !filtered() && !($root.hideClosed() && closed()) && !($root.hideAssigned() && assignee() != 'nobody'), css: { closed: closed, highlighted: id === $root.issueManager.highlightedIssue() }"><a data-bind="attr: { href: '#' + id }, text: id" title="Permalink" class="issueId"></a>:&nbsp;<span class="issue-critical" data-bind="text: critical() ? '★ ' : ''"></span>
 			<span class="assignee" data-bind="css: { myself: $root.userManager.isCurrentUser(assignee()) }, text: assigneeLabel"></span>
 			&nbsp;<span class="description" data-bind="html: $root.addHtmlLinks(description)"></span>
 			<!-- ko foreach: tags -->
 				<span class="tag" data-bind="text: $data"></span>
 			<!-- /ko -->
-			<span class="details subtle">(created by <span data-bind="text: creator"></span> <time data-bind="attr: { datetime: createdDate }"></time>)</span>
+			<span class="details">(created by <span data-bind="text: creator"></span> <time data-bind="attr: { datetime: createdDate }"></time>)</span>
 		</li>
 	</ul>
 </div>
 
-<script type="text/html" id="onlineUsersTemplate"><span class="onlineUser"><span data-bind="text: name"></span><!-- ko if: count > 1 --> <span class="subtle" data-bind="text: '(' + count + ')'"></span><!-- /ko --></span></script>
+<script type="text/html" id="onlineUsersTemplate"><span class="onlineUser"><span data-bind="text: name"></span><!-- ko if: count > 1 --> <span class="muted" data-bind="text: '(' + count + ')'"></span><!-- /ko --></span></script>
 

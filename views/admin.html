@@ -5,10 +5,10 @@
 	<script data-main="js/mainAdmin" src="js/require.js"></script>
 </head>
 <body>
-<div id="header">
-	<h1>Ω</h1>
+<header class="main-header">
+	<h1 class="omega">Ω</h1>
 	<a class="switchProject" href="/">back</a>
-</div>
+</header>
 
 <div>
 	<h2>Admin</h2>
@@ -17,14 +17,14 @@
 	<!-- ko foreach: projects -->
 	<div class="adminProjectForm">
 		<h3 class="adminProjectTitle" data-bind="text: name"></h3>
-		<p class="subtle">Created <span data-bind="text: new Date(createdDate).toLocaleString()"></span></p>
+		<p class="createdDate">Created <span data-bind="text: new Date(createdDate).toLocaleString()"></span></p>
 		<label><input type="checkbox" disabled name="unlisted" data-bind="checked: unlisted" /> unlisted</label>
 		<label><input type="checkbox" disabled name="closed" data-bind="checked: closed" /> closed</label>
 		<label><input type="checkbox" disabled name="deleted" data-bind="checked: deleted" /> deleted</label>
 		<!-- ko if: !deleted -->
 		<form method="post" data-bind="attr: { action: '/project/' + slug }">
 			<input type="hidden" name="_method" value="delete" />
-			<input type="submit" value="Delete">
+			<input class="btn btn-danger" type="submit" value="Delete">
 		</form>
 		<!-- /ko -->
 	</div>

@@ -1,12 +1,9 @@
-// TODO: lessify
+// TODO: finish lessifying
 
 @baseFontSize: 16px;
 @linkColor: @red;
 @baseLineHeight: 18px;
 
-html {
-	overflow-y: scroll; /* prevent jump */
-}
 body {
 	margin: 3em 3em 1em;
 }
@@ -14,6 +11,7 @@ pre {
 	font-style: normal;
 }
 
+// TODO: bootstrap flash styles
 .flash {
 	position: absolute;
 	top: 10px;
@@ -29,6 +27,7 @@ pre {
 	border-radius: 0.4em;
 	border: 1px solid #999;
 }
+
 .offscreen {
 	position: absolute;
 	left: -9999px;
@@ -36,31 +35,35 @@ pre {
 	height: 1px;
 }
 .subtle {
-    color: #666;
+	color: #666;
 }
 .loud {
-	color: #899FA4;
-}
-.warningMessage {
-	margin: 0.5em 0 0 0;
-	font-size: 1em;
-	font-weight: normal;
-}
-.notificationToggle {
-	cursor: pointer;
-	color: #7A6A53;
-}
-.notificationToggle:hover {
-	color: #999;
+	color: @orange;
 }
 
-#header {
-	position: relative;	
-}
-#header h1,
-#header h2 {
-	display: inline;
-	margin: 0;
+
+.main-header {
+	position: relative;
+
+	h1, h2 {
+		display: inline;
+		margin: 0;
+	}
+
+	h1 {
+		//font-family: georgia, serif;
+		text-shadow: #ddd 2px 0 2px;
+		font-size: 5em;
+		line-height: 0;
+	}
+
+	h2, .switchProject {
+		margin-left: 0.5em;
+	}
+
+	.switchProject {
+		font-size: small;
+	}
 }
 
 .omega {
@@ -68,83 +71,39 @@ pre {
 	font-size: 1.3em;
 }
 
-#header h1 {
-	font-family: georgia, serif;
-	text-shadow: #ddd 2px 0 2px;
-	font-size: 5em;
-	line-height: 0;
-}
-#header h2,
-#header .switchProject {
-	margin-left: 0.5em;
-}
-#header .switchProject {
-	font-size: small;
-}
-#loggedInUser {
-	position: absolute;
-	right: 0;
-	bottom: 0;
-	line-height: 2em;
-}
-input[type='text'] {
-	padding: 0.6em;
-	outline: none;
-}
-input[type='text']:focus {
-	border: 1px solid #aaa;
-	box-shadow: 0 0 3px rgba(0,0,0,0.2);
-}
-#messages, input[type='text'] {
+#messages {
 	border: 1px solid #ccc;
 	border-radius: 0.4em;
 	font-size: 0.9em;
-}
-#messages {
+
 	height: 15em;
 	list-style-type: none;
 	padding: 0.6em;
 	overflow: auto;
 	margin: 0.2em 0;
 	resize: vertical;
+
+	.speaker {
+		font-weight: bold;
+	}
+
+	.system {
+		font-style: italic;
+	}
+
+	li:hover .message {
+		.hovered;
+	}
 }
-#messages .speaker {
-	font-weight: bold;
-}
-#messages .system {
-	font-style: italic;
-}
-#messages li:hover .message,
-#issuesContainer .issuesList li:hover .description {
+
+.hovered {
 	opacity: 0.5;
 }
-#onlineUsers {
-	font-size: 0.9em;
-	text-align: right;
+
+#issuesContainer .issuesList li:hover .description {
+	.hovered;
 }
-.onlineUser + .onlineUser:before {
-	content: ', ';
-}
-#messageInput {
-	width: 100%;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
-}
-#commandList {
-	padding: 0.3em;
-	background-color: #eee;
-	margin: 0;
-}
-#commandList dt {
-	font-family: monospace;
-	font-size: 0.9em;
-}
-#formContainer {
-	height: 3em;
-}
-#nameInput {
-	margin: 0 0.5em;
-}
+
 #issuesContainer {
 	margin-top: 1em;
 }
@@ -153,6 +112,7 @@ input[type='text']:focus {
 	border-bottom: 1px solid #ccc;
 }
 #issuesContainer .issueCounts {
+	.muted;
 	font-size: small;
 	font-weight: normal;
 }
@@ -168,13 +128,13 @@ input[type='text']:focus {
 	margin-left: 1em;
 }
 #issuesContainer .noneMessage {
-    position: absolute;
-    margin-top: 0;
+	.muted;
+	position: absolute;
+	margin: 0.5em 0 0 0;
+	padding: 0;
 }
-#issuesContainer .noneMessage,
 #issuesContainer .issuesList {
     margin: 0.5em 0 0 0;
-	list-style-type: none;
 	padding: 0;
 }
 #messages li,
@@ -191,8 +151,11 @@ input[type='text']:focus {
 	-webkit-transition: background-color 1s;
 	-firefox-transition: background-color 1s;	
 }
+
+// TODO: introduce detail-on-hover class
 #messages .details,
 #issuesContainer .issuesList .details {
+	color: @gray;
 	display: none;
 	padding-left: 0.5em;
 	font-size: small;
@@ -211,40 +174,19 @@ input[type='text']:focus {
 #issuesContainer .closed .assignee {
 	text-decoration: line-through;
 }
-.footer {
-	font-size: small;
-	text-align: center;
-	margin-top: 4em;
-}
-
-.tag {
-	padding: 0 5px 2px;
-	border-radius: 3px;
-	font-size: small;
-	color: white;
-	background-color: #999;
-	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
-	vertical-align: baseline;
-}
-
-#issueFilter {
-	padding: 0.3em;
-}
 
 .tooltip {
 	font-size: 0.9em !important;
 }
 
-.fixed {
-	position: fixed;
-	padding: 0.3em 3em 1em;
-	top: 0;
-	left: 0;
-	right: 0;
-	z-index: 1000;
-	background-image: -webkit-linear-gradient(white 70%, rgba(255,255,255,0));
-}
-
 .error {
 	color: @errorText;
 }
+
+.footer {
+	color: @gray;
+	font-size: small;
+	text-align: center;
+	margin-top: 4em;
+}
+

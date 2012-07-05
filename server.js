@@ -81,7 +81,7 @@ app.get('/project/:slug', function (req, res) {
 		var flash = req.flash('info');
 		var message = flash.length ? _.first(flash) : null;
 
-		res.render('project.html', { title: project.name, flash: message });
+		res.render('project.html', { title: project.name, flash: message, noindex: project.unlisted });
 	} else if (project && project.deleted) {
 		res.writeHead(410); // Gone
 		res.end('Project deleted');
@@ -100,7 +100,7 @@ app.delete('/project/:slug', auth, function (req, res) {
 });
 
 app.get('/admin', auth, function (req, res) {
-	res.render('admin.html', { projects: JSON.stringify(projectDao.findAll()) });
+	res.render('admin.html', { projects: JSON.stringify(projectDao.findAll()), noindex: true });
 });
 
 tracker.init(app);

@@ -1842,6 +1842,9 @@ body {
 pre {
   font-style: normal;
 }
+.clickable {
+  cursor: pointer;
+}
 .flash {
   position: absolute;
   top: 10px;
@@ -2012,8 +2015,19 @@ html {
   width: 100%;
   text-align: center;
 }
-.issue-critical {
+.issue-priority.issue-priority-critical {
   color: #f89406;
+}
+.issue-priority.issue-priority-critical.enabled:hover {
+  cursor: pointer;
+  color: #c67605;
+}
+.issue-priority.issue-priority-normal {
+  color: #eeeeee;
+}
+.issue-priority.issue-priority-normal.enabled:hover {
+  cursor: pointer;
+  color: #d5d5d5;
 }
 .notificationToggle {
   cursor: pointer;

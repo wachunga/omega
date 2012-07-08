@@ -11,9 +11,27 @@ html {
 	text-align: center;
 }
 
-.issue-critical {
-	color: @orange;
+.issue-priority {
+
+	&.issue-priority-critical {
+		color: @orange;
+
+		&.enabled:hover {
+			.clickable;
+			color: darken(@orange, 10%);
+		}
+	}
+
+	&.issue-priority-normal {
+		color: @grayLighter;
+
+		&.enabled:hover {
+			.clickable;
+			color: darken(@grayLighter, 10%);
+		}
+	}
 }
+
 
 .notificationToggle {
 	cursor: pointer;

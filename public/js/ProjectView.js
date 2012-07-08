@@ -101,6 +101,13 @@ function ($, _, ko, timeago, tooltips, util, Issue, Notifier, UserManager, Messa
 		window.alert(error.toString());
 	};
 
+	ProjectView.prototype.togglePriority = function (issue) {
+		if (this.userManager.noUser()) {
+			return;
+		}
+		this.issueManager.prioritizeIssue(issue.id);
+	};
+
 	// TODO: extract command parsing etc.
 	ProjectView.prototype.handleInput = function () {
 		if (this.userManager.noUser()) {

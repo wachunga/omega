@@ -38,16 +38,18 @@
 	</form>
 </div>
 
-<dl id="commandList" class="hide" data-bind="fadeVisible: helpOpen, click: function() { helpOpen(false); $messageInput.focus(); }">
-	<dt>/create &lt;description&gt;</dt>
-	<dt>/critical &lt;id&gt;</dt>
-	<dt>/assign &lt;id&gt; [&lt;user&gt;]</dt>
-	<dt>/unassign &lt;id&gt;</dt>
-	<dt>/edit &lt;id&gt; &lt;description&gt;</dt>
-	<dt>/close &lt;id&gt;</dt>
-	<dt>/reopen &lt;id&gt;</dt>
-	<dt>/reset</dt>
-</dl>
+<ol id="commandList" class="unstyled hide" data-bind="fadeVisible: helpOpen, click: function() { helpOpen(false); $messageInput.focus(); }">
+	<li>/create &lt;description&gt;</li>
+	<li>/critical &lt;id&gt;</li>
+	<li>/tag &lt;id&gt; &lt;tag&gt;</li>
+	<li>/untag &lt;id&gt;</li>
+	<li>/assign &lt;id&gt; [&lt;user&gt;]</li>
+	<li>/unassign &lt;id&gt;</li>
+	<li>/edit &lt;id&gt; &lt;description&gt;</li>
+	<li>/close &lt;id&gt;</li>
+	<li>/reopen &lt;id&gt;</li>
+	<li>/reset</li>
+</ol>
 
 <div id="issuesContainer">
 	<label class="hideIssues"><input type="checkbox" data-bind="checked: hideClosed"/> hide closed</label>

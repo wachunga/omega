@@ -49,14 +49,13 @@ html {
 }
 
 #commandList {
-	padding: 0.3em;
+	padding: 1em;
 	background-color: #eee;
 	margin: 0;
+	.border-radius(3px);
 
-	dt {
-		font-family: monospace;
-		font-size: 0.9em;
-	}
+	font-family: monospace;
+	font-size: 0.9em;
 }
 
 #onlineUsers {
@@ -95,8 +94,9 @@ html {
 
 .tag {
 	@bg: #999;
+
 	padding: 0 5px 2px;
-	border-radius: 3px;
+	.border-radius(3px);
 	font-size: small;
 	color: white;
 	background-color: @bg;
@@ -120,5 +120,5 @@ html {
 	left: 0;
 	right: 0;
 	z-index: 1000;
-	background-image: -webkit-linear-gradient(white 70%, rgba(255,255,255,0));
+	background-image: -webkit-linear-gradient(white 70%, rgba(255,255,255,0)); // TODO: mixin
 }

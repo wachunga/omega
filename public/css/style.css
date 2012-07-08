@@ -2044,11 +2044,12 @@ html {
   line-height: 2em;
 }
 #commandList {
-  padding: 0.3em;
+  padding: 1em;
   background-color: #eee;
   margin: 0;
-}
-#commandList dt {
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
   font-family: monospace;
   font-size: 0.9em;
 }
@@ -2086,6 +2087,8 @@ html {
 }
 .tag {
   padding: 0 5px 2px;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
   border-radius: 3px;
   font-size: small;
   color: white;

@@ -63,7 +63,7 @@
 			<span class="assignee" data-bind="css: { myself: $root.userManager.isCurrentUser(assignee()) }, text: assigneeLabel"></span>
 			&nbsp;<span class="description" data-bind="html: $root.addHtmlLinks(description)"></span>
 			<!-- ko foreach: tags -->
-				<span class="tag" data-bind="text: $data"></span>
+				<span class="tag" data-bind="text: $data, click: $root.filterByTag.bind($root)"></span>
 			<!-- /ko -->
 			<span class="details">(created by <span data-bind="text: creator"></span> <time data-bind="attr: { datetime: createdDate }"></time>)</span>
 		</li>

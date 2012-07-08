@@ -56,6 +56,17 @@ define(['ko', 'underscore', 'jquery', 'Issue', 'error/NoSuchIssueError'], functi
 	}
 
 	IssueManager.prototype.filterIssueList = function (filterValue) {
+		filterValue = filterValue.trim();
+
+		// supports tag:<tag>
+		if (filterValue.substr(0,4) === 'tag:') {
+			var tag = filterValue.substr(4);
+			_.each(this.sortedIssues(), function (issue) {
+				issue.filtered(!_.include(issue.tags(), tag));
+			});
+			return;
+		}
+
 		var regex = new RegExp(filterValue, 'mi');
 
 		_.each(this.sortedIssues(), function (issue) {

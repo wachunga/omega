@@ -12,12 +12,12 @@ html {
 }
 
 .issue-priority {
+	.clickable;
 
 	&.issue-priority-critical {
 		color: @orange;
 
 		&.enabled:hover {
-			.clickable;
 			color: darken(@orange, 10%);
 		}
 	}
@@ -26,7 +26,6 @@ html {
 		color: @grayLighter;
 
 		&.enabled:hover {
-			.clickable;
 			color: darken(@grayLighter, 10%);
 		}
 	}
@@ -95,13 +94,19 @@ html {
 }
 
 .tag {
+	@bg: #999;
 	padding: 0 5px 2px;
 	border-radius: 3px;
 	font-size: small;
 	color: white;
-	background-color: #999;
+	background-color: @bg;
 	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
 	vertical-align: baseline;
+	.clickable;
+
+	&:hover {
+		background-color: darken(@bg, 10%);
+	}
 }
 
 #issueFilter {

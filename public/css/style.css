@@ -2015,18 +2015,19 @@ html {
   width: 100%;
   text-align: center;
 }
+.issue-priority {
+  cursor: pointer;
+}
 .issue-priority.issue-priority-critical {
   color: #f89406;
 }
 .issue-priority.issue-priority-critical.enabled:hover {
-  cursor: pointer;
   color: #c67605;
 }
 .issue-priority.issue-priority-normal {
   color: #eeeeee;
 }
 .issue-priority.issue-priority-normal.enabled:hover {
-  cursor: pointer;
   color: #d5d5d5;
 }
 .notificationToggle {
@@ -2088,9 +2089,13 @@ html {
   border-radius: 3px;
   font-size: small;
   color: white;
-  background-color: #999;
+  background-color: #999999;
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
   vertical-align: baseline;
+  cursor: pointer;
+}
+.tag:hover {
+  background-color: #808080;
 }
 #issueFilter {
   padding: 0.3em;

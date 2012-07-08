@@ -101,6 +101,11 @@ function ($, _, ko, timeago, tooltips, util, Issue, Notifier, UserManager, Messa
 		window.alert(error.toString());
 	};
 
+	ProjectView.prototype.filterByTag = function (tag) {
+		this.issueManager.issueFilterInstant('tag:' + tag);
+		$('#issueFilter').focus();
+	};
+
 	ProjectView.prototype.togglePriority = function (issue) {
 		if (this.userManager.noUser()) {
 			return;

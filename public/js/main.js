@@ -26,7 +26,7 @@ require(['jquery', 'ko'], function ($, ko) {
 				}).error(function (result) {
 					result = JSON.parse(result.responseText);
 					if (result.error === 'exists') {
-						that.error('A <a href="' + result.url + '">project with that name</a> already exists.');
+						that.error('A project with that name already exists: <a href="' + result.url + '">' + name + '</a>');
 					} else {
 						that.error('Invalid project name.');
 					}

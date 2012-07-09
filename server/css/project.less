@@ -146,6 +146,11 @@ html {
 		background-color: #E2E9E5;
 		.transition(background-color 1s);
 	}
+
+	.closed .description,
+	.closed .assignee {
+		text-decoration: line-through;
+	}
 }
 
 #messages li,
@@ -171,10 +176,7 @@ html {
 #issuesContainer .issuesList li:hover .details {
 	display: inline;
 }
-#issuesContainer .closed .description,
-#issuesContainer .closed .assignee {
-	text-decoration: line-through;
-}
+
 
 .tag {
 	@bg: #999;
@@ -204,5 +206,6 @@ html {
 	left: 0;
 	right: 0;
 	z-index: 1000;
-	background-image: -webkit-linear-gradient(white 70%, rgba(255,255,255,0)); // TODO: mixin
+	#gradient > .vertical-three-colors(white, white, 70%, rgba(255,255,255,0));
+	background-color: initial; // override mixin's value
 }

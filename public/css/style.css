@@ -1845,21 +1845,6 @@ pre {
 .clickable {
   cursor: pointer;
 }
-.flash {
-  position: absolute;
-  top: 10px;
-  left: 0;
-  z-index: 1001;
-  width: 100%;
-  text-align: center;
-}
-.flash span {
-  padding: 5px 10px;
-  background: #E2E9E5;
-  box-shadow: 0 0 1px rgba(0, 0, 0, 0.1);
-  border-radius: 0.4em;
-  border: 1px solid #999;
-}
 .offscreen {
   position: absolute;
   left: -9999px;
@@ -1904,6 +1889,9 @@ pre {
 }
 .error {
   color: #b94a48;
+}
+.error a {
+  color: black;
 }
 .footer {
   color: #555555;
@@ -2041,6 +2029,10 @@ html {
   -o-transition: background-color 1s;
   transition: background-color 1s;
 }
+#issuesContainer .closed .description,
+#issuesContainer .closed .assignee {
+  text-decoration: line-through;
+}
 #messages li,
 #issuesContainer .issuesList li {
   position: relative;
@@ -2061,10 +2053,6 @@ html {
 #messages li:hover .details,
 #issuesContainer .issuesList li:hover .details {
   display: inline;
-}
-#issuesContainer .closed .description,
-#issuesContainer .closed .assignee {
-  text-decoration: line-through;
 }
 .tag {
   padding: 0 5px 2px;
@@ -2091,5 +2079,14 @@ html {
   left: 0;
   right: 0;
   z-index: 1000;
-  background-image: -webkit-linear-gradient(#ffffff 70%, rgba(255, 255, 255, 0));
+  background-color: rgba(255, 255, 255, 0.8);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ffffff), color-stop(70%, #ffffff), to(rgba(255, 255, 255, 0)));
+  background-image: -webkit-linear-gradient(#ffffff, #ffffff 70%, rgba(255, 255, 255, 0));
+  background-image: -moz-linear-gradient(top, #ffffff, #ffffff 70%, rgba(255, 255, 255, 0));
+  background-image: -ms-linear-gradient(#ffffff, #ffffff 70%, rgba(255, 255, 255, 0));
+  background-image: -o-linear-gradient(#ffffff, #ffffff 70%, rgba(255, 255, 255, 0));
+  background-image: linear-gradient(#ffffff, #ffffff 70%, rgba(255, 255, 255, 0));
+  background-repeat: no-repeat;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='rgba(255, 255, 255, 0)', GradientType=0);
+  background-color: initial;
 }

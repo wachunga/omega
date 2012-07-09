@@ -4,9 +4,8 @@
 </head>
 <body>
 <% if (flash) { %>
-<div class="flash hide"><span><%- flash %></span></div>
+<div class="alert alert-success alert-fading"><%- flash %></div>
 <% } %>
-
 <div style="display: none;" class="alert alert-danger" data-bind="visible: disconnected() && !loading()">Warning: disconnected from server</div>
 
 <header class="main-header">
@@ -31,6 +30,7 @@
 <div id="formContainer">
 	<form id="form" autocomplete="off" data-bind="submit: handleInput">
 		<label style="display: none;" data-bind="visible: userManager.noUser">You're not signed in. Who are you? <input id="nameInput" type="text" data-bind="attr: { placeholder: userManager.namePlaceholder }"/></label>
+		<!-- todo: inline error -->
 		<span style="display: none;" class="invalidName loud" data-bind="fadeVisible: userManager.invalidName">I don't think so. Try again.</span>
 
 		<input style="display: none;" id="messageInput" data-bind="visible: !userManager.noUser()" type="text" tabindex="1" placeholder="Type commands (like '/help') or just chat it up"/>

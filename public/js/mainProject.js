@@ -23,7 +23,7 @@ require(['jquery', 'ProjectView'], function ($, ProjectView) {
 		$(window).on('scroll', processScroll);
 		processScroll();
 
-		$('.flash').click(hideFlashMessages).delay(500).fadeIn().delay(8000).fadeOut();
+		$('.alert-fading').click(hideFlashMessages).delay(500).fadeIn().delay(6000).fadeOut();
 
 		var projectView = new ProjectView($("#nameInput"), $("#messageInput"), $("#messages"), socket);
 	});

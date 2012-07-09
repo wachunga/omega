@@ -179,13 +179,13 @@ function ($, _, ko, timeago, tooltips, util, Issue, Notifier, UserManager, Messa
 					this.issueManager.assignIssue(id, assignee);
 					break;
 				case 'tag':
-					id = parseInt(getArgument(rest, 1), 10); // TODO: comma separated ids
+					id = parseInt(getArgument(rest, 1), 10);
 					var tag = getArgument(rest, 2);
 					requireArgument(id, tag);
 					this.issueManager.tagIssue(id, tag);
 					break;
 				case 'untag':
-					id = parseInt(getArgument(rest, 1), 10); // TODO: comma separated ids
+					id = parseInt(getArgument(rest, 1), 10);
 					requireArgument(id);
 					this.issueManager.untagIssue(id);
 					break;

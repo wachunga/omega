@@ -67,7 +67,7 @@ app.post('/project', function (req, res) {
 	} else {
 		var created = projectDao.create(name, !!req.body.unlisted);
 		tracker.listen(created);
-		var message = created.unlisted ? "Here's your project. Remember: it's unlisted, so nobody'll find it unless you share the address." : "Here's your project. Love, Ω";
+		var message = created.unlisted ? "Here's your project. Remember: it's unlisted, so nobody'll find it unless you share the address." : "Here's your project.";
 		req.flash('info', message);
 		res.json({ url: '/project/' + created.slug });
 	}

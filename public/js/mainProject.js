@@ -23,7 +23,9 @@ require(['jquery', 'ProjectView'], function ($, ProjectView) {
 		$(window).on('scroll', processScroll);
 		processScroll();
 
-		$('.alert-fading').click(hideFlashMessages).delay(500).fadeIn().delay(6000).fadeOut();
+		$('.alert-closable').click(hideFlashMessages);
+		// TODO: alert-fading needs to work after dom load too
+		$('.alert-fading').delay(500).fadeIn().delay(6000).fadeOut();
 
 		var projectView = new ProjectView($("#nameInput"), $("#messageInput"), $("#messages"), socket);
 	});

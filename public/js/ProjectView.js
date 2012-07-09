@@ -24,6 +24,7 @@ function ($, _, ko, timeago, tooltips, util, Issue, Notifier, UserManager, Messa
 		this.notifier = new Notifier(this.userManager, socket);
 		this.$messageInput = $messageInput;
 
+		this.alert = ko.observable();
 		this.disconnected = ko.observable();
 		this.loading = ko.observable(true);
 
@@ -98,10 +99,10 @@ function ($, _, ko, timeago, tooltips, util, Issue, Notifier, UserManager, Messa
 	
 	// @VisibleForTesting
 	ProjectView.prototype.notifyOfBadCommand = function () {
-		window.alert(util.getRandomItem(BAD_COMMAND_RESPONSES) + ' Try /help.'); // TODO: style
+		this.alert(util.getRandomItem(BAD_COMMAND_RESPONSES) + ' Try /help.');
 	};
 	ProjectView.prototype.notifyNoSuchIssue = function (error) {
-		window.alert(error.toString());
+		this.alert(error.toString());
 	};
 
 	ProjectView.prototype.filterByTag = function (tag) {

@@ -48,6 +48,31 @@ html {
 	line-height: 2em;
 }
 
+#messages {
+	border: 1px solid @inputBorder;
+	border-radius: 0.4em;
+	font-size: 0.9em;
+
+	height: 15em;
+	list-style-type: none;
+	padding: 0.6em;
+	overflow: auto;
+	margin: 0.2em 0;
+	resize: vertical;
+
+	.speaker {
+		font-weight: bold;
+	}
+
+	.system {
+		font-style: italic;
+	}
+
+	li:hover .message {
+		.hovered;
+	}
+}
+
 #commandList {
 	padding: 1em;
 	background-color: #eee;
@@ -84,12 +109,71 @@ html {
 }
 
 #issuesContainer {
+
+	var {
+		font-style: normal;
+	}
+
+	.hideIssues {
+		float: right;
+		line-height: 1.9em;
+		margin-left: 1em;
+	}
+
+
+	.noneMessage {
+		.muted;
+	}
+
 	.issueId {
 		display: inline-block;
 		text-align: right;
 		width: 100px;
 		margin-left: -85px;
 	}
+
+	.issuesList li:hover .description {
+		.hovered;
+	}
+
+	.myself {
+		color: #fff;
+		background-color: #666;
+		padding: 0 0.3em;
+	}
+
+	.highlighted {
+		background-color: #E2E9E5;
+		.transition(background-color 1s);
+	}
+}
+
+#messages li,
+#issuesContainer .issuesList li {
+	position: relative;
+}
+
+// TODO: introduce detail-on-hover class
+#messages .details,
+#issuesContainer .issuesList .details {
+	color: @gray;
+	display: none;
+	padding-left: 0.5em;
+	font-size: small;
+	font-style: normal;
+	height: 100%;
+	position: absolute;
+	right: 0;
+	top: 0;
+	background-color: rgba(255,255,255,0.95);
+}
+#messages li:hover .details,
+#issuesContainer .issuesList li:hover .details {
+	display: inline;
+}
+#issuesContainer .closed .description,
+#issuesContainer .closed .assignee {
+	text-decoration: line-through;
 }
 
 .tag {

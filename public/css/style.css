@@ -1896,99 +1896,8 @@ pre {
   font-family: georgia, serif;
   font-size: 1.3em;
 }
-#messages {
-  border: 1px solid #ccc;
-  border-radius: 0.4em;
-  font-size: 0.9em;
-  height: 15em;
-  list-style-type: none;
-  padding: 0.6em;
-  overflow: auto;
-  margin: 0.2em 0;
-  resize: vertical;
-}
-#messages .speaker {
-  font-weight: bold;
-}
-#messages .system {
-  font-style: italic;
-}
-#messages li:hover .message {
-  opacity: 0.5;
-}
 .hovered {
   opacity: 0.5;
-}
-#issuesContainer .issuesList li:hover .description {
-  opacity: 0.5;
-}
-#issuesContainer {
-  margin-top: 1em;
-}
-#issuesContainer h2 {
-  margin-bottom: 0;
-  border-bottom: 1px solid #ccc;
-}
-#issuesContainer .issueCounts {
-  color: #999999;
-  font-size: small;
-  font-weight: normal;
-}
-#issuesContainer var {
-  font-style: normal;
-}
-#issuesContainer a {
-  text-decoration: none;
-}
-#issuesContainer .hideIssues {
-  float: right;
-  line-height: 1.9em;
-  margin-left: 1em;
-}
-#issuesContainer .noneMessage {
-  color: #999999;
-  position: absolute;
-  margin: 0.5em 0 0 0;
-  padding: 0;
-}
-#issuesContainer .issuesList {
-  margin: 0.5em 0 0 0;
-  padding: 0;
-}
-#messages li,
-#issuesContainer .issuesList li {
-  position: relative;
-}
-#issuesContainer .issuesList .myself {
-  color: #fff;
-  background-color: #666;
-  padding: 0 0.3em;
-}
-#issuesContainer .issuesList .highlighted {
-  background-color: #E2E9E5;
-  -webkit-transition: background-color 1s;
-  -firefox-transition: background-color 1s;
-}
-#messages .details,
-#issuesContainer .issuesList .details {
-  color: #555555;
-  display: none;
-  padding-left: 0.5em;
-  font-size: small;
-  font-style: normal;
-  height: 100%;
-  position: absolute;
-  right: 0;
-  top: 0;
-  background-color: rgba(255, 255, 255, 0.95);
-}
-#messages li:hover .details,
-#issuesContainer .issuesList li:hover .details {
-  display: inline;
-}
-#issuesContainer .closed .description,
-#issuesContainer .closed .assignee {
-  text-decoration: line-through;
 }
 .tooltip {
   font-size: 0.9em !important;
@@ -2043,6 +1952,26 @@ html {
   bottom: 0;
   line-height: 2em;
 }
+#messages {
+  border: 1px solid #cccccc;
+  border-radius: 0.4em;
+  font-size: 0.9em;
+  height: 15em;
+  list-style-type: none;
+  padding: 0.6em;
+  overflow: auto;
+  margin: 0.2em 0;
+  resize: vertical;
+}
+#messages .speaker {
+  font-weight: bold;
+}
+#messages .system {
+  font-style: italic;
+}
+#messages li:hover .message {
+  opacity: 0.5;
+}
 #commandList {
   padding: 1em;
   background-color: #eee;
@@ -2079,11 +2008,63 @@ html {
 #formContainer #form {
   margin: 0;
 }
+#issuesContainer var {
+  font-style: normal;
+}
+#issuesContainer .hideIssues {
+  float: right;
+  line-height: 1.9em;
+  margin-left: 1em;
+}
+#issuesContainer .noneMessage {
+  color: #999999;
+}
 #issuesContainer .issueId {
   display: inline-block;
   text-align: right;
   width: 100px;
   margin-left: -85px;
+}
+#issuesContainer .issuesList li:hover .description {
+  opacity: 0.5;
+}
+#issuesContainer .myself {
+  color: #fff;
+  background-color: #666;
+  padding: 0 0.3em;
+}
+#issuesContainer .highlighted {
+  background-color: #E2E9E5;
+  -webkit-transition: background-color 1s;
+  -moz-transition: background-color 1s;
+  -ms-transition: background-color 1s;
+  -o-transition: background-color 1s;
+  transition: background-color 1s;
+}
+#messages li,
+#issuesContainer .issuesList li {
+  position: relative;
+}
+#messages .details,
+#issuesContainer .issuesList .details {
+  color: #555555;
+  display: none;
+  padding-left: 0.5em;
+  font-size: small;
+  font-style: normal;
+  height: 100%;
+  position: absolute;
+  right: 0;
+  top: 0;
+  background-color: rgba(255, 255, 255, 0.95);
+}
+#messages li:hover .details,
+#issuesContainer .issuesList li:hover .details {
+  display: inline;
+}
+#issuesContainer .closed .description,
+#issuesContainer .closed .assignee {
+  text-decoration: line-through;
 }
 .tag {
   padding: 0 5px 2px;

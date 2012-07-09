@@ -55,8 +55,9 @@
 	<label class="hideIssues"><input type="checkbox" data-bind="checked: hideClosed"/> hide closed</label>
 	<label class="hideIssues"><input type="checkbox" data-bind="checked: hideAssigned"/> hide assigned</label>
 	<label class="hideIssues"><input id="issueFilter" class="input-medium" type="search" data-bind="value: issueManager.issueFilterInstant, valueUpdate: 'afterkeydown'" placeholder="Filter"></label>
-	<h2>Issues <span data-bind="fadeVisible: !loading() && issueManager.allIssues().length >= 3" class="issueCounts">(<var data-bind="text: issueManager.openIssuesCount"></var> open, <var data-bind="text: issueManager.closedIssuesCount"></var> closed)</span></h2>
-
+	<div class="page-header">
+		<h1>Issues <small class="issueCounts" data-bind="fadeVisible: !loading() && issueManager.allIssues().length >= 3">(<var data-bind="text: issueManager.openIssuesCount"></var> open, <var data-bind="text: issueManager.closedIssuesCount"></var> closed)</small></h1>
+	</div>
 	<p class="noneMessage" data-bind="fadeVisible: !issueManager.allIssues().length || (hideClosed() && issueManager.openIssuesCount() == 0)">No open issues. w00t!</p>
 	<ul class="issuesList unstyled" data-bind="foreach: { data: issueManager.sortedIssues, afterRender: applyTimeago }">
 		<li data-bind="attr: { id: id }, fadeVisible: !filtered() && !($root.hideClosed() && closed()) && !($root.hideAssigned() && assignee() != 'nobody'), css: { closed: closed, highlighted: id === $root.issueManager.highlightedIssue() }">

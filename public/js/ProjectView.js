@@ -55,6 +55,9 @@ function ($, _, ko, timeago, tooltips, util, Issue, Notifier, UserManager, Messa
 
 	ProjectView.prototype.initTooltips = function () {
 		var that = this;
+		$('body').tooltip({
+			selector: '.tooltipped'
+		});
 		$('#messages').tooltip({
 			selector: '.id',
 			placement: 'right',

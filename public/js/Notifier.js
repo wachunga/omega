@@ -9,8 +9,13 @@ define(['ko', 'underscore'], function (ko, _) {
 		this.currentUser = users.current;
 
 		this.statusMessage = ko.computed(function () {
+
 			return this.webNotifyEnabled() ? 'Web notifications are enabled' : 'Web notifications are disabled';
 		}, this);
+
+		this.statusMessage.subscribe(function () {
+			$('.tooltipped').tooltip('hide');
+		});
 
 		this.requestNotificationPermission = _.bind(requestNotificationPermission, this);
 

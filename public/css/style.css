@@ -1957,7 +1957,7 @@ html {
 #messages .system {
   font-style: italic;
 }
-#messages li:hover .message {
+#messages .has-details:hover .message {
   opacity: 0.5;
 }
 #commandList {

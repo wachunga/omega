@@ -90,9 +90,10 @@ body {
 #onlineUsers {
 	font-size: 0.9em;
 	text-align: right;
-}
-.onlineUser + .onlineUser:before {
-	content: ', ';
+
+	.onlineUser + .onlineUser:before {
+		content: ', ';
+	}
 }
 
 #messageInput {
@@ -197,10 +198,6 @@ body {
 	&:hover {
 		background-color: darken(@bg, 10%);
 	}
-}
-
-#issueFilter {
-	padding: 0.3em;
 }
 
 .fixed {

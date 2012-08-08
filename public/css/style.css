@@ -1883,6 +1883,7 @@ pre {
 }
 .hovered {
   opacity: 0.5;
+  filter: alpha(opacity=50);
 }
 .tooltip {
   font-size: 0.9em !important;
@@ -1962,6 +1963,7 @@ body {
 }
 #messages .has-details:hover .message {
   opacity: 0.5;
+  filter: alpha(opacity=50);
 }
 #commandList {
   padding: 1em;
@@ -1977,7 +1979,7 @@ body {
   font-size: 0.9em;
   text-align: right;
 }
-.onlineUser + .onlineUser:before {
+#onlineUsers .onlineUser + .onlineUser:before {
   content: ', ';
 }
 #messageInput {
@@ -2018,6 +2020,7 @@ body {
 }
 #issuesContainer .issuesList li:hover .description {
   opacity: 0.5;
+  filter: alpha(opacity=50);
 }
 #issuesContainer .myself {
   color: #fff;
@@ -2071,9 +2074,6 @@ body {
 }
 .tag:hover {
   background-color: #808080;
-}
-#issueFilter {
-  padding: 0.3em;
 }
 .fixed {
   position: fixed;

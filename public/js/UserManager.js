@@ -13,7 +13,7 @@ define(['jquery', 'ko', 'underscore', 'util'], function ($, ko, _, util) {
 		this.namePlaceholder = util.getRandomItem(NAMES);
 		this.invalidName = ko.observable(false);
 
-		this.current = ko.observable(window.localStorage[USERNAME_KEY]);
+		this.current = ko.observable(util.isLocalStorageSupported() ? window.localStorage[USERNAME_KEY] : null);
 		this.noUser = ko.computed(function () {
 			return !this.current();
 		}, this);
@@ -49,7 +49,9 @@ define(['jquery', 'ko', 'underscore', 'util'], function ($, ko, _, util) {
 		this.loggedIn(false);
 		this.socket.emit('login user', name, function (invalidName) {
 			if (!invalidName) {
-				window.localStorage[USERNAME_KEY] = name;
+				if (util.isLocalStorageSupported()) {
+					window.localStorage[USERNAME_KEY] = name;
+				}
 				that.$nameInput.val('');
 				that.current(name);
 			}
@@ -60,7 +62,9 @@ define(['jquery', 'ko', 'underscore', 'util'], function ($, ko, _, util) {
 
 	UserManager.prototype.logout = function () {
 		this.$nameInput.focus();
-		delete window.localStorage[USERNAME_KEY];
+		if (util.isLocalStorageSupported()) {
+			delete window.localStorage[USERNAME_KEY];
+		}
 		this.current(undefined);
 		this.socket.emit('logout');
 	};

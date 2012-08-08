@@ -9,17 +9,12 @@ require.config({
 });
 
 
-require(['jquery', 'ProjectView'], function ($, ProjectView) {
+require(['jquery', 'ko', 'ProjectView'], function ($, ko, ProjectView) {
 
 	var project = location.pathname.match(/project\/([^\/]+)/)[1];
 	var socket = io.connect('/' + project); // would love to push this into module, but causes odd race condition in some browsers
 
 	$(function () {
-		if (!isLocalStorageSupported) {
-			alert("Your browser is very out of date. To use Ω, please use a newer browser."); // TODO: graceful degradation
-			return;
-		}
-
 		$(window).on('scroll', processScroll);
 		processScroll();
 
@@ -34,13 +29,20 @@ require(['jquery', 'ProjectView'], function ($, ProjectView) {
 		$(this).fadeOut();
 	}
 
-	function isLocalStorageSupported() {
-		try {
-			return 'localStorage' in window && window['localStorage'] !== null;
-		} catch (e) {
-			return false;
+	ko.bindingHandlers.fadeVisible = {
+		init: function(element, valueAccessor) {
+			var value = valueAccessor();
+			$(element).toggle(ko.utils.unwrapObservable(value));
+		},
+		update: function(element, valueAccessor) {
+			var value = valueAccessor();
+			if (ko.utils.unwrapObservable(value)) {
+				$(element).fadeIn('fast');
+			} else {
+				$(element).fadeOut('fast');
+			}
 		}
-	}
+	};
 
 	var $fixable = $('#form');
 	var topOffset = $fixable.offset().top;

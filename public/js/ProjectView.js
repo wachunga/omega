@@ -29,6 +29,7 @@ function ($, _, ko, timeago, tooltips, util, Issue, Notifier, UserManager, Messa
 		this.loading = ko.observable(true);
 
 		this.initTooltips();
+		this.warnIfBrowserSucks();
 
 		$(window).bind('hashchange', _.bind(this.checkHashForBookmark, this));
 
@@ -52,6 +53,13 @@ function ($, _, ko, timeago, tooltips, util, Issue, Notifier, UserManager, Messa
 		this.socket.on('issues', function (issues) {
 			that.checkHashForBookmark();
 		});
+	};
+
+	ProjectView.prototype.warnIfBrowserSucks = function () {
+		if (!util.isLocalStorageSupported()) {
+			this.alert('Your browser has been found to be lacking. For the best experience, update your browser already.');
+			return;
+		}
 	};
 
 	ProjectView.prototype.initTooltips = function () {
@@ -97,7 +105,6 @@ function ($, _, ko, timeago, tooltips, util, Issue, Notifier, UserManager, Messa
 		return match ? match[argToReturn] : null;
 	}
 	
-	// @VisibleForTesting
 	ProjectView.prototype.notifyOfBadCommand = function () {
 		this.alert(util.getRandomItem(BAD_COMMAND_RESPONSES) + ' Try /help.');
 	};

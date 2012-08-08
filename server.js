@@ -73,6 +73,7 @@ app.post('/project', function (req, res) {
 	}
 });
 app.get('/project', function (req, res) {
+	res.statusCode = 404;
 	res.end('Nothing to see here. Try /project/<name>');
 });
 app.get('/project/:slug', function (req, res) {
@@ -83,12 +84,18 @@ app.get('/project/:slug', function (req, res) {
 
 		res.render('project.html', { title: project.name, flash: message, noindex: project.unlisted });
 	} else if (project && project.deleted) {
-		res.writeHead(410); // Gone
+		res.statusCode = 410; // Gone
 		res.end('Project deleted');
 	} else {
-		res.writeHead(404);
+		res.statusCode = 404;
 		res.end('No such project');
 	}
+});
+app.get('/project/:slug/export', function (req, res) {
+	var project = projectDao.find(req.params.slug);
+	var filename = project.name + '.json';
+	res.setHeader('Content-disposition', 'attachment; filename=' + filename);
+	res.json(issueDao.load(project));
 });
 
 var auth = express.basicAuth('admin', password);

@@ -157,6 +157,9 @@ function ($, _, ko, timeago, tooltips, util, Issue, Notifier, UserManager, Messa
 				case '?':
 					this.helpOpen(!this.helpOpen());
 					break;
+				case 'export':
+					window.location.href += '/export';
+					break;
 				case 'add':
 				case 'create':
 				case 'nouveau':

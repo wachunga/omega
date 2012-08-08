@@ -6,7 +6,7 @@
 <% if (flash) { %>
 <div class="alert alert-success alert-fading alert-closable"><%- flash %></div>
 <% } %>
-<div style="display: none;" class="alert alert-danger" data-bind="visible: disconnected() && !loading()">Warning: disconnected from server</div>
+<div style="display: none;" class="alert alert-danger" data-bind="visible: disconnected() && !loading()">Warning: disconnected from server. <a href="" data-bind="click: reconnect">Reconnect</a></div>
 <div style="display: none;" class="alert alert-danger alert-closable" data-bind="visible: !!alert() && !loading(), text: alert"></div>
 
 <header class="main-header">

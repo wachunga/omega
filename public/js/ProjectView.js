@@ -242,6 +242,10 @@ function ($, _, ko, timeago, tooltips, util, Issue, Notifier, UserManager, Messa
 		this.socket.emit('user message', message);
 	};
 
+	ProjectView.prototype.reconnect = function () {
+		this.socket.socket.connect();
+	};
+
 	ProjectView.prototype.reset = function () {
 		if (window.confirm('Warning: this will completely delete all issues from the server.')) {
 			if (window.confirm('I have a bad feeling about this. Are you absolutely sure?')) {

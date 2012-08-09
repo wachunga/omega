@@ -39,20 +39,30 @@
 	</form>
 </div>
 
-<!-- TODO: explain markdown -->
-<ol id="commandList" class="unstyled hide" data-bind="fadeVisible: helpOpen, click: function() { helpOpen(false); $messageInput.focus(); }">
-	<li>/create &lt;description&gt;</li>
-	<li>/critical &lt;id&gt;</li>
-	<li>/tag &lt;id&gt; &lt;tag&gt;</li>
-	<li>/untag &lt;id&gt;</li>
-	<li>/assign &lt;id&gt; [&lt;user&gt;]</li>
-	<li>/unassign &lt;id&gt;</li>
-	<li>/edit &lt;id&gt; &lt;description&gt;</li>
-	<li>/close &lt;id&gt;</li>
-	<li>/reopen &lt;id&gt;</li>
-	<li>/reset</li>
-	<li>/export</li>
-</ol>
+<div id="helpBin" class="hide" data-bind="fadeVisible: helpOpen, click: function() { helpOpen(false); $messageInput.focus(); }">
+	<p>Available commands:</p>
+	<ol id="commandList" class="unstyled indented">
+		<li>/create &lt;description&gt;</li>
+		<li>/critical &lt;id&gt;</li>
+		<li>/tag &lt;id&gt; &lt;tag&gt;</li>
+		<li>/untag &lt;id&gt;</li>
+		<li>/assign &lt;id&gt; [&lt;user&gt;]</li>
+		<li>/unassign &lt;id&gt;</li>
+		<li>/edit &lt;id&gt; &lt;description&gt;</li>
+		<li>/close &lt;id&gt;</li>
+		<li>/reopen &lt;id&gt;</li>
+		<li>/reset</li>
+		<li>/export</li>
+	</ol>
+	<p>You can also use a subset of <a href="http://daringfireball.net/projects/markdown/">markdown</a> in messages and issues, like so:</p>
+	<ul class="unstyled indented">
+		<li><code>[link](example.com)</code>  &rarr; <a href="http://example.com">link</a></li>
+		<li><code>&lt;http://example.com&gt;</code> &rarr; <a href="http://example.com">http://example.com</a></li>
+		<li><code>*italics*</code> &rarr; <em>italics</em></li>
+		<li><code>**bold**</code> &rarr; <strong>bold</strong> </li>
+		<li><code>`code`</code> &rarr; <code>code</code></li>
+	</ul>
+</div>
 
 <div id="issuesContainer">
 	<label class="hideIssues"><input type="checkbox" data-bind="checked: hideClosed"/> hide closed</label>

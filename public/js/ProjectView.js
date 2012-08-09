@@ -36,7 +36,6 @@ function ($, _, ko, timeago, tooltips, util, Issue, Notifier, UserManager, Messa
 		this.hideClosed = ko.observable(true);
 		this.hideAssigned = ko.observable(false);
 		this.helpOpen = ko.observable(false);
-		this.addHtmlLinks = util.addHtmlLinks;
 
 		ko.applyBindings(this);
 

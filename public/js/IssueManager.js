@@ -133,7 +133,8 @@ define(['ko', 'underscore', 'jquery', 'Issue', 'error/NoSuchIssueError'], functi
 
 	IssueManager.prototype.refreshIssue = function (props, event) {
 		var issue = this.findIssue(event.issue.id);
-		_.each(props, function (value, key) {
+		_.each(_.keys(props), function (key) {
+			var value = event.issue[key];
 			if (ko.isObservable(issue[key])) {
 				issue[key](value);
 			} else {

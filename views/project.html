@@ -39,6 +39,7 @@
 	</form>
 </div>
 
+<!-- TODO: explain markdown -->
 <ol id="commandList" class="unstyled hide" data-bind="fadeVisible: helpOpen, click: function() { helpOpen(false); $messageInput.focus(); }">
 	<li>/create &lt;description&gt;</li>
 	<li>/critical &lt;id&gt;</li>
@@ -66,7 +67,7 @@
 			<a data-bind="attr: { href: '#' + id }, text: id" title="Permalink" class="issueId"></a>:
 			&nbsp;<span class="issue-priority" data-bind="css: { 'enabled': !$root.userManager.noUser(), 'issue-priority-critical': critical, 'issue-priority-normal': !critical() }, click: $root.togglePriority.bind($root)">★</span>
 			<span class="assignee" data-bind="css: { myself: $root.userManager.isCurrentUser(assignee()) }, text: assigneeLabel"></span>
-			&nbsp;<span class="description" data-bind="html: $root.addHtmlLinks(description)"></span>
+			&nbsp;<span class="description" data-bind="html: description"></span>
 			<!-- ko foreach: tags -->
 				<span class="tag" data-bind="text: $data, click: $root.filterByTag.bind($root)"></span>
 			<!-- /ko -->

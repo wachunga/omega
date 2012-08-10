@@ -196,7 +196,7 @@ body {
 .tag {
 	@bg: #999;
 
-	padding: 0 5px 2px;
+	padding: 0 5px 4px;
 	.border-radius(3px);
 	font-size: small;
 	color: white;
@@ -207,6 +207,13 @@ body {
 
 	&:hover {
 		background-color: darken(@bg, 10%);
+	}
+
+	&.tag-on {
+		background-color: @btnSuccessBackground;
+	}
+	&.tag-off {
+		background-color: @btnDangerBackground;
 	}
 }
 

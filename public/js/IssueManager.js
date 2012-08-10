@@ -1,26 +1,65 @@
 define(['ko', 'underscore', 'jquery', 'Issue', 'error/NoSuchIssueError'], function (ko, _, $, Issue, NoSuchIssueError) {
 
+	function TagFilter(label) {
+		this.label = label;
+		// -1 = exclude; 1 = include
+		this.state = ko.observable(0);
+	}
+
+	TagFilter.prototype.isActive = function () {
+		return this.state() !== 0;
+	};
+
+	TagFilter.prototype.toggle = function () {
+		var next = this.state() === 1 ? -1 : this.state()+1;
+		this.state(next);
+	}
+
+	TagFilter.withState = function (tagFilters, state) {
+		return _.compact(_.map(tagFilters, function (tagFilter) {
+			if (tagFilter.state() === state) {
+				return tagFilter.label;
+			}
+		}));
+	};
+
 	function IssueManager(socket) {
 		this.socket = socket;
 
 		this.allIssues = ko.observableArray();
+		this.allTags = ko.computed(function () {
+			return _.chain(this.allIssues())
+				.map(function (issue) {
+					if (issue.tags().length) {
+						return issue.tags();
+					}
+				})
+				.compact().flatten().uniq().value();
+		}, this);
+		this.tagFilters = ko.computed(function () {
+			console.log('recreating tagfilters') // FIXME: don't blow away states for existing tag filters
+			return _.map(this.allTags(), function (tag) {
+				return new TagFilter(tag);
+			});
+		}, this);
+
 		this.sortedIssues = ko.computed(function () {
 			return this.allIssues().sort(Issue.sort);
 		}, this);
 		this.openIssuesCount = ko.computed(function () {
-			return _.select(this.allIssues(), function (issue) {
+			return _.filter(this.allIssues(), function (issue) {
 				return !issue.closed();
 			}).length;
 		}, this);
-		this.closedIssuesCount = ko.computed(function () {
-			return this.allIssues().length - this.openIssuesCount();
+		this.filteredIssuesCount = ko.computed(function () {
+			return _.filter(this.sortedIssues(), function (issue) {
+				return !issue.filtered();
+			}).length;
 		}, this);
 		this.highlightedIssue = ko.observable();
 
 		this.issueFilterInstant = ko.observable();
 		this.issueFilter = ko.computed(this.issueFilterInstant).extend({ throttle: 400 });
-
-		this.filteredIssues = ko.observableArray([]);
 		this.issueFilter.subscribe(this.filterIssueList, this);
 
 		var that = this;
@@ -55,21 +94,43 @@ define(['ko', 'underscore', 'jquery', 'Issue', 'error/NoSuchIssueError'], functi
 
 	}
 
-	IssueManager.prototype.filterIssueList = function (filterValue) {
-		filterValue = filterValue.trim();
+	IssueManager.prototype.tagFilterToggle = function (tagFilter) {
+		tagFilter.toggle();
+		this.filterIssueList();
+	};
 
-		// supports tag:<tag>
-		if (filterValue.substr(0,4) === 'tag:') {
-			var tag = filterValue.substr(4);
-			_.each(this.sortedIssues(), function (issue) {
-				issue.filtered(!_.include(issue.tags(), tag));
+	IssueManager.prototype.filterIssueList = function () {
+		console.log('filtering list');
+
+		var requiredTags = TagFilter.withState(this.tagFilters(), 1);
+		var forbiddenTags = TagFilter.withState(this.tagFilters(), -1);
+		_.each(this.sortedIssues(), function (issue) {
+			var issueTags = issue.tags();
+
+			// if issue does not have tag that is required, filter
+			var hasAllRequired = _.all(requiredTags, function (requiredTag) {
+				return _.include(issueTags, requiredTag);
 			});
-			return;
-		}
+			if (! hasAllRequired) {
+				issue.filtered(true);
+				return;
+			}
 
+			// if issue has tag that has been excluded, filter
+			var hasForbiddenTag = _.any(forbiddenTags, function (forbiddenTag) {
+				return _.include(issueTags, forbiddenTag);
+			});
+			issue.filtered(hasForbiddenTag);
+		});
+
+		var filterValue = $("#issueFilter").val().trim();
 		var regex = new RegExp(filterValue, 'mi');
 
 		_.each(this.sortedIssues(), function (issue) {
+			if (issue.filtered()) {
+				return;
+			}
+
 			var tags = issue.tags().join(' ');
 			if (!filterValue || regex.test(issue.description() + tags)) {
 				issue.filtered(false);

@@ -65,11 +65,20 @@
 </div>
 
 <div id="issuesContainer">
-	<label class="hideIssues"><input type="checkbox" data-bind="checked: hideClosed"/> hide closed</label>
-	<label class="hideIssues"><input type="checkbox" data-bind="checked: hideAssigned"/> hide assigned</label>
-	<label class="hideIssues"><input id="issueFilter" class="input-medium" type="search" data-bind="value: issueManager.issueFilterInstant, valueUpdate: 'afterkeydown'" placeholder="Filter"></label>
+	<label class="hideIssues"><button class="btn btn-info" data-bind="">Filter</button></label>
 	<div class="page-header">
-		<h1>Issues <small class="issueCounts" data-bind="fadeVisible: !loading() && issueManager.allIssues().length >= 3">(<var data-bind="text: issueManager.openIssuesCount"></var> open, <var data-bind="text: issueManager.closedIssuesCount"></var> closed)</small></h1>
+		<h1>Issues <small class="issueCounts" style="display: none;" data-bind="fadeVisible: !loading() && issueManager.allIssues().length >= 3">(<span data-bind="visible: issueManager.filteredIssuesCount() < issueManager.allIssues().length">showing <var data-bind="text: issueManager.filteredIssuesCount"></var> of </span><var data-bind="text: issueManager.allIssues().length"></var> total)</small></h1>
+		<div class="well">
+			<!-- TODO: add reset -->
+			<input id="issueFilter" class="input-medium" type="search" data-bind="value: issueManager.issueFilterInstant, valueUpdate: 'afterkeydown'" placeholder="Filter">
+			<label><input type="checkbox" data-bind="checked: hideClosed"/> hide closed</label>
+			<label><input type="checkbox" data-bind="checked: hideAssigned"/> hide assigned</label>
+			<div class="tag-filters">
+				<!-- ko foreach: issueManager.tagFilters -->
+				<span class="tag" data-bind="text: label, css: { 'tag-on': state() === 1, 'tag-off': state() === -1 }, click: $root.issueManager.tagFilterToggle.bind($root.issueManager)"></span>
+				<!-- /ko -->
+			</div>
+		</div>
 	</div>
 	<p class="noneMessage" data-bind="fadeVisible: !issueManager.allIssues().length || (hideClosed() && issueManager.openIssuesCount() == 0)">No open issues. w00t!</p>
 	<ul class="issuesList unstyled" data-bind="foreach: { data: issueManager.sortedIssues, afterRender: applyTimeago }">

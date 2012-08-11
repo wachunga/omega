@@ -1,66 +1,12 @@
-define(['ko', 'underscore', 'jquery', 'Issue', 'error/NoSuchIssueError'], function (ko, _, $, Issue, NoSuchIssueError) {
-
-	var TagState = {
-		off: -1,
-		default: 0,
-		on: 1
-	};
-
-	function TagFilter(label) {
-		this.label = label;
-		this.state = ko.observable(TagState.default);
-	}
-
-	TagFilter.prototype.isActive = function () {
-		return this.state() !== TagState.default;
-	};
-
-	TagFilter.prototype.toggle = function () {
-		var next = this.state() === TagState.on ? TagState.off : this.state()+1;
-		this.state(next);
-	}
-
-	TagFilter.getOff = function (tagFilters) {
-		return withState(tagFilters, TagState.off);
-	};
-
-	TagFilter.getOn = function (tagFilters) {
-		return withState(tagFilters, TagState.on);
-	};
-
-	TagFilter.resetAll = function (tagFilters) {
-		_.each(tagFilters, function (tagFilter) {
-			tagFilter.state(TagState.default);
-		});
-	};
-
-	function withState(tagFilters, state) {
-		return _.compact(_.map(tagFilters, function (tagFilter) {
-			if (tagFilter.state() === state) {
-				return tagFilter.label;
-			}
-		}));
-	}
+define([
+	'ko', 'underscore', 'jquery', 'Issue', 'error/NoSuchIssueError', 'TagFilter'
+], function (ko, _, $, Issue, NoSuchIssueError, TagFilter) {
 
 	function IssueManager(socket) {
 		this.socket = socket;
 
 		this.allIssues = ko.observableArray();
-		this.allTags = ko.computed(function () {
-			return _.chain(this.allIssues())
-				.map(function (issue) {
-					if (issue.tags().length) {
-						return issue.tags();
-					}
-				})
-				.compact().flatten().uniq().value();
-		}, this);
-		this.tagFilters = ko.computed(function () {
-			console.log('recreating tagfilters') // FIXME: don't blow away states for existing tag filters
-			return _.map(this.allTags(), function (tag) {
-				return new TagFilter(tag);
-			});
-		}, this);
+		this.tagFilters = ko.observableArray();
 
 		this.hideClosed = ko.observable(true);
 		this.hideClosed.subscribe(this.filterIssueList, this);
@@ -84,13 +30,13 @@ define(['ko', 'underscore', 'jquery', 'Issue', 'error/NoSuchIssueError'], functi
 			that.allIssues(_.map(issues, function (issue) {
 				return new Issue(issue.id, issue);
 			}));
+			that.initTagFilters(that.allIssues());
 			that.filterIssueList();
 		});
 
 		this.socket.on('issue created', function (event) {
 			var newIssue = new Issue(event.issue.id, event.issue);
-			var filters = that.tagFilters();
-			newIssue.updateFiltered(that.hideClosed(), TagFilter.getOn(filters), TagFilter.getOn(filters), getFilterInputValue());
+			filterIssue(newIssue, that);
 			that.allIssues.push(newIssue);
 		});
 		this.socket.on('issue assigned', function (event) {
@@ -100,10 +46,12 @@ define(['ko', 'underscore', 'jquery', 'Issue', 'error/NoSuchIssueError'], functi
 		this.socket.on('issue tagged', function (event) {
 			var issue = that.findIssue(event.issue.id);
 			issue.tags(event.issue.tags);
+			filterIssue(issue, that);
 		});
 		this.socket.on('issue untagged', function (event) {
 			var issue = that.findIssue(event.issue.id);
 			issue.tags([]);
+			filterIssue(issue, that);
 		});
 		this.socket.on('issue updated', _.bind(this.refreshIssue, this));
 		this.socket.on('issue prioritized', _.bind(this.refreshIssue, this));
@@ -111,8 +59,32 @@ define(['ko', 'underscore', 'jquery', 'Issue', 'error/NoSuchIssueError'], functi
 			var issue = that.findIssue(event.issue.id);
 			issue.closer(event.issue.closer);
 			issue.closed(true);
+			filterIssue(issue, that);
 		});
 	}
+
+	function filterIssue(issue, model) {
+		var filters = model.tagFilters();
+		issue.updateFiltered(model.hideClosed(), TagFilter.getOn(filters), TagFilter.getOff(filters), getFilterInputValue());
+	}
+
+	function getUniqueTags(issues) {
+		return _.chain(issues)
+			.map(function (issue) {
+				if (issue.tags().length) {
+					return issue.tags();
+				}
+			})
+			.compact().flatten().uniq().value();
+	}
+
+	IssueManager.prototype.initTagFilters = function (issues) {
+		var tags = getUniqueTags(issues);
+
+		this.tagFilters(_.map(tags, function (tag) {
+			return new TagFilter(tag);
+		}));
+	};
 
 	function getFilterInputValue() {
 		return $("#issueFilter").val().trim();

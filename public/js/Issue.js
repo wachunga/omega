@@ -17,6 +17,39 @@ define(['underscore', 'ko'], function (_, ko) {
 		}, this);
 	}
 
+	Issue.prototype.updateFiltered = function (hideClosed, requiredTags, forbiddenTags, filterValue) {
+		if (hideClosed && this.closed()) {
+			this.filtered(true);
+			return;
+		}
+
+		var issueTags = this.tags();
+		// if issue does not have tag that is required, filter
+		var hasAllRequired = _.all(requiredTags, function (requiredTag) {
+			return _.include(issueTags, requiredTag);
+		});
+		if (! hasAllRequired) {
+			this.filtered(true);
+			return;
+		}
+
+		// if issue has tag that has been excluded, filter
+		var hasForbiddenTag = _.any(forbiddenTags, function (forbiddenTag) {
+			return _.include(issueTags, forbiddenTag);
+		});
+		this.filtered(hasForbiddenTag);
+		if (this.filtered()) {
+			return;
+		}
+
+		var regex = new RegExp(filterValue, 'mi');
+		if (!filterValue || regex.test(this.description() + issueTags.join(' '))) {
+			this.filtered(false);
+		} else {
+			this.filtered(true); // no match, so hide
+		}
+	};
+
 	Issue.sort = function (a, b) {
 		if (a.critical()) {
 			if (b.critical()) {

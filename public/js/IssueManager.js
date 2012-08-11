@@ -1,27 +1,46 @@
 define(['ko', 'underscore', 'jquery', 'Issue', 'error/NoSuchIssueError'], function (ko, _, $, Issue, NoSuchIssueError) {
 
+	var TagState = {
+		off: -1,
+		default: 0,
+		on: 1
+	};
+
 	function TagFilter(label) {
 		this.label = label;
-		// -1 = exclude; 1 = include
-		this.state = ko.observable(0);
+		this.state = ko.observable(TagState.default);
 	}
 
 	TagFilter.prototype.isActive = function () {
-		return this.state() !== 0;
+		return this.state() !== TagState.default;
 	};
 
 	TagFilter.prototype.toggle = function () {
-		var next = this.state() === 1 ? -1 : this.state()+1;
+		var next = this.state() === TagState.on ? TagState.off : this.state()+1;
 		this.state(next);
 	}
 
-	TagFilter.withState = function (tagFilters, state) {
+	TagFilter.getOff = function (tagFilters) {
+		return withState(tagFilters, TagState.off);
+	};
+
+	TagFilter.getOn = function (tagFilters) {
+		return withState(tagFilters, TagState.on);
+	};
+
+	TagFilter.resetAll = function (tagFilters) {
+		_.each(tagFilters, function (tagFilter) {
+			tagFilter.state(TagState.default);
+		});
+	};
+
+	function withState(tagFilters, state) {
 		return _.compact(_.map(tagFilters, function (tagFilter) {
 			if (tagFilter.state() === state) {
 				return tagFilter.label;
 			}
 		}));
-	};
+	}
 
 	function IssueManager(socket) {
 		this.socket = socket;
@@ -69,7 +88,10 @@ define(['ko', 'underscore', 'jquery', 'Issue', 'error/NoSuchIssueError'], functi
 		});
 
 		this.socket.on('issue created', function (event) {
-			that.allIssues.push(new Issue(event.issue.id, event.issue));
+			var newIssue = new Issue(event.issue.id, event.issue);
+			var filters = that.tagFilters();
+			newIssue.updateFiltered(that.hideClosed(), TagFilter.getOn(filters), TagFilter.getOn(filters), getFilterInputValue());
+			that.allIssues.push(newIssue);
 		});
 		this.socket.on('issue assigned', function (event) {
 			var issue = that.findIssue(event.issue.id);
@@ -90,8 +112,18 @@ define(['ko', 'underscore', 'jquery', 'Issue', 'error/NoSuchIssueError'], functi
 			issue.closer(event.issue.closer);
 			issue.closed(true);
 		});
-
 	}
+
+	function getFilterInputValue() {
+		return $("#issueFilter").val().trim();
+	}
+
+	IssueManager.prototype.resetFilters = function () {
+		this.hideClosed(true);
+		$("#issueFilter").val('');
+		TagFilter.resetAll(this.tagFilters());
+		this.filterIssueList();
+	};
 
 	IssueManager.prototype.tagFilterToggle = function (tagFilter) {
 		tagFilter.toggle();
@@ -102,42 +134,12 @@ define(['ko', 'underscore', 'jquery', 'Issue', 'error/NoSuchIssueError'], functi
 		console.log('filtering list');
 
 		var hideClosed = this.hideClosed();
-		var requiredTags = TagFilter.withState(this.tagFilters(), 1);
-		var forbiddenTags = TagFilter.withState(this.tagFilters(), -1);
-		var filterValue = $("#issueFilter").val().trim();
-		var regex = new RegExp(filterValue, 'mi');
+		var requiredTags = TagFilter.getOn(this.tagFilters());
+		var forbiddenTags = TagFilter.getOff(this.tagFilters());
+		var filterValue = getFilterInputValue();
 
 		_.each(this.sortedIssues(), function (issue) {
-			if (hideClosed && issue.closed()) {
-				issue.filtered(true);
-				return;
-			}
-
-			var issueTags = issue.tags();
-			// if issue does not have tag that is required, filter
-			var hasAllRequired = _.all(requiredTags, function (requiredTag) {
-				return _.include(issueTags, requiredTag);
-			});
-			if (! hasAllRequired) {
-				issue.filtered(true);
-				return;
-			}
-
-			// if issue has tag that has been excluded, filter
-			var hasForbiddenTag = _.any(forbiddenTags, function (forbiddenTag) {
-				return _.include(issueTags, forbiddenTag);
-			});
-			issue.filtered(hasForbiddenTag);
-			if (issue.filtered()) {
-				return;
-			}
-
-			var tags = issue.tags().join(' ');
-			if (!filterValue || regex.test(issue.description() + tags)) {
-				issue.filtered(false);
-			} else {
-				issue.filtered(true); // no match, so hide
-			}
+			issue.updateFiltered(hideClosed, requiredTags, forbiddenTags, filterValue);
 		});
 	};
 

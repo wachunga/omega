@@ -33,9 +33,8 @@ function ($, _, ko, timeago, tooltips, util, Issue, Notifier, UserManager, Messa
 
 		$(window).bind('hashchange', _.bind(this.checkHashForBookmark, this));
 
-		this.hideClosed = ko.observable(true);
-		this.hideAssigned = ko.observable(false);
 		this.helpOpen = ko.observable(false);
+		this.filtersOpen = ko.observable(false);
 
 		ko.applyBindings(this);
 
@@ -121,6 +120,10 @@ function ($, _, ko, timeago, tooltips, util, Issue, Notifier, UserManager, Messa
 			return;
 		}
 		this.issueManager.prioritizeIssue(issue.id);
+	};
+
+	ProjectView.prototype.toggleFilters = function (issue) {
+		this.filtersOpen(!this.filtersOpen());
 	};
 
 	// TODO: extract command parsing etc.

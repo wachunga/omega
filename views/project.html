@@ -13,7 +13,7 @@
 	<h1 class="omega">Ω</h1>
 	<h2><%= title %></h2>
 	<a class="switchProject" href="/">switch</a>
-	<div id="loggedInUser" data-bind="visible: !loading() && userManager.current()">welcome, <strong data-bind="text: userManager.current"></strong> | <span class="notificationToggle tooltipped" data-bind="text: notifier.webNotifyEnabled() ? '⚑' : '⚐', click: notifier.requestNotificationPermission, attr: { 'data-original-title': notifier.statusMessage }"></span> | <a href="#" data-bind="click: userManager.logout">kthxbye</a></div>
+	<div id="loggedInUser" class="hide" data-bind="fadeVisible: !loading() && userManager.current()">welcome, <strong data-bind="text: userManager.current"></strong> | <span class="notificationToggle tooltipped" data-bind="text: notifier.webNotifyEnabled() ? '⚑' : '⚐', click: notifier.requestNotificationPermission, attr: { 'data-original-title': notifier.statusMessage }"></span> | <a href="#" data-bind="click: userManager.logout">kthxbye</a></div>
 </header>
 <ul id="messages" data-bind="foreach: { data: messageList.messages, beforeRemove: function(elem) { $(elem).fadeOut() }, afterAdd: function(elem) { $(elem).hide().fadeIn('fast') }, afterRender: applyTimeago }">
 	<li data-bind="css: { system: !speaker, 'has-details': !!date  }">
@@ -30,11 +30,11 @@
 </div>
 <div id="formContainer">
 	<form id="form" autocomplete="off" data-bind="submit: handleInput">
-		<label style="display: none;" data-bind="visible: userManager.noUser">You're not signed in. Who are you? <input id="nameInput" type="text" data-bind="attr: { placeholder: userManager.namePlaceholder }"/></label>
+		<label class="hide" data-bind="fadeVisible: userManager.noUser">You're not signed in. Who are you? <input id="nameInput" type="text" data-bind="attr: { placeholder: userManager.namePlaceholder }"/></label>
 		<!-- todo: inline error -->
-		<span style="display: none;" class="invalidName loud" data-bind="fadeVisible: userManager.invalidName">I don't think so. Try again.</span>
+		<span class="hide invalidName loud" data-bind="fadeVisible: userManager.invalidName">I don't think so. Try again.</span>
 
-		<input style="display: none;" id="messageInput" data-bind="visible: !userManager.noUser()" type="text" tabindex="1" placeholder="Type commands (like '/help') or just chat it up"/>
+		<input id="messageInput" class="hide" data-bind="fadeVisible: !userManager.noUser()" type="text" tabindex="1" placeholder="Type commands (like '/help') or just chat it up"/>
 		<input class="offscreen" type="submit"/>
 	</form>
 </div>
@@ -65,30 +65,31 @@
 </div>
 
 <div id="issuesContainer">
-	<label class="hideIssues"><button class="btn btn-info" data-bind="">Filter</button></label>
+	<label class="hideIssues"><button class="btn btn-info" data-bind="click: toggleFilters">Filter</button></label>
 	<div class="page-header">
-		<h1>Issues <small class="issueCounts" style="display: none;" data-bind="fadeVisible: !loading() && issueManager.allIssues().length >= 3">(<span data-bind="visible: issueManager.filteredIssuesCount() < issueManager.allIssues().length">showing <var data-bind="text: issueManager.filteredIssuesCount"></var> of </span><var data-bind="text: issueManager.allIssues().length"></var> total)</small></h1>
-		<div class="well">
-			<!-- TODO: add reset -->
-			<input id="issueFilter" class="input-medium" type="search" data-bind="value: issueManager.issueFilterInstant, valueUpdate: 'afterkeydown'" placeholder="Filter">
-			<label><input type="checkbox" data-bind="checked: hideClosed"/> hide closed</label>
-			<label><input type="checkbox" data-bind="checked: hideAssigned"/> hide assigned</label>
-			<div class="tag-filters">
-				<!-- ko foreach: issueManager.tagFilters -->
-				<span class="tag" data-bind="text: label, css: { 'tag-on': state() === 1, 'tag-off': state() === -1 }, click: $root.issueManager.tagFilterToggle.bind($root.issueManager)"></span>
-				<!-- /ko -->
-			</div>
+		<h1>Issues <small class="issueCounts hide" data-bind="fadeVisible: !loading() && issueManager.allIssues().length >= 3">(<span data-bind="visible: issueManager.filteredIssuesCount() < issueManager.allIssues().length">showing <var data-bind="text: issueManager.filteredIssuesCount"></var> of </span><var data-bind="text: issueManager.allIssues().length"></var> total)</small></h1>
+	</div>
+	<div class="hide page-header" id="filter-bin" data-bind="fadeVisible: filtersOpen">
+		<!-- TODO: add reset -->
+		<input id="issueFilter" class="input-medium" type="search" data-bind="value: issueManager.issueFilterInstant, valueUpdate: 'afterkeydown'" placeholder="Filter">
+		<label><input type="checkbox" data-bind="checked: issueManager.hideClosed"/> hide closed</label>
+		<div class="tag-filters">
+			<!-- ko foreach: issueManager.tagFilters -->
+			<span class="tag" data-bind="text: label, css: { 'tag-on': state() === 1, 'tag-off': state() === -1 }, click: $root.issueManager.tagFilterToggle.bind($root.issueManager)"></span>
+			<!-- /ko -->
 		</div>
 	</div>
-	<p class="noneMessage" data-bind="fadeVisible: !issueManager.allIssues().length || (hideClosed() && issueManager.openIssuesCount() == 0)">No open issues. w00t!</p>
-	<ul class="issuesList unstyled" data-bind="foreach: { data: issueManager.sortedIssues, afterRender: applyTimeago }">
-		<li data-bind="attr: { id: id }, fadeVisible: !filtered() && !($root.hideClosed() && closed()) && !($root.hideAssigned() && assignee() != 'nobody'), css: { closed: closed, highlighted: id === $root.issueManager.highlightedIssue() }">
+	<p class="noneMessage hide" data-bind="fadeVisible: !loading() && !issueManager.allIssues().length">No issues. w00t!</p>
+	<p data-bind="fadeVisible: loading">loading&hellip;</p>
+	<ul class="issuesList unstyled hide" data-bind="fadeVisible: !loading(), foreach: { data: issueManager.sortedIssues, afterRender: applyTimeago }">
+		<li data-bind="attr: { id: id }, fadeVisible: !filtered(), css: { closed: closed, highlighted: id === $root.issueManager.highlightedIssue() }">
 			<a data-bind="attr: { href: '#' + id }, text: id" title="Permalink" class="issueId"></a>:
 			&nbsp;<span class="issue-priority" data-bind="css: { 'enabled': !$root.userManager.noUser(), 'issue-priority-critical': critical, 'issue-priority-normal': !critical() }, click: $root.togglePriority.bind($root)">★</span>
 			<span class="assignee" data-bind="css: { myself: $root.userManager.isCurrentUser(assignee()) }, text: assigneeLabel"></span>
 			&nbsp;<span class="description" data-bind="html: description"></span>
 			<!-- ko foreach: tags -->
-				<span class="tag" data-bind="text: $data, click: $root.filterByTag.bind($root)"></span>
+				<!-- TODO: click to remove from issue? -->
+				<span class="tag" data-bind="text: $data"></span>
 			<!-- /ko -->
 			<span class="details">(created by <span data-bind="text: creator"></span> <time data-bind="attr: { datetime: createdDate }"></time>)</span>
 		</li>

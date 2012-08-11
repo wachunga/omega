@@ -43,13 +43,11 @@ define(['ko', 'underscore', 'jquery', 'Issue', 'error/NoSuchIssueError'], functi
 			});
 		}, this);
 
+		this.hideClosed = ko.observable(true);
+		this.hideClosed.subscribe(this.filterIssueList, this);
+
 		this.sortedIssues = ko.computed(function () {
 			return this.allIssues().sort(Issue.sort);
-		}, this);
-		this.openIssuesCount = ko.computed(function () {
-			return _.filter(this.allIssues(), function (issue) {
-				return !issue.closed();
-			}).length;
 		}, this);
 		this.filteredIssuesCount = ko.computed(function () {
 			return _.filter(this.sortedIssues(), function (issue) {
@@ -67,6 +65,7 @@ define(['ko', 'underscore', 'jquery', 'Issue', 'error/NoSuchIssueError'], functi
 			that.allIssues(_.map(issues, function (issue) {
 				return new Issue(issue.id, issue);
 			}));
+			that.filterIssueList();
 		});
 
 		this.socket.on('issue created', function (event) {
@@ -102,11 +101,19 @@ define(['ko', 'underscore', 'jquery', 'Issue', 'error/NoSuchIssueError'], functi
 	IssueManager.prototype.filterIssueList = function () {
 		console.log('filtering list');
 
+		var hideClosed = this.hideClosed();
 		var requiredTags = TagFilter.withState(this.tagFilters(), 1);
 		var forbiddenTags = TagFilter.withState(this.tagFilters(), -1);
-		_.each(this.sortedIssues(), function (issue) {
-			var issueTags = issue.tags();
+		var filterValue = $("#issueFilter").val().trim();
+		var regex = new RegExp(filterValue, 'mi');
 
+		_.each(this.sortedIssues(), function (issue) {
+			if (hideClosed && issue.closed()) {
+				issue.filtered(true);
+				return;
+			}
+
+			var issueTags = issue.tags();
 			// if issue does not have tag that is required, filter
 			var hasAllRequired = _.all(requiredTags, function (requiredTag) {
 				return _.include(issueTags, requiredTag);
@@ -121,12 +128,6 @@ define(['ko', 'underscore', 'jquery', 'Issue', 'error/NoSuchIssueError'], functi
 				return _.include(issueTags, forbiddenTag);
 			});
 			issue.filtered(hasForbiddenTag);
-		});
-
-		var filterValue = $("#issueFilter").val().trim();
-		var regex = new RegExp(filterValue, 'mi');
-
-		_.each(this.sortedIssues(), function (issue) {
 			if (issue.filtered()) {
 				return;
 			}

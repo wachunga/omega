@@ -2,17 +2,9 @@
 
 define([
 	'jquery', 'underscore', 'ko', 'timeago', 'tooltips',
-	'util', 'Issue', 'Notifier', 'UserManager', 'MessageList', 'IssueManager', 'error/NoSuchIssueError'
+	'util', 'Issue', 'Notifier', 'UserManager', 'MessageList', 'IssueManager', 'error/NoSuchIssueError', 'flavour'
 ],
-function ($, _, ko, timeago, tooltips, util, Issue, Notifier, UserManager, MessageList, IssueManager, NoSuchIssueError) {
-
-	var BAD_COMMAND_RESPONSES = [
-		'Oops.', 'This is not a Turing test.',
-		'The least you could do is be grammatical.',
-		'That does not compute.',
-		'I can haz parser.',
-		'These are not the droids you\'re looking for.'
-	];
+function ($, _, ko, timeago, tooltips, util, Issue, Notifier, UserManager, MessageList, IssueManager, NoSuchIssueError, flavour) {
 
 	var ProjectView = function ($nameInput, $messageInput, $messageList, socket) {
 		var that = this;
@@ -104,7 +96,7 @@ function ($, _, ko, timeago, tooltips, util, Issue, Notifier, UserManager, Messa
 	}
 	
 	ProjectView.prototype.notifyOfBadCommand = function () {
-		this.alert(util.getRandomItem(BAD_COMMAND_RESPONSES) + ' Try /help.');
+		this.alert(flavour.badCommand() + ' Try /help.');
 	};
 	ProjectView.prototype.notifyNoSuchIssue = function (error) {
 		this.alert(error.toString());

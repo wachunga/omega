@@ -11,10 +11,19 @@ define(['util'], function (util) {
 				'   _ \\<,_ \n' +
 				'  (_)/ (_)' +
 				'</pre>',
+		],
+		BadCommand: [
+			'Oops.', 'This is not a Turing test.',
+			'The least you could do is be grammatical.',
+			'That does not compute.',
+			'I can haz parser.',
+			'These are not the droids you\'re looking for.'
 		]
 	};
 
-	function apply(message, event) {
+	var exports = {};
+
+	exports.message = function (message, event) {
 		var flavourOptions = flavour[event.type];
 		if (flavourOptions) {
 			var pseudoRandom = new Date(event.timestamp).valueOf() % 100; // last 2 digits of epoch
@@ -22,8 +31,12 @@ define(['util'], function (util) {
 			return message + ' ' + flavourOptions[index];
 		}
 		return message;
-	}
+	};
 
-	return apply;
+	exports.badCommand = function () {
+		return util.getRandomItem(flavour.BadCommand);
+	};
+
+	return exports;
 
 });

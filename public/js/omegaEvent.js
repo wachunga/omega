@@ -15,17 +15,18 @@ define(['underscore'], function (_) {
 
 	OmegaEventType.prototype.notifies = function () {
 		return !!this.notificationTitle && !!this.notificationBody;
-	}
+	};
 
+	// TODO: move into json file
 	OmegaEvent.Type = {
 		UserMessage: new OmegaEventType("UserMessage", "<%= message %>", "<%= speaker %> says...", "<%= message %>"),
-		NewIssue: new OmegaEventType("NewIssue", "<%= issue.creator %> created $id$<%= issue.id %>.", "New issue", "<%= issue.description %>"),
-		AssignIssue: new OmegaEventType("AssignIssue", "<%= assigner %> assigned $id$<%= issue.id %> to <%= issue.assignee %>."),
-		TagIssue: new OmegaEventType("TagIssue", "<%= updater %> tagged $id$<%= issue.id %> with '<%= tag %>'."),
-		UntagIssue: new OmegaEventType("UntagIssue", "<%= updater %> removed tags from $id$<%= issue.id %>."),
-		UpdateIssue: new OmegaEventType("UpdateIssue", "<%= updater %> updated $id$<%= issue.id %>."),
-		CloseIssue: new OmegaEventType("CloseIssue", "<%= issue.closer %> closed $id$<%= issue.id %>.", "Issue closed", "<%= issue.description %>"),
-		PrioritizeIssue: new OmegaEventType("PrioritizeIssue", "<%= updater %> marked $id$<%= issue.id %> as<% if (!issue.critical) print(' not'); %> critical.")
+		NewIssue: new OmegaEventType("NewIssue", "<%= issue.creator %> created <a class=\"id\" data-id=\"<%= issue.id %>\" href=\"#<%= issue.id %>\">Ω<%= issue.id%></a>.", "New issue", "<%= issue.description %>"),
+		AssignIssue: new OmegaEventType("AssignIssue", "<%= assigner %> assigned <a class=\"id\" data-id=\"<%= issue.id %>\" href=\"#<%= issue.id %>\">Ω<%= issue.id%></a> to <%= issue.assignee %>."),
+		TagIssue: new OmegaEventType("TagIssue", "<%= updater %> tagged <a class=\"id\" data-id=\"<%= issue.id %>\" href=\"#<%= issue.id %>\">Ω<%= issue.id%></a> with '<%= tag %>'."),
+		UntagIssue: new OmegaEventType("UntagIssue", "<%= updater %> removed tags from <a class=\"id\" data-id=\"<%= issue.id %>\" href=\"#<%= issue.id %>\">Ω<%= issue.id%></a>."),
+		UpdateIssue: new OmegaEventType("UpdateIssue", "<%= updater %> updated <a class=\"id\" data-id=\"<%= issue.id %>\" href=\"#<%= issue.id %>\">Ω<%= issue.id%></a>."),
+		CloseIssue: new OmegaEventType("CloseIssue", "<%= issue.closer %> closed <a class=\"id\" data-id=\"<%= issue.id %>\" href=\"#<%= issue.id %>\">Ω<%= issue.id%></a>.", "Issue closed", "<%= issue.description %>"),
+		PrioritizeIssue: new OmegaEventType("PrioritizeIssue", "<%= updater %> marked <a class=\"id\" data-id=\"<%= issue.id %>\" href=\"#<%= issue.id %>\">Ω<%= issue.id%></a> as<% if (!issue.critical) print(' not'); %> critical.")
 	};
 	
 	return OmegaEvent;

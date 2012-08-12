@@ -110,7 +110,6 @@
 			<span class="assignee" data-bind="css: { myself: $root.userManager.isCurrentUser(assignee()) }, text: assigneeLabel"></span>
 			&nbsp;<span class="description" data-bind="html: description"></span>
 			<!-- ko foreach: tags -->
-				<!-- TODO: click to remove from issue? -->
 				<span class="tag" data-bind="text: $data"></span>
 			<!-- /ko -->
 			<span class="details">(created by <span data-bind="text: creator"></span> <time data-bind="attr: { datetime: createdDate }"></time>)</span>

@@ -7,6 +7,12 @@ define(['underscore'], function (_) {
 		return _.isFunction(value) ? value() : value;
 	}
 
+	exports.stripHtml = function (html) {
+		var tmp = document.createElement('DIV');
+		tmp.innerHTML = html;
+		return tmp.textContent || tmp.innerText;
+	};
+
 	exports.getRandomItem = function (array) {
 		return array[Math.floor(Math.random() * array.length)];
 	};

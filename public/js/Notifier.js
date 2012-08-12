@@ -1,4 +1,4 @@
-define(['ko', 'underscore', 'omegaEvent'], function (ko, _, OmegaEvent) {
+define(['ko', 'underscore', 'omegaEvent', 'util'], function (ko, _, OmegaEvent, util) {
 
 	var NOTIFICATION_ALLOWED = 0; // unintuitive, but correct
 	var NOTIFICATION_DURATION = 4000;
@@ -30,7 +30,7 @@ define(['ko', 'underscore', 'omegaEvent'], function (ko, _, OmegaEvent) {
 		}
 
 		var title = _.template(type.notificationTitle, event.details);
-		var body = _.template(type.notificationBody, event.details);
+		var body = util.stripHtml(_.template(type.notificationBody, event.details));
 		var popup = window.webkitNotifications.createNotification("/favicon.ico", title, body);
 		popup.show();
 		setInterval(function () { popup.cancel(); }, NOTIFICATION_DURATION);

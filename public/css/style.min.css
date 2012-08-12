@@ -276,6 +276,10 @@ pre{font-style:normal;}
 .tooltip{font-size:0.9em !important;}
 .error{color:#b94a48;}.error a{color:black;}
 .footer{color:#555555;font-size:small;text-align:center;margin-top:4em;}
+.adminProjectForm{border-bottom:2px solid #aaa;padding:15px 0;}
+.adminProjectTitle{margin-top:0;}
+.adminProjectForm:first-child{border-top:2px solid #aaa;}
+.createdDate{color:#999999;}
 html{overflow-y:scroll;}
 body{margin-top:60px;}
 .alert{position:fixed;top:0;left:0;z-index:1001;width:100%;text-align:center;}.alert a{color:#08C;}

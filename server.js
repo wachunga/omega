@@ -42,7 +42,6 @@ app.configure('development', function () {
 
 	app.use(lessMiddleware({
 		debug: true,
-		compress: true,
 		src: __dirname + '/server',
 		dest: __dirname + '/public'
 	}));

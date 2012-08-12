@@ -1,6 +1,6 @@
 {
   "name": "omega",
-  "node": "0.6.12",
+  "node": "0.6.17",
   "description": "A real-time issue tracker optimized for small teams",
   "version": "1.0.0pre",
   "keywords": ["issue", "bug", "tracker", "minimal", "realtime", "socket", "chat", "team"],

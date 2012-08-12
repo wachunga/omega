@@ -214,9 +214,6 @@ function ($, _, ko, timeago, tooltips, util, Issue, Notifier, UserManager, Messa
 					requireArgument(id, desc);
 					this.issueManager.updateIssue(id, { description: desc });
 					break;
-				case 'reset':
-					this.reset();
-					break;
 				default:
 					this.notifyOfBadCommand();
 					break;
@@ -238,14 +235,6 @@ function ($, _, ko, timeago, tooltips, util, Issue, Notifier, UserManager, Messa
 
 	ProjectView.prototype.reconnect = function () {
 		this.socket.socket.connect();
-	};
-
-	ProjectView.prototype.reset = function () {
-		if (window.confirm('Warning: this will completely delete all issues from the server.')) {
-			if (window.confirm('I have a bad feeling about this. Are you absolutely sure?')) {
-				this.socket.emit('reset issues');
-			}
-		}
 	};
 
 	// doesn't highlight if filtering issues, but not a big deal

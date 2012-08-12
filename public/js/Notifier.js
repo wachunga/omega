@@ -9,7 +9,6 @@ define(['ko', 'underscore'], function (ko, _) {
 		this.currentUser = users.current;
 
 		this.statusMessage = ko.computed(function () {
-
 			return this.webNotifyEnabled() ? 'Web notifications are enabled' : 'Web notifications are disabled';
 		}, this);
 

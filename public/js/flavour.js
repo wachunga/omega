@@ -1,5 +1,7 @@
 define(['util'], function (util) {
 
+	// TODO: move to server
+
 	var flavour = {
 		closeIssue: [
 			'You, sir, are a genius.', 'Die issues, die!', '*golf clap*',

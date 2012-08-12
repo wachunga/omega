@@ -1,12 +1,5 @@
+define(['underscore'], function (_) {
 
-var isNode = (typeof exports !== 'undefined');
-
-(function(exports){
-
-	if (isNode) {
-		var _ = require('underscore');
-	}
-	
 	function OmegaEvent(type, details) {
 		this.type = type;
 		this.issue = details.issue;
@@ -21,17 +14,17 @@ var isNode = (typeof exports !== 'undefined');
 			};
 		}
 	}
-	
+
 	function OmegaEventType(name, message, notificationTitle, notificationBody) {
 		this.name = name;
 		this.message = message;
-		
+
 		if (notificationTitle && notificationBody) {
 			this.notificationTitle = notificationTitle;
 			this.notificationBody = notificationBody;
 		}
 	}
-	
+
 	// TODO: this should be client only
 	OmegaEvent.Type = {
 		UserMessage: new OmegaEventType("userMessage", "<%= message %>", "<%= speaker %> says...", "<%= message %>"),
@@ -44,6 +37,5 @@ var isNode = (typeof exports !== 'undefined');
 		PrioritizeIssue: new OmegaEventType("prioritizeIssue", "<%= updater %> marked $id$<%= issue.id %> as<% if (!issue.critical) print(' not'); %> critical.")
 	};
 	
-	exports.OmegaEvent = OmegaEvent;
-
-}(isNode ? exports : (OmegaIssueTracker = OmegaIssueTracker || {})));
+	return OmegaEvent;
+});

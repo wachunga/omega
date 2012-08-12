@@ -8,7 +8,7 @@ define(['underscore'], function (_) {
 	}
 
 	exports.addHtml = function (text) {
-		return text.replace(ID_REGEX, '<a class="id" data-id="$1" href="#$1">Ω$1</a>');
+		return text.replace(ID_REGEX, '<a class="id" data-id="$1" href="#$1">Ω$1</a>'); // TODO: just specify in template
 	};
 
 	exports.getRandomItem = function (array) {

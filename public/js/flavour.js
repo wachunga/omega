@@ -1,9 +1,7 @@
 define(['util'], function (util) {
 
-	// TODO: move to server
-
 	var flavour = {
-		closeIssue: [
+		CloseIssue: [
 			'You, sir, are a genius.', 'Die issues, die!', '*golf clap*',
 			'Ω ♥ you.', 'You deserve a break.',
 			'Not bad, not bad at all.', 'FTW!',
@@ -16,11 +14,14 @@ define(['util'], function (util) {
 		]
 	};
 
-	function apply(key, text) {
-		if (flavour[key]) {
-			return text + ' ' + util.getRandomItem(flavour[key]);
+	function apply(message, event) {
+		var flavourOptions = flavour[event.type];
+		if (flavourOptions) {
+			var pseudoRandom = new Date(event.timestamp).valueOf() % 100; // last 2 digits of epoch
+			var index = Math.floor(pseudoRandom / 100 * flavourOptions.length);
+			return message + ' ' + flavourOptions[index];
 		}
-		return text;
+		return message;
 	}
 
 	return apply;

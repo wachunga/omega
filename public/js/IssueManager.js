@@ -35,29 +35,33 @@ define([
 		});
 
 		this.socket.on('issue created', function (event) {
-			var newIssue = new Issue(event.issue.id, event.issue);
+			var newIssue = new Issue(event.details.issue.id, event.details.issue);
 			filterIssue(newIssue, that);
 			that.allIssues.push(newIssue);
 		});
 		this.socket.on('issue assigned', function (event) {
-			var issue = that.findIssue(event.issue.id);
-			issue.assignee(event.issue.assignee);
+			var issue = that.findIssue(event.details.issue.id);
+			issue.assignee(event.details.issue.assignee);
 		});
 		this.socket.on('issue tagged', function (event) {
-			var issue = that.findIssue(event.issue.id);
-			issue.tags(event.issue.tags);
+			var issue = that.findIssue(event.details.issue.id);
+			issue.tags(event.details.issue.tags);
 			filterIssue(issue, that);
 		});
 		this.socket.on('issue untagged', function (event) {
-			var issue = that.findIssue(event.issue.id);
+			var issue = that.findIssue(event.details.issue.id);
 			issue.tags([]);
 			filterIssue(issue, that);
 		});
-		this.socket.on('issue updated', _.bind(this.refreshIssue, this));
 		this.socket.on('issue prioritized', _.bind(this.refreshIssue, this));
+		this.socket.on('issue updated', function (props, event) {
+			that.refreshIssue(props, event);
+			var issue = that.findIssue(event.details.issue.id);
+			filterIssue(issue, that);
+		});
 		this.socket.on('issue closed', function (event) {
-			var issue = that.findIssue(event.issue.id);
-			issue.closer(event.issue.closer);
+			var issue = that.findIssue(event.details.issue.id);
+			issue.closer(event.details.issue.closer);
 			issue.closed(true);
 			filterIssue(issue, that);
 		});
@@ -166,9 +170,9 @@ define([
 	};
 
 	IssueManager.prototype.refreshIssue = function (props, event) {
-		var issue = this.findIssue(event.issue.id);
+		var issue = this.findIssue(event.details.issue.id);
 		_.each(_.keys(props), function (key) {
-			var value = event.issue[key];
+			var value = event.details.issue[key];
 			if (ko.isObservable(issue[key])) {
 				issue[key](value);
 			} else {

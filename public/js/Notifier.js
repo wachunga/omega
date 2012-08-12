@@ -1,4 +1,4 @@
-define(['ko', 'underscore'], function (ko, _) {
+define(['ko', 'underscore', 'omegaEvent'], function (ko, _, OmegaEvent) {
 
 	var NOTIFICATION_ALLOWED = 0; // unintuitive, but correct
 	var NOTIFICATION_DURATION = 4000;
@@ -24,23 +24,26 @@ define(['ko', 'underscore'], function (ko, _) {
 	}
 
 	Notifier.prototype.notify = function (event) {
-		if (!window.webkitNotifications || !this.webNotifyEnabled() || getUserFromEvent(event) === this.currentUser() || !event.notification) {
+		var type = OmegaEvent.Type[event.type];
+		if (!window.webkitNotifications || !this.webNotifyEnabled() || getUserFromEvent(event) === this.currentUser() || !type.notifies()) {
 			return;
 		}
 
-		var popup = window.webkitNotifications.createNotification("/favicon.ico", event.notification.title, event.notification.body);
+		var title = _.template(type.notificationTitle, event.details);
+		var body = _.template(type.notificationBody, event.details);
+		var popup = window.webkitNotifications.createNotification("/favicon.ico", title, body);
 		popup.show();
 		setInterval(function () { popup.cancel(); }, NOTIFICATION_DURATION);
 	};
 
 	function getUserFromEvent(event) {
-		switch (event.type.name) {
-			case 'newIssue':
-				return event.issue.creator;
-			case 'closeIssue':
-				return event.issue.closer;
-			case 'userMessage':
-				return event.speaker;
+		switch (event.type) {
+			case 'NewIssue':
+				return event.details.issue.creator;
+			case 'CloseIssue':
+				return event.details.issue.closer;
+			case 'UserMessage':
+				return event.details.speaker;
 			default:
 				throw new Error('Could not determine user for event: ' + event);
 		}

@@ -23,7 +23,8 @@
     "optimist": "0.3.x",
     "slugs": "0.1.x",
     "node-markdown": "0.1.x",
-    "requirejs": "2.0.x"
+    "requirejs": "2.0.x",
+    "less-middleware": "0.1.x"
   },
   "devDependencies": {
     "jshint": "0.5.x",

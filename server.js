@@ -2,6 +2,8 @@
 
 var express = require('express'),
 	_ = require('underscore'),
+	lessMiddleware = require('less-middleware'),
+
 	issueDao = require('./lib/issueDao'),
 	projectDao = require('./lib/projectDao'),
 	tracker = require('./lib/tracker');
@@ -33,17 +35,33 @@ if (process.env['NODE_ENV'] === 'nodester') {
 projectDao.init(db_dir);
 issueDao.init(db_dir);
 
-var app = express.createServer(
-	express.logger(),
-	express.cookieParser(),
-	express.session({ secret: 'nyan cat' }), // for flash messages
-	express.static(__dirname + www_public),
-	express.bodyParser(),
-	express.methodOverride()
-);
-app.set('views', __dirname + '/views');
-app.register('.html', require('ejs')); // call our views html
-app.use(app.router);
+var app = express.createServer();
+
+app.configure('development', function () {
+	console.log('Starting development server');
+
+	app.use(lessMiddleware({
+		debug: true,
+		compress: true,
+		src: __dirname + '/server',
+		dest: __dirname + '/public'
+	}));
+});
+
+app.configure(function () {
+	app.set('views', __dirname + '/views');
+	app.register('.html', require('ejs')); // call our views html
+
+	app.use(express.logger());
+	app.use(express.cookieParser());
+	app.use(express.session({ secret: 'nyan cat' })); // for flash messages
+	app.use(express.static(__dirname + www_public));
+
+	app.use(express.bodyParser());
+	app.use(express.methodOverride());
+	app.use(app.router);
+});
+
 app.listen(port);
 
 app.get('/', function (req, res) {

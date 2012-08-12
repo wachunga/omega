@@ -24,9 +24,7 @@ var argv = require('optimist')
 
 var port = process.env.app_port || argv.port;
 var password = process.env.admin_pass || argv.password;
-// run with --optimized to use 'public-built/' directory
-// build 'public-built/' using 'node r.js -o app.build.js'
-var www_public = argv.optimized ? '/public-built' : '/public';
+var www_public = '/public'; // TODO: get r.js optimizer going again and run on startup (according to NODE_ENV)
 
 var db_dir = __dirname + '/db/';
 if (process.env['NODE_ENV'] === 'nodester') {

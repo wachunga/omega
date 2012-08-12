@@ -1,5 +1,6 @@
 // RequireJS Optimizer Configuration
 //
+// TODO-DH: update this for 1.0
 // This is only recommended for *production* installations of Omega.
 //
 // To optimize: node r.js -o app.build.js

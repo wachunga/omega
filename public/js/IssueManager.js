@@ -8,8 +8,8 @@ define([
 		this.allIssues = ko.observableArray();
 		this.tagFilters = ko.observableArray();
 
-		this.hideClosed = ko.observable(true);
-		this.hideClosed.subscribe(this.filterIssueList, this);
+		this.showClosed = ko.observable(false);
+		this.showClosed.subscribe(this.filterIssueList, this);
 
 		this.sortedIssues = ko.computed(function () {
 			return this.allIssues().sort(Issue.sort);
@@ -65,7 +65,7 @@ define([
 
 	function filterIssue(issue, model) {
 		var filters = model.tagFilters();
-		issue.updateFiltered(model.hideClosed(), TagFilter.getOn(filters), TagFilter.getOff(filters), getFilterInputValue());
+		issue.updateFiltered(model.showClosed(), TagFilter.getOn(filters), TagFilter.getOff(filters), getFilterInputValue());
 	}
 
 	function getUniqueTags(issues) {
@@ -91,7 +91,7 @@ define([
 	}
 
 	IssueManager.prototype.resetFilters = function () {
-		this.hideClosed(true);
+		this.showClosed(false);
 		$("#issueFilter").val('');
 		TagFilter.resetAll(this.tagFilters());
 		this.filterIssueList();
@@ -103,13 +103,13 @@ define([
 	};
 
 	IssueManager.prototype.filterIssueList = function () {
-		var hideClosed = this.hideClosed();
+		var showClosed = this.showClosed();
 		var requiredTags = TagFilter.getOn(this.tagFilters());
 		var forbiddenTags = TagFilter.getOff(this.tagFilters());
 		var filterValue = getFilterInputValue();
 
 		_.each(this.sortedIssues(), function (issue) {
-			issue.updateFiltered(hideClosed, requiredTags, forbiddenTags, filterValue);
+			issue.updateFiltered(showClosed, requiredTags, forbiddenTags, filterValue);
 		});
 	};
 

@@ -89,16 +89,12 @@
 						</div>
 					</div>
 					<div class="control-group">
-						<label class="control-label">Hide closed:</label>
+						<label class="control-label">Show closed:</label>
 						<div class="controls">
-							<input type="checkbox" data-bind="checked: issueManager.hideClosed"/>
+							<input type="checkbox" data-bind="checked: issueManager.showClosed"/>
 						</div>
 					</div>
-					<div class="control-group">
-						<div class="controls">
-							<button class="btn btn-inverse btn-small" data-bind="click: issueManager.resetFilters.bind(issueManager)">Reset</button>
-						</div>
-					</div>
+					<button class="reset btn btn-inverse btn-small" data-bind="click: issueManager.resetFilters.bind(issueManager)">Reset</button>
 				</fieldset>
 			</form>
 

@@ -193,11 +193,14 @@ body {
 }
 
 #filterBin {
+	@filter-bin-padding: 10px;
+
 	border-top: 1px solid #E5E5E5;
 	border-bottom: 1px solid #E5E5E5;
 	background: whiteSmoke;
-	padding: 10px;
+	padding: @filter-bin-padding;
 	margin-top: 17px;
+	position: relative;
 
 	.control-group {
 		margin-bottom: 10px;
@@ -214,6 +217,12 @@ body {
 	form {
 		margin-bottom: 0;
 	}
+
+	.reset {
+		position: absolute;
+		bottom: @filter-bin-padding;
+		right: @filter-bin-padding;
+	}
 }
 
 .tag-filter {
@@ -225,7 +234,7 @@ body {
 .tag {
 	@bg: #999;
 
-	padding: 0 5px 4px;
+	padding: 1px 5px 3px;
 	.border-radius(3px);
 	font-size: small;
 	color: white;

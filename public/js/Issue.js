@@ -17,8 +17,8 @@ define(['underscore', 'ko'], function (_, ko) {
 		}, this);
 	}
 
-	Issue.prototype.updateFiltered = function (hideClosed, requiredTags, forbiddenTags, filterValue) {
-		if (hideClosed && this.closed()) {
+	Issue.prototype.updateFiltered = function (showClosed, requiredTags, forbiddenTags, filterValue) {
+		if (!showClosed && this.closed()) {
 			this.filtered(true);
 			return;
 		}

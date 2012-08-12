@@ -30,11 +30,8 @@
 </div>
 <div id="formContainer">
 	<form id="form" autocomplete="off" data-bind="submit: handleInput">
-		<label class="hide" data-bind="fadeVisible: userManager.noUser">You're not signed in. Who are you? <input id="nameInput" type="text" data-bind="attr: { placeholder: userManager.namePlaceholder }"/></label>
-		<!-- todo: inline error -->
-		<span class="hide invalidName loud" data-bind="fadeVisible: userManager.invalidName">I don't think so. Try again.</span>
-
-		<input id="messageInput" class="hide" data-bind="fadeVisible: !userManager.noUser()" type="text" tabindex="1" placeholder="Type commands (like '/help') or just chat it up"/>
+		<label class="hide" data-bind="fadeVisible: userManager.noUser">You're not signed in. Who are you? <input id="nameInput" type="text" data-bind="attr: { placeholder: userManager.namePlaceholder }" tabindex="1"> <span class="hide error" data-bind="fadeVisible: userManager.invalidName">I don't think so. Try again.</span></label>
+		<input id="messageInput" class="hide" data-bind="fadeVisible: !userManager.noUser()" type="text" tabindex="2" placeholder="Type commands (like '/help') or just chat it up"/>
 		<input class="offscreen" type="submit"/>
 	</form>
 </div>
@@ -74,7 +71,7 @@
 					<div class="control-group">
 						<label class="control-label" for="issueFilter">Description:</label>
 						<div class="controls">
-							<input id="issueFilter" class="input-medium" type="search" data-bind="value: issueManager.issueFilterInstant, valueUpdate: 'afterkeydown'" placeholder="Filter">
+							<input id="issueFilter" class="input-large" type="search" data-bind="value: issueManager.issueFilterInstant, valueUpdate: 'afterkeydown'" tabindex="3">
 						</div>
 					</div>
 					<div class="control-group">

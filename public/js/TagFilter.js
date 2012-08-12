@@ -29,7 +29,7 @@ define(['underscore', 'ko'], function (_, ko) {
 	TagFilter.prototype.toggle = function () {
 		var next = this.state() === TagState.on ? TagState.off : this.state()+1;
 		this.state(next);
-	}
+	};
 
 	TagFilter.getOff = function (tagFilters) {
 		return withState(tagFilters, TagState.off);

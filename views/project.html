@@ -65,19 +65,45 @@
 </div>
 
 <div id="issuesContainer">
-	<label class="hideIssues"><button class="btn btn-info" data-bind="click: toggleFilters">Filter</button></label>
+	<label class="hideIssues"><button class="btn" data-bind="click: toggleFilters, css: { active: filtersOpen }">Filter</button></label>
 	<div class="page-header">
 		<h1>Issues <small class="issueCounts hide" data-bind="fadeVisible: !loading() && issueManager.allIssues().length >= 3">(<span data-bind="visible: issueManager.filteredIssuesCount() < issueManager.allIssues().length">showing <var data-bind="text: issueManager.filteredIssuesCount"></var> of </span><var data-bind="text: issueManager.allIssues().length"></var> total)</small></h1>
-	</div>
-	<div class="hide page-header" id="filter-bin" data-bind="fadeVisible: filtersOpen">
-		<input id="issueFilter" class="input-medium" type="search" data-bind="value: issueManager.issueFilterInstant, valueUpdate: 'afterkeydown'" placeholder="Filter">
-		<label><input type="checkbox" data-bind="checked: issueManager.hideClosed"/> hide closed</label>
-		<div class="tag-filters">
-			<!-- ko foreach: issueManager.tagFilters -->
-			<span class="tag" data-bind="text: label, css: { 'tag-on': state() === 1, 'tag-off': state() === -1 }, click: $root.issueManager.tagFilterToggle.bind($root.issueManager)"></span>
-			<!-- /ko -->
+		<div class="hide" id="filterBin" data-bind="fadeVisible: filtersOpen">
+			<form class="form-horizontal">
+				<fieldset>
+					<div class="control-group">
+						<label class="control-label" for="issueFilter">Description:</label>
+						<div class="controls">
+							<input id="issueFilter" class="input-medium" type="search" data-bind="value: issueManager.issueFilterInstant, valueUpdate: 'afterkeydown'" placeholder="Filter">
+						</div>
+					</div>
+					<div class="control-group">
+						<label class="control-label">Tags:</label>
+						<div class="controls">
+							<div class="tag-filters">
+								<!-- ko foreach: issueManager.tagFilters -->
+								<span class="tag" data-bind="css: { 'tag-on': state() === 1, 'tag-off': state() === -1 }, click: $root.issueManager.tagFilterToggle.bind($root.issueManager)"><strong class="tag-filter" data-bind="text: getSymbol()"></strong><span data-bind="text: label"></span></span></span>
+								<!-- /ko -->
+							</div>
+							<p class="help-block"><strong>Protip:</strong> Click once for 'must have this tag'. Click again for 'must not have this tag'.</p>
+						</div>
+					</div>
+					<div class="control-group">
+						<label class="control-label">Hide closed:</label>
+						<div class="controls">
+							<input type="checkbox" data-bind="checked: issueManager.hideClosed"/>
+						</div>
+					</div>
+					<div class="control-group">
+						<div class="controls">
+							<button class="btn btn-inverse btn-small" data-bind="click: issueManager.resetFilters.bind(issueManager)">Reset</button>
+						</div>
+					</div>
+				</fieldset>
+			</form>
+
+
 		</div>
-		<button class="btn btn-warn" data-bind="click: issueManager.resetFilters.bind(issueManager)">Reset</button>
 	</div>
 	<p class="noneMessage hide" data-bind="fadeVisible: !loading() && !issueManager.allIssues().length">No issues. w00t!</p>
 	<p data-bind="fadeVisible: loading">loading&hellip;</p>

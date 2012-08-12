@@ -103,8 +103,6 @@ define([
 	};
 
 	IssueManager.prototype.filterIssueList = function () {
-		console.log('filtering list');
-
 		var hideClosed = this.hideClosed();
 		var requiredTags = TagFilter.getOn(this.tagFilters());
 		var forbiddenTags = TagFilter.getOff(this.tagFilters());

@@ -11,6 +11,17 @@ define(['underscore', 'ko'], function (_, ko) {
 		this.state = ko.observable(TagState.default);
 	}
 
+	TagFilter.prototype.getSymbol = function () {
+		switch (this.state()) {
+			case TagState.on:
+				return '✓';
+			case TagState.off:
+				return '✗';
+			default:
+				return ' ';
+		}
+	};
+
 	TagFilter.prototype.isActive = function () {
 		return this.state() !== TagState.default;
 	};

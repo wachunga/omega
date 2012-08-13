@@ -3,8 +3,9 @@
 @baseLineHeight: 20px;
 
 body {
-	margin: 3em 3em 1em;
+	margin-top: 60px; // leave room for flashes
 }
+
 pre {
 	font-style: normal;
 }
@@ -77,3 +78,15 @@ pre {
 	margin-top: 4em;
 }
 
+.alert {
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 1001;
+	width: 100%;
+	text-align: center;
+
+	a {
+		color: #08C;
+	}
+}

@@ -12,11 +12,12 @@ require.config({
 	}
 });
 
-
 require(['jquery', 'ko', 'alerts'], function ($, ko, alerts) {
 
 	$(function () {
-		var viewModel = {
+		alerts.init();
+
+		ko.applyBindings({
 			projects: data,
 			confirmReset: function () {
 				if (window.confirm('Warning: this will permanently delete all issues for this project.')) {
@@ -25,10 +26,7 @@ require(['jquery', 'ko', 'alerts'], function ($, ko, alerts) {
 					}
 				}
 			}
-		};
-		alerts.init();
-
-		ko.applyBindings(viewModel);
+		});
 	});
 
 });

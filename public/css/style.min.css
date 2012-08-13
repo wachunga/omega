@@ -67,6 +67,10 @@ a:hover{color:#5c1611;text-decoration:underline;}
 .row-fluid .span3{width:23.404255317%;*width:23.3510638276383%;}
 .row-fluid .span2{width:14.89361702%;*width:14.8404255306383%;}
 .row-fluid .span1{width:6.382978723%;*width:6.329787233638298%;}
+.container{margin-right:auto;margin-left:auto;*zoom:1;}.container:before,.container:after{display:table;content:"";}
+.container:after{clear:both;}
+.container-fluid{padding-right:20px;padding-left:20px;*zoom:1;}.container-fluid:before,.container-fluid:after{display:table;content:"";}
+.container-fluid:after{clear:both;}
 p{margin:0 0 10px;}p small{font-size:14px;color:#999999;}
 .lead{margin-bottom:20px;font-size:20px;font-weight:200;line-height:30px;}
 h1,h2,h3,h4,h5,h6{margin:0;font-family:inherit;font-weight:bold;color:inherit;text-rendering:optimizelegibility;}h1 small,h2 small,h3 small,h4 small,h5 small,h6 small{font-weight:normal;color:#999999;}
@@ -314,7 +318,7 @@ a.label:hover,a.badge:hover{color:#ffffff;text-decoration:none;cursor:pointer;}
 .hide{display:none;}
 .show{display:block;}
 .invisible{visibility:hidden;}
-body{margin:3em 3em 1em;}
+body{margin-top:60px;}
 pre{font-style:normal;}
 .clickable{cursor:pointer;}
 .offscreen{position:absolute;left:-9999px;width:1px;height:1px;}
@@ -328,12 +332,15 @@ pre{font-style:normal;}
 .tooltip{font-size:0.9em !important;}
 .error{color:#b94a48;}.error a{color:black;}
 .footer{color:#555555;font-size:small;text-align:center;margin-top:4em;}
+.alert{position:fixed;top:0;left:0;z-index:1001;width:100%;text-align:center;}.alert a{color:#08C;}
+body.home{overflow:hidden;}
+.mega{color:whiteSmoke;z-index:-2;position:absolute;font-size:1500px;top:50%;left:-47%;opacity:0.8;}
+.hero-nakamura{padding:40px;background-color:black;background-color:rgba(0, 0, 0, 0.7);color:white;margin:40px 0 70px;-webkit-border-radius:4px;-moz-border-radius:4px;border-radius:4px;}.hero-nakamura h1{font-size:42px;margin-bottom:0;font-weight:normal;}
+.hero-nakamura p{font-size:26px;font-weight:200;line-height:40px;letter-spacing:1px;margin-bottom:0;}
+.hero-nakamura .btn{margin-top:20px;}
 .adminProjectForm{border-bottom:1px solid #eeeeee;padding:20px 0;}.adminProjectForm form{display:inline;}
 .adminProjectTitle{line-height:30px;}
 .createdDate{color:#999999;}
-html{overflow-y:scroll;}
-body{margin-top:60px;}
-.alert{position:fixed;top:0;left:0;z-index:1001;width:100%;text-align:center;}.alert a{color:#08C;}
 .issue-priority{cursor:pointer;}.issue-priority.issue-priority-critical{color:#f89406;}.issue-priority.issue-priority-critical.enabled:hover{color:#c67605;}
 .issue-priority.issue-priority-normal{color:#eeeeee;}.issue-priority.issue-priority-normal.enabled:hover{color:#d5d5d5;}
 .notificationToggle{cursor:pointer;color:#7A6A53;}.notificationToggle:hover{color:#999;}

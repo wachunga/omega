@@ -3,6 +3,8 @@
 	<script data-main="js/mainAdmin" src="js/require.js"></script>
 </head>
 <body>
+<div class="container">
+
 <% if (flash.error && flash.error.length) { %>
 <div class="alert alert-error alert-fading alert-closable"><%-: flash.error | join %></div>
 <% } %>
@@ -19,7 +21,7 @@
 	<!-- ko foreach: projects -->
 	<section class="adminProjectForm">
 
-		<h2 class="adminProjectTitle" data-bind="text: name"></h2> <!-- TODO: allow updating name -->
+		<h2 class="adminProjectTitle" data-bind="text: name"></h2> <!-- TODO: support updating name -->
 		<p class="createdDate">Created <span data-bind="text: new Date(createdDate).toLocaleString()"></span></p>
 		<p><span class="badge badge-info" data-bind="text: issueCount"></span> issue(s)</p>
 

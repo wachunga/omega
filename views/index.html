@@ -1,46 +1,60 @@
 	<title>Omega Issue Tracker</title>
 	<script data-main="js/main" src="js/require.js"></script>
 </head>
-<body>
+<body class="home">
+<div class="container">
 
-<div class="hero-unit">
-	<h1>Welcome to <span class="omega small">Ω</span></h1>
-	<p>Real-time issue tracking optimized for small teams.</p>
-	<p><a class="btn btn-inverse btn-large" href="http://github.com/wachunga/omega#readme">Learn more</a></p>
+<h1 class="omega mega">Ω</h1>
+
+<div class="hero-nakamura">
+	<a class="btn btn-warning btn-large pull-right" href="http://github.com/wachunga/omega#readme">Learn more</a>
+	<h1>Omega</h1>
+	<p>Real-time issue tracking optimized for small teams</p>
 </div>
 
-<div>
-	<div class="page-header">
-		<h1>What are you working on?</h1>
+<div class="row">
+
+	<div class="span4">
+		<h2>New project</h2>
+		<p>What are you working on?</p>
+		<form data-bind="submit: submitForm.bind($data)">
+			<input type="text" id="projectNameInput" name="projectName" required placeholder="My awesome project" tabindex="1">
+			<label class="checkbox"><input type="checkbox" name="unlisted" tabindex="2" /> <span title="Unlisted, so only people with the address are likely to find your project">top secret</span></label>
+			<div style="margin: 10px 0;">
+				<input type="submit" class="btn btn-inverse" value="Create" tabindex="3">
+			</div>
+			<span class="error help-block" data-bind="visible: !!error(), html: error"></span>
+		</form>
 	</div>
 
-	<h2>New project</h2>
-	<p>Because you can never have too many...</p>
-	<form class="form-inline" data-bind="submit: submitForm.bind($data)">
-		<input type="text" id="projectNameInput" name="projectName" required placeholder="My awesome project" tabindex="1">
-		<label class="checkbox"><input type="checkbox" name="unlisted" tabindex="2" /> top secret</label>
-		<div style="margin-top: 10px;">
-			<input type="submit" class="btn btn-primary" value="Create" tabindex="3">
-			<span class="error help-inline" data-bind="visible: !!error(), html: error"></span>
-		</div>
-	</form>
+	<div class="span4">
+		<h2>Existing project</h2>
+	<% if (projects.length > 0) { %>
+		<p>Originality is completely overrated.</p>
+		<ul>
+			<% for (var i = 0; i < projects.length; i++) { %>
+			<li><a href="<%= projects[i].url %>"><%= projects[i].name %></a></li>
+			<% } %>
+		</ul>
 
-<% if (projects.length > 0 || unlisted > 0) { %>
-	<h2>Existing project <small>(<a href="admin">admin</a>)</small></h2>
-	<p>Maybe one of these?</p>
-<% } %>
-
-<% if (projects.length > 0) { %>
-	<ul>
-	<% for (var i = 0; i < projects.length; i++) { %>
-		<li><a href="<%= projects[i].url %>"><%= projects[i].name %></a></li>
+		<% if (unlisted > 0) { %>
+		<p>(plus <strong><%= unlisted %></strong> top secret <%= unlisted === 1 ? 'project' : 'projects' %>)</p>
+		<% } %>
+	<% } else if (unlisted > 0) { %>
+		<p>Only top secret projects for now (<strong><%= unlisted %></strong> total)</p>
+	<% } else { %>
+		<p>Nobody is working on anything, apparently. Go figure.</p>
 	<% } %>
-	</ul>
 
-	<% if (unlisted > 0) { %>
-	<p>(plus <strong><%= unlisted %></strong> top secret projects)</p>
-	<% } %>
-<% } else if (unlisted > 0) { %>
-	<p>Only top secret projects for now (<strong><%= unlisted %></strong> total)</p>
-<% } %>
+	</div>
+
+	<div class="span4">
+		<h2>Administration</h2>
+		<p>Project configuration and so on. Almost definitely not public.</p>
+		<p><a class="btn btn-inverse" href="admin">Admin</a></p>
+	</div>
+
+
 </div>
+
+<hr>

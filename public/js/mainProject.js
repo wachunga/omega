@@ -14,25 +14,19 @@ require.config({
 });
 
 
-require(['jquery', 'knockoutBindings', 'ProjectView'], function ($, knockoutBindings, ProjectView) {
+require(['jquery', 'knockoutBindings', 'ProjectView', 'alerts'], function ($, knockoutBindings, ProjectView, alerts) {
 
 	var project = location.pathname.match(/project\/([^\/]+)/)[1];
 	var socket = io.connect('/' + project); // would love to push this into module, but causes odd race condition in some browsers
 
 	$(function () {
+		alerts.init();
+
 		$(window).on('scroll', processScroll);
 		processScroll();
 
-		$('.alert-closable').click(hideFlashMessages);
-		// TODO: alert-fading needs to work after dom load too
-		$('.alert-fading').delay(500).fadeIn().delay(6000).fadeOut();
-
 		var projectView = new ProjectView($("#nameInput"), $("#messageInput"), $("#messages"), socket);
 	});
-
-	function hideFlashMessages() {
-		$(this).fadeOut();
-	}
 
 	var $fixable = $('#form');
 	var topOffset = $fixable.offset().top;

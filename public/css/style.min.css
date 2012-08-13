@@ -282,13 +282,12 @@ pre{font-style:normal;}
 .main-header h2,.main-header .switchProject{margin-left:0.5em;}
 .main-header .switchProject{font-size:small;}
 .omega{font-family:georgia, serif;font-size:4em;text-shadow:#ddd 2px 0 2px;line-height:0;}.omega.small{font-size:1.3em;}
-.hovered{opacity:0.5;filter:alpha(opacity=50);}
+.hovered{opacity:0.9;filter:alpha(opacity=90);}
 .tooltip{font-size:0.9em !important;}
 .error{color:#b94a48;}.error a{color:black;}
 .footer{color:#555555;font-size:small;text-align:center;margin-top:4em;}
-.adminProjectForm{border-bottom:2px solid #aaa;padding:15px 0;}
-.adminProjectTitle{margin-top:0;}
-.adminProjectForm:first-child{border-top:2px solid #aaa;}
+.adminProjectForm{border-bottom:1px solid #eeeeee;padding:20px 0;}.adminProjectForm form{display:inline;}
+.adminProjectTitle{line-height:30px;}
 .createdDate{color:#999999;}
 html{overflow-y:scroll;}
 body{margin-top:60px;}
@@ -299,7 +298,7 @@ body{margin-top:60px;}
 #loggedInUser{position:absolute;right:0;bottom:0;line-height:2em;}
 #messages{border:1px solid #cccccc;border-radius:0.4em;font-size:0.9em;height:15em;list-style-type:none;padding:0.6em;overflow:auto;margin:0.2em 0;resize:vertical;}#messages .speaker{font-weight:bold;}
 #messages .system{font-style:italic;}
-#messages .has-details:hover .message{opacity:0.5;filter:alpha(opacity=50);}
+#messages .has-details:hover .message{opacity:0.9;filter:alpha(opacity=90);}
 #helpBin{padding:1em;background-color:#eee;margin:0;-webkit-border-radius:3px;-moz-border-radius:3px;border-radius:3px;font-size:0.9em;}
 .indented{padding-left:1em;}
 #commandList{font-family:monospace;}
@@ -311,7 +310,7 @@ body{margin-top:60px;}
 #issuesContainer var{font-style:normal;}
 #issuesContainer .noneMessage{color:#999999;}
 #issuesContainer .issueId{display:inline-block;text-align:right;width:100px;margin-left:-85px;}
-#issuesContainer .issuesList li:hover .description{opacity:0.5;filter:alpha(opacity=50);}
+#issuesContainer .issuesList li:hover .description{opacity:0.9;filter:alpha(opacity=90);}
 #issuesContainer .myself{color:#fff;background-color:#666;padding:0 0.3em;}
 #issuesContainer .highlighted{background-color:#E2E9E5;-webkit-transition:background-color 1s;-moz-transition:background-color 1s;-ms-transition:background-color 1s;-o-transition:background-color 1s;transition:background-color 1s;}
 #issuesContainer .closed .description,#issuesContainer .closed .assignee{text-decoration:line-through;}

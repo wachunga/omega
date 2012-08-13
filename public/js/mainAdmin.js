@@ -13,12 +13,20 @@ require.config({
 });
 
 
-require(['jquery', 'ko'], function ($, ko) {
+require(['jquery', 'ko', 'alerts'], function ($, ko, alerts) {
 
 	$(function () {
 		var viewModel = {
-			projects: data
+			projects: data,
+			confirmReset: function () {
+				if (window.confirm('Warning: this will permanently delete all issues for this project.')) {
+					if (window.confirm('I have a bad feeling about this. Are you absolutely sure?')) {
+						return true;
+					}
+				}
+			}
 		};
+		alerts.init();
 
 		ko.applyBindings(viewModel);
 	});

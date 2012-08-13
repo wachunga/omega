@@ -5,6 +5,7 @@ var express = require('express'),
 	lessMiddleware = require('less-middleware'),
 
 	issueDao = require('./lib/issueDao'),
+	historyDao = require('./lib/historyDao'),
 	projectDao = require('./lib/projectDao'),
 	tracker = require('./lib/tracker');
 
@@ -63,6 +64,8 @@ app.configure(function () {
 
 app.listen(port);
 
+// TODO: extract routes elsewhere
+
 app.get('/', function (req, res) {
 	var unlistedCount = projectDao.findUnlisted().length;
 	res.render('index.html', { projects: projectDao.findListed(), unlisted: unlistedCount });
@@ -113,17 +116,57 @@ app.get('/project/:slug/export', function (req, res) {
 	res.json(issueDao.load(project));
 });
 
+
 var auth = express.basicAuth('admin', password);
+
+app.get('/admin', auth, function (req, res) {
+	res.render('admin.html', {
+		projects: JSON.stringify(projectDao.findAll()),
+		flash: req.flash(),
+		noindex: true
+	});
+});
 
 app.delete('/project/:slug', auth, function (req, res) {
 	console.log('trying to delete ' + req.params.slug);
-	projectDao.remove(req.params.slug);
+	var project = projectDao.find(req.params.slug);
+	var success = projectDao.remove(req.params.slug);
+	buildAdminFlashMessage(req, project, 'delete', success);
 	res.redirect('back');
 });
 
-app.get('/admin', auth, function (req, res) {
-	res.render('admin.html', { projects: JSON.stringify(projectDao.findAll()), noindex: true });
+app.put('/project/:slug', auth, function (req, res) {
+	var original = projectDao.find(req.params.slug);
+	console.log('trying to update ' + req.params.slug, req.body);
+
+	var updated = req.body.project;
+	if (!_.isUndefined(updated.deleted)) {
+		if (updated.deleted === 'false') {
+			var success = projectDao.unremove(req.params.slug);
+			buildAdminFlashMessage(req, original, 'undelete', success);
+		}
+	}
+	if (!_.isUndefined(updated.unlisted)) {
+		var success = projectDao.toggleUnlisted(req.params.slug);
+		buildAdminFlashMessage(req, original, 'update', success);
+	}
+	res.redirect('back');
 });
+
+app.delete('/project/:slug/issues', auth, function (req, res) {
+	var project = projectDao.find(req.params.slug);
+	issueDao.reset(project);
+	historyDao.reset(project);
+	req.flash('info', 'All issues in project \'' + project.name + '\' have been deleted.');
+
+	res.redirect('back');
+});
+
+function buildAdminFlashMessage(req, project, action, success) {
+	var type = success ? 'info' : 'error';
+	var message = success ? 'Project \'' + project.name + '\' has been ' + action + 'd.' : 'Oops, could not ' + action + ' \'' + project.name + '\'';
+	req.flash(type, message);
+}
 
 tracker.init(app);
 

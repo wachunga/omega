@@ -131,29 +131,16 @@ app.get('/admin', auth, function (req, res) {
 	});
 });
 
-app.delete('/project/:slug', auth, function (req, res) {
-	console.log('trying to delete ' + req.params.slug);
-	var project = projectDao.find(req.params.slug);
-	var success = projectDao.remove(req.params.slug);
-	buildAdminFlashMessage(req, project, 'delete', success);
-	res.redirect('back');
-});
-
 app.put('/project/:slug', auth, function (req, res) {
 	var original = projectDao.find(req.params.slug);
-	console.log('trying to update ' + req.params.slug, req.body);
 
-	var updated = req.body.project;
-	if (!_.isUndefined(updated.deleted)) {
-		if (updated.deleted === 'false') {
-			var success = projectDao.unremove(req.params.slug);
-			buildAdminFlashMessage(req, original, 'undelete', success);
-		}
-	}
-	if (!_.isUndefined(updated.unlisted)) {
-		var success = projectDao.toggleUnlisted(req.params.slug);
-		buildAdminFlashMessage(req, original, 'update', success);
-	}
+	var updated = {};
+	_.each(['unlisted', 'deleted'], function (prop) {
+		var set = req.body[prop] === 'on';
+		updated[prop] = set;
+	});
+	var success = projectDao.update(req.params.slug, updated);
+	buildAdminFlashMessage(req, original, 'update', success);
 	res.redirect('back');
 });
 

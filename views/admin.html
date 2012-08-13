@@ -21,34 +21,21 @@
 
 		<h2 class="adminProjectTitle" data-bind="text: name"></h2> <!-- TODO: allow updating name -->
 		<p class="createdDate">Created <span data-bind="text: new Date(createdDate).toLocaleString()"></span></p>
-		<p><span class="badge badge-info" data-bind="text: issueCount"></span> issues</p>
-		<label><input type="checkbox" disabled name="unlisted" data-bind="checked: unlisted" /> top secret</label>
-		<label><input type="checkbox" disabled name="deleted" data-bind="checked: deleted" /> deleted</label>
+		<p><span class="badge badge-info" data-bind="text: issueCount"></span> issue(s)</p>
 
 		<form method="post" data-bind="attr: { action: '/project/' + slug }">
 			<input type="hidden" name="_method" value="put" />
-			<input type="hidden" name="project[unlisted]" data-bind="value: !unlisted" />
-			<input class="btn" type="submit" value="Toggle top secret">
+
+			<label><input type="checkbox" name="unlisted" data-bind="checked: unlisted" /> top secret</label>
+			<label><input type="checkbox" name="deleted" data-bind="checked: deleted" /> deleted</label>
+
+			<input class="btn" type="submit" value="Save">
 		</form>
 
 		<form method="post" data-bind="attr: { action: '/project/' + slug + '/issues' }, submit: $parent.confirmReset">
 			<input type="hidden" name="_method" value="delete" />
 			<input class="btn btn-danger" type="submit" value="Reset issues">
 		</form>
-
-		<!-- ko if: !deleted -->
-		<form method="post" data-bind="attr: { action: '/project/' + slug }">
-			<input type="hidden" name="_method" value="delete" />
-			<input class="btn btn-warning" type="submit" value="Delete">
-		</form>
-		<!-- /ko -->
-		<!-- ko if: deleted -->
-		<form method="post" data-bind="attr: { action: '/project/' + slug }">
-			<input type="hidden" name="_method" value="put" />
-			<input type="hidden" name="project[deleted]" value="false" />
-			<input class="btn" type="submit" value="Undelete">
-		</form>
-		<!-- /ko -->
 	</section>
 	<!-- /ko -->
 

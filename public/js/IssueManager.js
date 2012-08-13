@@ -45,12 +45,24 @@ define([
 		});
 		this.socket.on('issue tagged', function (event) {
 			var issue = that.findIssue(event.details.issue.id);
-			issue.tags(event.details.issue.tags);
+			var tags = event.details.issue.tags;
+			var newTag = _.first(_.difference(tags, issue.tags()));
+			issue.tags(tags);
+			that.addTagFilterIfNecessary(newTag);
 			filterIssue(issue, that);
 		});
 		this.socket.on('issue untagged', function (event) {
 			var issue = that.findIssue(event.details.issue.id);
+			var oldTags = issue.tags();
 			issue.tags([]);
+			_.each(oldTags, function (tag) {
+				var stillUsed = _.any(that.allIssues(), function (issue) {
+					return _.include(issue.tags(), tag);
+				});
+				if (!stillUsed) {
+					that.removeTagFilter(tag);
+				}
+			})
 			filterIssue(issue, that);
 		});
 		this.socket.on('issue prioritized', _.bind(this.refreshIssue, this));
@@ -89,6 +101,21 @@ define([
 		this.tagFilters(_.map(tags, function (tag) {
 			return new TagFilter(tag);
 		}));
+	};
+
+	IssueManager.prototype.removeTagFilter = function (tag) {
+		this.tagFilters.remove(function (item) {
+			return item.label === tag;
+		});
+	};
+
+	IssueManager.prototype.addTagFilterIfNecessary = function (tag) {
+		var alreadyExists = _.any(this.tagFilters(), function (tagFilter) {
+			return tagFilter.label === tag;
+		});
+		if (!alreadyExists) {
+			this.tagFilters.push(new TagFilter(tag));
+		}
 	};
 
 	function getFilterInputValue() {

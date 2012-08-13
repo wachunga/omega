@@ -134,7 +134,8 @@ function ($, _, ko, timeago, tooltips, util, Issue, Notifier, UserManager, Messa
 		if (!input || input.length < 1) {
 			return;
 		}
-		
+
+		this.$messageInput.focus();
 		if (!isCommand(input)) {
 			this.send(input); // assume chat message
 			return;

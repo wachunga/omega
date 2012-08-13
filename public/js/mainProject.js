@@ -14,7 +14,7 @@ require.config({
 });
 
 
-require(['jquery', 'ko', 'ProjectView'], function ($, ko, ProjectView) {
+require(['jquery', 'knockoutBindings', 'ProjectView'], function ($, knockoutBindings, ProjectView) {
 
 	var project = location.pathname.match(/project\/([^\/]+)/)[1];
 	var socket = io.connect('/' + project); // would love to push this into module, but causes odd race condition in some browsers
@@ -33,21 +33,6 @@ require(['jquery', 'ko', 'ProjectView'], function ($, ko, ProjectView) {
 	function hideFlashMessages() {
 		$(this).fadeOut();
 	}
-
-	ko.bindingHandlers.fadeVisible = {
-		init: function(element, valueAccessor) {
-			var value = valueAccessor();
-			$(element).toggle(ko.utils.unwrapObservable(value));
-		},
-		update: function(element, valueAccessor) {
-			var value = valueAccessor();
-			if (ko.utils.unwrapObservable(value)) {
-				$(element).fadeIn('fast');
-			} else {
-				$(element).fadeOut('fast');
-			}
-		}
-	};
 
 	var $fixable = $('#form');
 	var topOffset = $fixable.offset().top;

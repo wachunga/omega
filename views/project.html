@@ -110,7 +110,7 @@
 			<!-- ko foreach: tags -->
 				<span class="label label-inverse" data-bind="text: $data"></span>
 			<!-- /ko -->
-			<span class="details">(created by <span data-bind="text: creator"></span> <time data-bind="attr: { datetime: createdDate }"></time>)</span>
+			<span class="details">(created by <span data-bind="text: creator"></span> <time data-bind="attr: { datetime: createdDate }"></time><!-- ko if: closed -->; closed by <span data-bind="text: closer"></span> <time data-bind="attr: { datetime: closedDate }"></time><!-- /ko -->)</span>
 		</li>
 	</ul>
 </div>

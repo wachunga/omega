@@ -62,6 +62,7 @@ define([
 		this.socket.on('issue closed', function (event) {
 			var issue = that.findIssue(event.details.issue.id);
 			issue.closer(event.details.issue.closer);
+			issue.closedDate(event.details.issue.closedDate);
 			issue.closed(true);
 			filterIssue(issue, that);
 		});

@@ -61,7 +61,7 @@
 </div>
 
 <div id="issuesContainer">
-	<label class="hideIssues"><button class="btn" data-bind="click: toggleFilters, css: { active: filtersOpen }">Filter</button></label>
+	<button class="filter-button btn pull-right" data-bind="click: toggleFilters, css: { active: filtersOpen }">Filter</button>
 	<div class="page-header">
 		<h1>Issues <small class="issueCounts hide" data-bind="fadeVisible: !loading() && issueManager.allIssues().length >= 3">(<span data-bind="visible: issueManager.filteredIssuesCount() < issueManager.allIssues().length">showing <var data-bind="text: issueManager.filteredIssuesCount"></var> of </span><var data-bind="text: issueManager.allIssues().length"></var> total)</small></h1>
 		<div class="hide" id="filterBin" data-bind="fadeVisible: filtersOpen">
@@ -78,7 +78,7 @@
 						<div class="controls">
 							<div class="tag-filters">
 								<!-- ko foreach: issueManager.tagFilters -->
-								<span class="tag" data-bind="css: { 'tag-on': state() === 1, 'tag-off': state() === -1 }, click: $root.issueManager.tagFilterToggle.bind($root.issueManager)"><strong class="tag-filter" data-bind="text: getSymbol()"></strong><span data-bind="text: label"></span></span></span>
+								<a class="label" href="" data-bind="css: { 'label-inverse': state() === 0, 'tag-on': state() === 1, 'tag-off': state() === -1 }, click: $root.issueManager.tagFilterToggle.bind($root.issueManager)"><strong class="tag-filter-symbol" data-bind="text: getSymbol()"></strong><span data-bind="text: label"></span></a>
 								<!-- /ko -->
 							</div>
 							<p class="help-block"><strong>Protip:</strong> Click once for 'must have this tag'. Click again for 'must not have this tag'.</p>
@@ -106,7 +106,7 @@
 			<span class="assignee" data-bind="css: { myself: $root.userManager.isCurrentUser(assignee()) }, text: assigneeLabel"></span>
 			&nbsp;<span class="description" data-bind="html: description"></span>
 			<!-- ko foreach: tags -->
-				<span class="tag" data-bind="text: $data"></span>
+				<span class="label label-inverse" data-bind="text: $data"></span>
 			<!-- /ko -->
 			<span class="details">(created by <span data-bind="text: creator"></span> <time data-bind="attr: { datetime: createdDate }"></time>)</span>
 		</li>

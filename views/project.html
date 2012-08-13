@@ -73,6 +73,7 @@
 							<input id="issueFilter" class="input-large" type="search" data-bind="value: issueManager.issueFilterInstant, valueUpdate: 'afterkeydown'" tabindex="3">
 						</div>
 					</div>
+					<!-- ko if: issueManager.tagFilters().length -->
 					<div class="control-group">
 						<label class="control-label">Tags:</label>
 						<div class="controls">
@@ -84,6 +85,7 @@
 							<p class="help-block"><strong>Protip:</strong> Click once for 'must have this tag'. Click again for 'must not have this tag'.</p>
 						</div>
 					</div>
+					<!-- /ko -->
 					<div class="control-group">
 						<label class="control-label">Show closed:</label>
 						<div class="controls">

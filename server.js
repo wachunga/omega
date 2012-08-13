@@ -120,8 +120,12 @@ app.get('/project/:slug/export', function (req, res) {
 var auth = express.basicAuth('admin', password);
 
 app.get('/admin', auth, function (req, res) {
+	var projects = _.map(projectDao.findAll(), function (project) {
+		project.issueCount = issueDao.count(project);
+		return project;
+	});
 	res.render('admin.html', {
-		projects: JSON.stringify(projectDao.findAll()),
+		projects: projects,
 		flash: req.flash(),
 		noindex: true
 	});

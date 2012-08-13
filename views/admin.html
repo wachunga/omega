@@ -1,5 +1,5 @@
 	<title>Admin - Omega Issue Tracker</title>
-	<script>var data = <%- projects %>;</script>
+	<script>var data = <%-: projects | json %>;</script>
 	<script data-main="js/mainAdmin" src="js/require.js"></script>
 </head>
 <body>
@@ -21,6 +21,7 @@
 
 		<h2 class="adminProjectTitle" data-bind="text: name"></h2> <!-- TODO: allow updating name -->
 		<p class="createdDate">Created <span data-bind="text: new Date(createdDate).toLocaleString()"></span></p>
+		<p><span class="badge badge-info" data-bind="text: issueCount"></span> issues</p>
 		<label><input type="checkbox" disabled name="unlisted" data-bind="checked: unlisted" /> top secret</label>
 		<label><input type="checkbox" disabled name="deleted" data-bind="checked: deleted" /> deleted</label>
 

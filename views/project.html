@@ -14,7 +14,7 @@
 <header class="main-header">
 	<h1 class="omega">Ω</h1>
 	<h2><%= title %></h2>
-	<a class="switchProject" href="/">switch</a>
+	<a class="switchProject" href="/">back</a>
 	<div id="loggedInUser" class="hide" data-bind="fadeVisible: !loading() && userManager.current()">welcome, <strong data-bind="text: userManager.current"></strong> | <span class="notificationToggle tooltipped" data-bind="text: notifier.webNotifyEnabled() ? '⚑' : '⚐', click: notifier.requestNotificationPermission, attr: { 'data-original-title': notifier.statusMessage }"></span> | <a href="#" data-bind="click: userManager.logout">kthxbye</a></div>
 </header>
 <ul id="messages" data-bind="foreach: { data: messageList.messages, beforeRemove: function(elem) { $(elem).fadeOut() }, afterAdd: function(elem) { $(elem).hide().fadeIn('fast') }, afterRender: applyTimeago }">

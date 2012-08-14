@@ -1,5 +1,6 @@
 var fs = require('fs'),
 	_ = require('underscore'),
+	path = require('path'),
 	Issue = require('./Issue');
 
 // TODO: writing to disk rather sucks
@@ -10,7 +11,7 @@ var home = '';
 var issues = {};
 
 issueDao.init = function (dir) {
-	home = dir;
+	home = path.normalize(dir);
 	console.log('storing issues in: ' + home);
 };
 

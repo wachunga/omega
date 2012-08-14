@@ -1,5 +1,6 @@
 var fs = require('fs'),
 	Project = require('./Project'),
+	path = require('path'),
 	_ = require('underscore');
 
 var projectDao = module.exports = {};
@@ -11,7 +12,7 @@ var projectsFile;
 var projects = {};
 
 projectDao.init = function (dir) {
-	projectsFile = dir + FILENAME + '.json';
+	projectsFile = path.normalize(dir + FILENAME + '.json');
 	console.log('storing projects in: ' + projectsFile);
 
 	projects = load() || {};

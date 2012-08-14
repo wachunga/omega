@@ -1,7 +1,7 @@
 var sio = require('socket.io'),
 	_ = require('underscore'),
 	markdown = require('node-markdown').Markdown,
-	requirejs = require('../server/requirejs-configured'),
+	requirejs = require('../requirejs-configured'),
 
 	issueDao = require('./issueDao'),
 	projectDao = require('./projectDao'),

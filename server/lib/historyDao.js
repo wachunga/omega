@@ -1,5 +1,5 @@
 var _ = require('underscore'),
-	requirejs = require('../server/requirejs-configured');
+	requirejs = require('../requirejs-configured');
 
 requirejs(['public/js/omegaEvent'], function (OmegaEvent) {
 
@@ -8,7 +8,7 @@ var historyDao = module.exports = {};
 var HISTORY_ITEMS_TO_SHOW = 10;
 var MAX_HISTORY_ITEMS = 100;
 
-// TODO: this should probably be persisted
+// TODO: persist this
 var history = {};
 historyDao.record = function (type, details, project) {
 	history[project.slug] = history[project.slug] || [];

@@ -25,6 +25,7 @@ var argv = require('optimist')
 	})
 	.argv;
 
+var version = require('./package.json').version;
 var port = process.env.app_port || argv.port;
 var password = process.env.admin_pass || argv.password;
 var www_public = '/public'; // TODO: get r.js optimizer going again and run on startup (according to NODE_ENV)
@@ -68,7 +69,10 @@ app.listen(port);
 
 app.get('/', function (req, res) {
 	var unlistedCount = projectDao.findUnlisted().length;
-	res.render('index.html', { projects: projectDao.findListed(), unlisted: unlistedCount });
+	res.render('index.html', viewOptions({
+		projects: projectDao.findListed(),
+		unlisted: unlistedCount
+	}));
 });
 app.post('/project', function (req, res) {
 	var name = req.body.projectName;
@@ -100,7 +104,11 @@ app.get('/project/:slug', function (req, res) {
 		var flash = req.flash('info');
 		var message = flash.length ? _.first(flash) : null;
 
-		res.render('project.html', { title: project.name, flash: message, noindex: project.unlisted });
+		res.render('project.html', viewOptions({
+			title: project.name,
+			flash: message,
+			noindex: project.unlisted
+		}));
 	} else if (project && project.deleted) {
 		res.statusCode = 410; // Gone
 		res.end('Project deleted');
@@ -124,11 +132,11 @@ app.get('/admin', auth, function (req, res) {
 		project.issueCount = issueDao.count(project);
 		return project;
 	});
-	res.render('admin.html', {
+	res.render('admin.html', viewOptions({
 		projects: projects,
 		flash: req.flash(),
 		noindex: true
-	});
+	}));
 });
 
 app.put('/project/:slug', auth, function (req, res) {
@@ -159,7 +167,11 @@ function buildAdminFlashMessage(req, project, action, success) {
 	req.flash(type, message);
 }
 
+function viewOptions(options) {
+	return _.extend({}, { version: version }, options);
+}
+
 tracker.init(app);
 
-console.log('Ω running on port ' + port);
+console.log('Ω v' + version + ' running on port ' + port);
 

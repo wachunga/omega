@@ -28,7 +28,7 @@ Features
 Installation
 ---
 
-Depending on your needs, you could create your project on <omegatracker.nodester.com>. But to have Ω all to yourself, you have a couple of options:
+Depending on your needs, you could create your project on <omegatracker.nodester.com>. But to have Ω all to yourself, there are a couple of options:
 
 1. Install it on your own server
 
@@ -64,19 +64,22 @@ Tests
 
 Ω is unit tested using [Jasmine](https://github.com/pivotal/jasmine). Open `tests/SpecRunner.html` to run the tests.
 
-Authors
+Contributors
 ---
 
-David Hirtle
+```
+ project: omega
+ commits: 230
+ files  : 102
+ authors: 
+   207  David Hirtle            90.0%
+    15   Neil Gentleman          6.5%
+     6	Drew Miller             2.6%
+     1	Farrin Reid             0.4%
+     1	Russell Porter          0.4%
+```
 
-* https://github.com/wachunga
-* [@wachunga](https://twitter.com/wachunga)
+Bugs
+---
 
-Neil Gentleman
-
-* https://github.com/nigelzor
-
-Drew Miller
-
-* https://github.com/xer0x
-* [@xer0x](https://twitter.com/xer0x)
+Our dev instance of Ω is not public (for now), but feel free to file issues on [github](https://github.com/wachunga/omega/issues) as usual.

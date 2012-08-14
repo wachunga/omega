@@ -71,12 +71,12 @@ Contributors
  project: omega
  commits: 230
  files  : 102
- authors: 
+ authors:
    207  David Hirtle            90.0%
-    15   Neil Gentleman          6.5%
-     6	Drew Miller             2.6%
-     1	Farrin Reid             0.4%
-     1	Russell Porter          0.4%
+    15  Neil Gentleman           6.5%
+     6  Drew Miller              2.6%
+     1  Farrin Reid              0.4%
+     1  Russell Porter           0.4%
 ```
 
 Bugs

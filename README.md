@@ -59,7 +59,24 @@ Start the server:
 
 Then just open a browser to http://localhost:1337 or wherever.
 
-Testing
+Tests
 ---
 
 Ω is unit tested using [Jasmine](https://github.com/pivotal/jasmine). Open `tests/SpecRunner.html` to run the tests.
+
+Authors
+---
+
+David Hirtle
+
+* https://github.com/wachunga
+* [@wachunga](https://twitter.com/wachunga)
+
+Neil Gentleman
+
+* https://github.com/nigelzor
+
+Drew Miller
+
+* https://github.com/xer0x
+* [@xer0x](https://twitter.com/xer0x)

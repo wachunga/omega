@@ -16,6 +16,7 @@ var argv = require('optimist')
 		alias: 'pass',
 		default: 'admin'
 	})
+	// TODO: get r.js optimizer going again and run on startup (according to NODE_ENV)
 	.options('optimized', {
 		alias: 'opt',
 		default: false
@@ -25,7 +26,7 @@ var argv = require('optimist')
 var version = require('../package.json').version;
 var port = process.env.app_port || argv.port;
 var password = process.env.admin_pass || argv.password;
-var www_public = '/../public'; // TODO: get r.js optimizer going again and run on startup (according to NODE_ENV)
+var www_public = '/../public';
 
 var db_dir = __dirname + '/../db/';
 if (process.env['NODE_ENV'] === 'nodester') {

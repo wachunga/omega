@@ -12,12 +12,15 @@
 <body>
 
 <script type="text/javascript">
+// TODO: port over to mocha or something
+
 require.config({
 	paths: {
-		'jquery': 'http://ajax.googleapis.com/ajax/libs/jquery/1.7.0/jquery.min',
+		'jquery': '../public/js/lib/jquery-1.7.1.min',
 		'ko': '../public/js/lib/knockout-2.0.0.min',
-		'underscore': '../public/js/lib/underscore-1.2.2.min',
+		'underscore': '../public/js/lib/underscore-min',
 		'timeago': '../public/js/lib/jquery.timeago',
+		'tooltips': '../public/js/lib/tooltips',
 		'ProjectView': '../public/js/ProjectView',
 		'MessageList': '../public/js/MessageList',
 		'UserManager': '../public/js/UserManager',
@@ -26,7 +29,15 @@ require.config({
 		'Notifier': '../public/js/Notifier',
 		'Issue': '../public/js/Issue',
 		'util': '../public/js/util',
+		'omegaEvent': '../public/js/omegaEvent',
+		'Message': '../public/js/Message',
+		'TagFilter': '../public/js/TagFilter',
 		'error/NoSuchIssueError': '../public/js/error/NoSuchIssueError'
+	},
+	shim: {
+		'underscore': {
+			exports: '_'
+		}
 	}
 });
 

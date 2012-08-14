@@ -1,7 +1,7 @@
 define([
-	'jquery', 'ProjectView', 'util'
+	'jquery', 'ProjectView', 'util', 'omegaEvent'
 ],
-function ($, ProjectView, util) {
+function ($, ProjectView, util, OmegaEvent) {
 	
 describe("omega", function () {
 
@@ -16,51 +16,60 @@ describe("omega", function () {
 		emit: function () {}
 	};
 
+	// server version
+	function fakeIssue(id, description, creator) {
+		return {
+			id: id || 1,
+			description: description || 'test issue',
+			creator: creator || 'bob'
+		};
+	}
+
 	var tracker;
 
 	beforeEach(function () {
-		tracker = new ProjectView(name, messageInput, form, messagesElement, socket);
+		tracker = new ProjectView(name, messageInput, messagesElement, socket);
 		tracker.userManager.current("norris");
 		tracker.userManager.loggedIn(true);
 	});
 	
 	describe("message list", function () {
+		var omegaEvents = [
+			new OmegaEvent(OmegaEvent.Type.NewIssue, { issue: fakeIssue(1, 'first test') }),
+			new OmegaEvent(OmegaEvent.Type.AssignIssue, { issue: fakeIssue(), assigner: 'fred' }),
+			new OmegaEvent(OmegaEvent.Type.NewIssue, { issue: fakeIssue(), updater: 'fred' })
+		];
+
 		it("shows history upon connection", function () {
-			var omegaEvents = [
-				{ type: { name: 'openIssue' }, message: "test1" },
-				{ type: { name: 'updateIssue' }, message: "test2" },
-				{ type: { name: 'assignIssue' }, message: "test3" }
-			];
-			
 			tracker.messageList.processHistory(omegaEvents);
 			expect(tracker.messageList.messages().length).toBe(3);
-			expect(tracker.messageList.messages()[0].message).toEqual("test1");
+			expect(tracker.messageList.messages()[0].message).toEqual('bob created <a class="id" data-id="1" href="#1">Ω1</a>.');
 		});
 		
 		it("shows consistent history by overwriting existing messages", function () {
 			tracker.messageList.messages([{msg: 'foo'}, {msg: 'bar'}]);
-			var omegaEvents = [
-				{ type: { name: 'openIssue' }, message: "test1" },
-				{ type: { name: 'updateIssue' }, message: "test2" },
-				{ type: { name: 'assignIssue' }, message: "test3" }
-			];
-			
+
 			tracker.messageList.processHistory(omegaEvents);
 			expect(tracker.messageList.messages().length).toBe(3);
-			expect(tracker.messageList.messages()[0].message).toEqual("test1");
+			expect(tracker.messageList.messages()[0].message).toEqual('bob created <a class="id" data-id="1" href="#1">Ω1</a>.');
 		});
 
 		it("adds flavour when appropriate", function () {
-			var closeEvent = { type: { name: 'closeIssue' }, message: "bob closed 3." };
-			var assignEvent = { type: { name: 'assignIssue' }, message: "bob assigned 3 to jim." };
+			var closeEvent = new OmegaEvent(OmegaEvent.Type.CloseIssue, { issue: fakeIssue() });
+			closeEvent.timestamp = 123;
+
+			var assignEvent = new OmegaEvent(OmegaEvent.Type.AssignIssue, { issue: fakeIssue(), assigner: 'fred' });
+			assignEvent.timestamp = 123;
+
 			tracker.messageList.append(closeEvent);
 			tracker.messageList.append(assignEvent);
 
+			var flavour = /Die issues, die!/;
 			var closeMessage = tracker.messageList.messages()[0].message;
-			expect(closeMessage.length).toBeGreaterThan(closeEvent.message.length);
+			expect(closeMessage).toMatch(flavour);
 
 			var assignMessage = tracker.messageList.messages()[1].message;
-			expect(assignMessage.length).toEqual(assignEvent.message.length);
+			expect(assignMessage).not.toMatch(flavour);
 		});
 	});
 
@@ -111,6 +120,7 @@ describe("omega", function () {
 
 		it("can view help", function () {
 			messageInput.val = function () { return "/help"; };
+			messageInput.focus = function () {};
 
 			tracker.handleInput();
 			expect(tracker.helpOpen()).toEqual(true);
@@ -130,14 +140,6 @@ describe("omega", function () {
 			spyOn(socket, 'emit');
 			tracker.handleInput();
 			expect(socket.emit).toHaveBeenCalledWith('user message', ':)');
-		});
-
-		it("can reset", function () {
-			messageInput.val = function () { return "/reset"; };
-
-			spyOn(tracker, 'reset');
-			tracker.handleInput();
-			expect(tracker.reset).toHaveBeenCalled();
 		});
 
 		it("can create issues", function () {

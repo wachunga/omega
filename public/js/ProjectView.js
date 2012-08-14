@@ -130,7 +130,7 @@ function ($, _, ko, timeago, tooltips, util, Issue, Notifier, UserManager, Messa
 		}
 		var input = this.$messageInput.val();
 		this.$messageInput.val('');
-		
+
 		if (!input || input.length < 1) {
 			return;
 		}

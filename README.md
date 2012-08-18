@@ -5,7 +5,7 @@ Traditional issue trackers emphasize metadata and workflow and tend to add consi
 
 Ω is not traditional. It facilitates squashing issues, not documenting their life stories. No administrivia.
 
-Initial version created during a Big Idea Day at [Pulse Energy](http://www.pulseenergy.com), where it is actively being used.
+Initial version created during a Big Idea Day at [Pulse Energy](http://www.pulseenergy.com), where it is actively being used. [More details](http://hirtopolis.wordpress.com/2012/08/16/instant-issue-tracking/)
 
 Features
 ---

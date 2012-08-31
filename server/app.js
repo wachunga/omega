@@ -67,11 +67,23 @@ app.listen(port);
 // TODO: extract routes elsewhere
 
 app.get('/', function (req, res) {
-	var unlistedCount = projectDao.findUnlisted().length;
-	res.render('index.html', viewOptions({
-		projects: projectDao.findListed(),
-		unlisted: unlistedCount
-	}));
+	projectDao.findAll(function (err, projects) {
+		var listed = [],
+			unlisted = 0;
+		_.each(projects, function (project) {
+			if (!project.deleted) {
+				if (project.unlisted) {
+					unlisted++;
+				} else {
+					listed.push(project);
+				}
+			}
+		});
+		res.render('index.html', viewOptions({
+			projects: listed,
+			unlisted: unlisted
+		}));
+	});
 });
 app.post('/project', function (req, res) {
 	var name = req.body.projectName;
@@ -83,81 +95,90 @@ app.post('/project', function (req, res) {
 		return;
 	}
 
-	if (projectDao.exists(name)) {
-		res.json({ error: 'exists', url: '/project/'  + projectDao.getSlug(name) }, 409); // Conflict
-	} else {
-		var created = projectDao.create(name, !!req.body.unlisted);
-		tracker.listen(created);
-		var message = created.unlisted ? "Here's your project. Remember: it's unlisted, so nobody'll find it unless you share the address." : "Here's your project.";
-		req.flash('info', message);
-		res.json({ url: '/project/' + created.slug });
-	}
+	// FIXME racy
+	projectDao.exists(name, function (err, exists) {
+		if (exists) {
+			res.json({ error: 'exists', url: '/project/'  + projectDao.getSlug(name) }, 409); // Conflict
+		} else {
+			projectDao.create(name, !!req.body.unlisted, function (err, created) {
+				tracker.listen(created);
+				var message = created.unlisted ? "Here's your project. Remember: it's unlisted, so nobody'll find it unless you share the address." : "Here's your project.";
+				req.flash('info', message);
+				res.json({ url: '/project/' + created.slug });
+			});
+		}
+	});
 });
 app.get('/project', function (req, res) {
 	res.statusCode = 404;
 	res.end('Nothing to see here. Try /project/<name>');
 });
 app.get('/project/:slug', function (req, res) {
-	var project = projectDao.find(req.params.slug);
-	if (project && !project.deleted) {
-		var flash = req.flash('info');
-		var message = flash.length ? _.first(flash) : null;
+	projectDao.find(req.params.slug, function (err, project) {
+		if (project && !project.deleted) {
+			var flash = req.flash('info');
+			var message = flash.length ? _.first(flash) : null;
 
-		res.render('project.html', viewOptions({
-			title: project.name,
-			flash: message,
-			noindex: project.unlisted
-		}));
-	} else if (project && project.deleted) {
-		res.statusCode = 410; // Gone
-		res.end('Project deleted');
-	} else {
-		res.statusCode = 404;
-		res.end('No such project');
-	}
+			res.render('project.html', viewOptions({
+				title: project.name,
+				flash: message,
+				noindex: project.unlisted
+			}));
+		} else if (project && project.deleted) {
+			res.statusCode = 410; // Gone
+			res.end('Project deleted');
+		} else {
+			res.statusCode = 404;
+			res.end('No such project');
+		}
+	});
 });
 app.get('/project/:slug/export', function (req, res) {
-	var project = projectDao.find(req.params.slug);
-	var filename = project.name + '.json';
-	res.setHeader('Content-disposition', 'attachment; filename=' + filename);
-	res.json(issueDao.load(project));
+	projectDao.find(req.params.slug, function (err, project) {
+		var filename = project.name + '.json';
+		res.setHeader('Content-disposition', 'attachment; filename=' + filename);
+		res.json(issueDao.load(project));
+	});
 });
 
 
 var auth = express.basicAuth('admin', password);
 
 app.get('/admin', auth, function (req, res) {
-	var projects = _.map(projectDao.findAll(), function (project) {
-		project.issueCount = issueDao.count(project);
-		return project;
+	projectDao.findAll(function (err, projects) {
+		_.each(projects, function (project) {
+			project.issueCount = issueDao.count(project);
+		});
+		res.render('admin.html', viewOptions({
+			projects: projects,
+			flash: req.flash(),
+			noindex: true
+		}));
 	});
-	res.render('admin.html', viewOptions({
-		projects: projects,
-		flash: req.flash(),
-		noindex: true
-	}));
 });
 
 app.put('/project/:slug', auth, function (req, res) {
-	var original = projectDao.find(req.params.slug);
-
-	var updated = {};
-	_.each(['unlisted', 'deleted'], function (prop) {
-		var set = req.body[prop] === 'on';
-		updated[prop] = set;
+	projectDao.find(req.params.slug, function (err, original) {
+		var updated = {};
+		_.each(['unlisted', 'deleted'], function (prop) {
+			var set = req.body[prop] === 'on';
+			updated[prop] = set;
+		});
+		projectDao.update(req.params.slug, updated, function (err) {
+			var success = !err;
+			buildAdminFlashMessage(req, original, 'update', success);
+			res.redirect('back');
+		});
 	});
-	var success = projectDao.update(req.params.slug, updated);
-	buildAdminFlashMessage(req, original, 'update', success);
-	res.redirect('back');
 });
 
 app.delete('/project/:slug/issues', auth, function (req, res) {
-	var project = projectDao.find(req.params.slug);
-	issueDao.reset(project);
-	historyDao.reset(project);
-	req.flash('info', 'All issues in project \'' + project.name + '\' have been deleted.');
-
-	res.redirect('back');
+	projectDao.find(req.params.slug, function (err, project) {
+		issueDao.reset(project);
+		historyDao.reset(project);
+		req.flash('info', 'All issues in project \'' + project.name + '\' have been deleted.');
+		res.redirect('back');
+	});
 });
 
 function buildAdminFlashMessage(req, project, action, success) {
@@ -170,6 +191,6 @@ function viewOptions(options) {
 	return _.extend({}, { version: version }, options);
 }
 
-tracker.init(app);
+tracker.init(app, projectDao);
 
 console.log('Ω v' + version + ' running on port ' + port);

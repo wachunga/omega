@@ -4,7 +4,6 @@ var sio = require('socket.io'),
 	requirejs = require('../requirejs-configured'),
 
 	issueDao = require('./issueDao'),
-	projectDao = require('./projectDao'),
 	userDao = require('./userDao'),
 	historyDao = require('./historyDao');
 
@@ -14,7 +13,7 @@ var tracker = module.exports = {};
 
 requirejs(['public/js/omegaEvent'], function (OmegaEvent) {
 
-tracker.init = function (app) {
+tracker.init = function (app, projectDao) {
 	var that = this;
 	that.io = sio.listen(app);
 	that.io.configure(function () {
@@ -22,8 +21,10 @@ tracker.init = function (app) {
 		that.io.set('transports', ['htmlfile', 'xhr-polling', 'jsonp-polling']);
 	});
 
-	_.each(projectDao.findAll(), function (project) {
-		that.listen(project);
+	projectDao.findAll(function (err, projects) {
+		_.each(projects, function (project) {
+			that.listen(project);
+		});
 	});
 };
 

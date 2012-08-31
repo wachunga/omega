@@ -27,22 +27,6 @@ function load() {
 	}
 }
 
-projectDao.isValidName = function (name) {
-	return !_.contains(INVALID_NAMES, name);
-};
-
-projectDao.getSlug = function (name) {
-	return Project.slugify(name);
-};
-
-projectDao.create = function (name, unlisted) {
-	var project = new Project(name, unlisted);
-	projects[project.slug] = project;
-	console.log('Created new project', project);
-	this.write();
-	return project;
-};
-
 projectDao.write = function () {
 	fs.writeFile(projectsFile, JSON.stringify(projects), function (err) {
 		if (err) {
@@ -53,12 +37,27 @@ projectDao.write = function () {
 	console.log('wrote projects');
 };
 
-projectDao.update = function (slug, updatedProject) {
+projectDao.isValidName = function (name) {
+	return !_.contains(INVALID_NAMES, name);
+};
+
+projectDao.getSlug = function (name) {
+	return Project.slugify(name);
+};
+
+projectDao.create = function (name, unlisted, callback) {
+	var project = new Project(name, unlisted);
+	projects[project.slug] = project;
+	console.log('Created new project', project);
+	this.write();
+	callback(null, project);
+};
+
+projectDao.update = function (slug, updatedProject, callback) {
 	var original = projects[slug];
 	if (!original) {
 		return false;
 	}
-
 	if (updatedProject.deleted !== undefined) {
 		projects[slug].deleted = updatedProject.deleted;
 	}
@@ -66,29 +65,17 @@ projectDao.update = function (slug, updatedProject) {
 		projects[slug].unlisted = updatedProject.unlisted;
 	}
 	this.write();
-	return true;
+	callback(null);
 };
 
-projectDao.exists = function (name) {
-	return !!this.find(this.getSlug(name));
+projectDao.exists = function (name, callback) {
+	callback(null, !!projects[this.getSlug(name)]);
 };
 
-projectDao.find = function (slug) {
-	return projects[slug];
+projectDao.find = function (slug, callback) {
+	callback(null, projects[slug]);
 };
 
-projectDao.findAll = function () {
-	return _.values(projects);
-};
-
-projectDao.findListed = function () {
-	return _.filter(projects, function (project) {
-		return !project.unlisted && !project.deleted;
-	});
-};
-
-projectDao.findUnlisted = function () {
-	return _.filter(projects, function (project) {
-		return project.unlisted && !project.deleted;
-	});
+projectDao.findAll = function (callback) {
+	callback(null, _.values(projects));
 };

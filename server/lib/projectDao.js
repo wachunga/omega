@@ -38,11 +38,10 @@ projectDao.write = function () {
 };
 
 projectDao.isValidName = function (name) {
-	return !_.contains(INVALID_NAMES, name);
-};
-
-projectDao.getSlug = function (name) {
-	return Project.slugify(name);
+	var slug = Project.slugify(name),
+		nameIsValid = !_.contains(INVALID_NAMES, name) && name.length > 3,
+		slugIsValid = !_.contains(INVALID_NAMES, slug) && slug.length > 3;
+	return nameIsValid && slugIsValid;
 };
 
 projectDao.create = function (name, unlisted, callback) {

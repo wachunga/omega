@@ -47,10 +47,14 @@ projectDao.getSlug = function (name) {
 
 projectDao.create = function (name, unlisted, callback) {
 	var project = new Project(name, unlisted);
-	projects[project.slug] = project;
-	console.log('Created new project', project);
-	this.write();
-	callback(null, project);
+	if (projects[project.slug]) {
+		callback(new Error('project exists'), projects[project.slug]);
+	} else {
+		projects[project.slug] = project;
+		console.log('Created new project', project);
+		this.write();
+		callback(null, project);
+	}
 };
 
 projectDao.update = function (slug, updatedProject, callback) {
@@ -66,10 +70,6 @@ projectDao.update = function (slug, updatedProject, callback) {
 	}
 	this.write();
 	callback(null);
-};
-
-projectDao.exists = function (name, callback) {
-	callback(null, !!projects[this.getSlug(name)]);
 };
 
 projectDao.find = function (slug, callback) {

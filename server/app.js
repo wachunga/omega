@@ -95,18 +95,18 @@ app.post('/project', function (req, res) {
 		return;
 	}
 
-	// FIXME racy
-	projectDao.exists(name, function (err, exists) {
-		if (exists) {
-			res.json({ error: 'exists', url: '/project/'  + projectDao.getSlug(name) }, 409); // Conflict
-		} else {
-			projectDao.create(name, !!req.body.unlisted, function (err, created) {
-				tracker.listen(created);
-				var message = created.unlisted ? "Here's your project. Remember: it's unlisted, so nobody'll find it unless you share the address." : "Here's your project.";
-				req.flash('info', message);
-				res.json({ url: '/project/' + created.slug });
-			});
+	projectDao.create(name, !!req.body.unlisted, function (err, project) {
+		if (err) {
+			if (err.message === 'project exists') {
+				res.json({ error: 'exists', url: project.url }, 409);
+				return;
+			}
+			throw err;
 		}
+		tracker.listen(project);
+		var message = project.unlisted ? "Here's your project. Remember: it's unlisted, so nobody'll find it unless you share the address." : "Here's your project.";
+		req.flash('info', message);
+		res.json({ url: project.url });
 	});
 });
 app.get('/project', function (req, res) {

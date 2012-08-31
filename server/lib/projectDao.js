@@ -27,15 +27,16 @@ function load() {
 	}
 }
 
-projectDao.write = function () {
+function write(callback) {
 	fs.writeFile(projectsFile, JSON.stringify(projects), function (err) {
 		if (err) {
 			console.log("Couldn't write projects file.");
-			throw err;
+		} else {
+			console.log('wrote projects');
 		}
+		callback(err);
 	});
-	console.log('wrote projects');
-};
+}
 
 projectDao.isValidName = function (name) {
 	var slug = Project.slugify(name),
@@ -51,15 +52,16 @@ projectDao.create = function (name, unlisted, callback) {
 	} else {
 		projects[project.slug] = project;
 		console.log('Created new project', project);
-		this.write();
-		callback(null, project);
+		write(function (err) {
+			callback(err, project);
+		});
 	}
 };
 
 projectDao.update = function (slug, updatedProject, callback) {
 	var original = projects[slug];
 	if (!original) {
-		return false;
+		callback(new Error('project does not exist'));
 	}
 	if (updatedProject.deleted !== undefined) {
 		projects[slug].deleted = updatedProject.deleted;
@@ -67,8 +69,7 @@ projectDao.update = function (slug, updatedProject, callback) {
 	if (updatedProject.unlisted !== undefined) {
 		projects[slug].unlisted = updatedProject.unlisted;
 	}
-	this.write();
-	callback(null);
+	write(callback);
 };
 
 projectDao.find = function (slug, callback) {

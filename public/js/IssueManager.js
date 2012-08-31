@@ -62,7 +62,7 @@ define([
 				if (!stillUsed) {
 					that.removeTagFilter(tag);
 				}
-			})
+			});
 			filterIssue(issue, that);
 		});
 		this.socket.on('issue prioritized', _.bind(this.refreshIssue, this));

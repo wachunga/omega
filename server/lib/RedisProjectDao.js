@@ -1,5 +1,6 @@
 var Project = require('./Project'),
-	_ = require('underscore');
+	_ = require('underscore'),
+	Q = require('q');
 
 var INVALID_NAMES = ['projects', 'lib', 'node_modules', 'public', 'tests', 'views'];
 
@@ -20,19 +21,17 @@ RedisProjectDao.prototype.isValidName = function (name) {
 RedisProjectDao.prototype.create = function (name, unlisted, callback) {
 	var project = new Project(name, unlisted);
 
-	this.client.sadd(this.prefix + "projects", project.slug, function (err, result) {
-		// TODO: error handling
-	});
-	this.client.setnx(this.prefix + "project:" + project.slug, JSON.stringify(project), function (err, result) {
-		if (err) {
-			callback(err);
-		} else if (!result) {
-			// TODO: return the existing project, not the new one
-			callback(new Error('project exists'), project);
-		} else {
-			callback(null, project);
+	Q.all([
+		Q.ninvoke(this.client, 'sadd', this.prefix + "projects", project.slug),
+		Q.ninvoke(this.client, 'setnx', this.prefix + "project:" + project.slug, JSON.stringify(project))
+	]).spread(function (added, created) {
+		if (!created) {
+			throw new Error('project exists');
 		}
-	});
+		callback(null, project);
+	}).fail(function (err) {
+		callback(err);
+	}).end();
 };
 
 RedisProjectDao.prototype.update = function (slug, updatedProject, callback) {
@@ -69,25 +68,17 @@ RedisProjectDao.prototype.find = function (slug, callback) {
 RedisProjectDao.prototype.findAll = function (callback) {
 	var self = this;
 
-	// TODO: use Q, async or some other callback-management library
-	this.client.smembers(this.prefix + "projects", function (err, result) {
-		if (err) {
-			callback(err);
-		} else {
-			var keys = result.map(function (slug) {
-				return self.prefix + "project:" + slug;
-			});
-			self.client.mget(keys, function (err, result) {
-				if (err) {
-					callback(err);
-				} else {
-					callback(null, result.map(function (json) {
-						return JSON.parse(json);
-					}));
-				}
-			});
-		}
-	});
+	Q.ninvoke(this.client, 'smembers', this.prefix + 'projects').then(function (slugs) {
+		return Q.ninvoke(self.client, 'mget', slugs.map(function (slug) {
+			return self.prefix + "project:" + slug;
+		}));
+	}).then(function (projects) {
+		callback(null, projects.map(function (json) {
+			return JSON.parse(json);
+		}));
+	}).fail(function (err) {
+		callback(err);
+	}).end();
 };
 
 module.exports = RedisProjectDao;

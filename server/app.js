@@ -3,7 +3,8 @@ var express = require('express'),
 
 	historyDao = require('./lib/historyDao'),
 	issueDao = require('./lib/issueDao'),
-	tracker = require('./lib/tracker');
+	tracker = require('./lib/tracker'),
+	Project = require('./lib/Project');
 
 // command line parameters
 var argv = require('optimist')
@@ -106,7 +107,8 @@ app.post('/project', function (req, res) {
 	projectDao.create(name, !!req.body.unlisted, function (err, project) {
 		if (err) {
 			if (err.message === 'project exists') {
-				res.json({ error: 'exists', url: project.url }, 409);
+				var url = '/project/' + Project.slugify(name);
+				res.json({ error: 'exists', url: url }, 409);
 				return;
 			}
 			throw err;

@@ -1,9 +1,8 @@
 var express = require('express'),
 	_ = require('underscore'),
 
-	issueDao = require('./lib/issueDao'),
 	historyDao = require('./lib/historyDao'),
-	projectDao = require('./lib/projectDao'),
+	issueDao = require('./lib/issueDao'),
 	tracker = require('./lib/tracker');
 
 // command line parameters
@@ -32,8 +31,17 @@ var db_dir = __dirname + '/../db/';
 if (process.env['NODE_ENV'] === 'nodester') {
 	db_dir = __dirname + '/../'; // override due to https://github.com/nodester/nodester/issues/313
 }
-projectDao.init(db_dir);
 issueDao.init(db_dir);
+
+if (argv.redis) {
+	var redis = require('redis');
+	var client = redis.createClient();
+	var RedisProjectDao = require('./lib/RedisProjectDao');
+	var projectDao = new RedisProjectDao(client);
+} else {
+	var projectDao = require('./lib/projectDao');
+	projectDao.init(db_dir);
+}
 
 var app = express.createServer();
 

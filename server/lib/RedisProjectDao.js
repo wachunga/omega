@@ -4,11 +4,16 @@ var Project = require('./Project'),
 
 var INVALID_NAMES = ['projects', 'lib', 'node_modules', 'public', 'tests', 'views'];
 
+/*
+ * schema:
+ * omega:projects :: set<slug>
+ * omega:project:<slug> :: json
+ */
 function RedisProjectDao(client) {
 	this.client = client;
 	this.prefix = "omega:";
 
-	console.log('storing projects in: redis://' + this.client.host + ':' + this.client.port + '/' + this.prefix + "projects");
+	console.log('storing projects in: redis://' + this.client.host + ':' + this.client.port + '/' + this.prefix);
 }
 
 RedisProjectDao.prototype.isValidName = function (name) {
@@ -41,17 +46,19 @@ RedisProjectDao.prototype.update = function (slug, updatedProject, callback) {
 	self.find(slug, function (err, project) {
 		if (err) {
 			callback(err);
+		} else {
+			if (!project) {
+				callback(new Error('project does not exist'));
+			} else {
+				if (updatedProject.deleted !== undefined) {
+					project.deleted = updatedProject.deleted;
+				}
+				if (updatedProject.unlisted !== undefined) {
+					project.unlisted = updatedProject.unlisted;
+				}
+				self.client.set(self.prefix + "project:" + project.slug, JSON.stringify(project), callback);
+			}
 		}
-		if (!project) {
-			callback(new Error('project does not exist'));
-		}
-		if (updatedProject.deleted !== undefined) {
-			project.deleted = updatedProject.deleted;
-		}
-		if (updatedProject.unlisted !== undefined) {
-			project.unlisted = updatedProject.unlisted;
-		}
-		self.client.set(self.prefix + "project:" + project.slug, JSON.stringify(project), callback);
 	});
 };
 

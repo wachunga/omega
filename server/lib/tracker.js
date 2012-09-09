@@ -3,7 +3,7 @@ var sio = require('socket.io'),
 	markdown = require('node-markdown').Markdown,
 	requirejs = require('../requirejs-configured'),
 
-	issueDao = require('./issueDao'),
+	issueDao, // set in init
 	userDao = require('./userDao'),
 	historyDao = require('./historyDao');
 
@@ -13,7 +13,7 @@ var tracker = module.exports = {};
 
 requirejs(['public/js/omegaEvent'], function (OmegaEvent) {
 
-tracker.init = function (app, projectDao) {
+tracker.init = function (app, projectDao, realIssueDao) {
 	var that = this;
 	that.io = sio.listen(app);
 	that.io.configure(function () {
@@ -21,6 +21,7 @@ tracker.init = function (app, projectDao) {
 		that.io.set('transports', ['htmlfile', 'xhr-polling', 'jsonp-polling']);
 	});
 
+	issueDao = realIssueDao;
 	projectDao.findAll(function (err, projects) {
 		_.each(projects, function (project) {
 			that.listen(project);
@@ -58,7 +59,9 @@ function markdownize(items) {
 }
 
 function onConnect(project, socket, projectSocket) {
-	socket.emit('issues', markdownize(issueDao.load(project)));
+	issueDao.load(project, function (err, issues) {
+		socket.emit('issues', markdownize(issues));
+	});
 	socket.emit('usernames', userDao.load(project));
 	socket.emit('history', markdownize(historyDao.load(project)));
 
@@ -80,9 +83,10 @@ function onConnect(project, socket, projectSocket) {
 	});
 
 	socket.on('new issue', function (description) {
-		var newIssue = markdownize(issueDao.add(description, socket.nickname, project));
-		var event = recordEvent(OmegaEvent.Type.NewIssue, {issue: newIssue});
-		projectSocket.emit('issue created', event);
+		issueDao.add(description, socket.nickname, project, function (err, issue) {
+			var event = recordEvent(OmegaEvent.Type.NewIssue, {issue: markdownize(issue)});
+			projectSocket.emit('issue created', event);
+		});
 	});
 
 	socket.on('assign issue', function (id, specifiedAssignee) {
@@ -90,51 +94,57 @@ function onConnect(project, socket, projectSocket) {
 		if (userDao.isCurrentUser(assignee)) {
 			assignee = socket.nickname;
 		}
-		var updated = markdownize(issueDao.update(id, { assignee: assignee }, project));
-		if (updated) {
-			var event = recordEvent(OmegaEvent.Type.AssignIssue, {assigner: socket.nickname, issue: updated});
-			projectSocket.emit('issue assigned', event);
-		}
+		issueDao.update(id, { assignee: assignee }, project, function (err, updated) {
+			if (updated) {
+				var event = recordEvent(OmegaEvent.Type.AssignIssue, {assigner: socket.nickname, issue: markdownize(updated)});
+				projectSocket.emit('issue assigned', event);
+			}
+		});
 	});
 
 	socket.on('tag issue', function (id, tag) {
-		var tagged = markdownize(issueDao.addTag(id, tag, project));
-		if (tagged) {
-			var event = recordEvent(OmegaEvent.Type.TagIssue, { updater: socket.nickname, issue: tagged, tag: tag });
-			projectSocket.emit('issue tagged', event);
-		}
+		issueDao.addTag(id, tag, project, function (err, tagged) {
+			if (tagged) {
+				var event = recordEvent(OmegaEvent.Type.TagIssue, { updater: socket.nickname, issue: markdownize(tagged), tag: tag });
+				projectSocket.emit('issue tagged', event);
+			}
+		});
 	});
 
 	socket.on('untag issue', function (id) {
-		var untagged = markdownize(issueDao.stripTags(id, project));
-		if (untagged) {
-			var event = recordEvent(OmegaEvent.Type.UntagIssue, { updater: socket.nickname, issue: untagged });
-			projectSocket.emit('issue untagged', event);
-		}
+		issueDao.stripTags(id, project, function (err, untagged) {
+			if (untagged) {
+				var event = recordEvent(OmegaEvent.Type.UntagIssue, { updater: socket.nickname, issue: markdownize(untagged) });
+				projectSocket.emit('issue untagged', event);
+			}
+		});
 	});
 
 	socket.on('close issue', function (id) {
-		var updated = markdownize(issueDao.update(id, { closed: true, closer: socket.nickname, closedDate: new Date() }, project));
-		if (updated) {
-			var event = recordEvent(OmegaEvent.Type.CloseIssue, {issue: updated});
-			projectSocket.emit('issue closed', event);
-		}
+		issueDao.update(id, { closed: true, closer: socket.nickname, closedDate: new Date() }, project, function (err, updated) {
+			if (updated) {
+				var event = recordEvent(OmegaEvent.Type.CloseIssue, {issue: markdownize(updated)});
+				projectSocket.emit('issue closed', event);
+			}
+		});
 	});
 
 	socket.on('update issue', function (id, props) {
-		var updated = markdownize(issueDao.update(id, props, project));
-		if (updated) {
-			var event = recordEvent(OmegaEvent.Type.UpdateIssue, {updater: socket.nickname, issue: updated});
-			projectSocket.emit('issue updated', props, event);
-		}
+		issueDao.update(id, props, project, function (err, updated) {
+			if (updated) {
+				var event = recordEvent(OmegaEvent.Type.UpdateIssue, {updater: socket.nickname, issue: markdownize(updated)});
+				projectSocket.emit('issue updated', props, event);
+			}
+		});
 	});
 
 	socket.on('prioritize issue', function (id) {
-		var updated = markdownize(issueDao.update(id, { critical: 'invert' }, project));
-		if (updated) {
-			var event = recordEvent(OmegaEvent.Type.PrioritizeIssue, {updater: socket.nickname, issue: updated});
-			projectSocket.emit('issue prioritized', {critical: updated.critical}, event);
-		}
+		issueDao.update(id, { critical: 'invert' }, project, function (err, updated) {
+			if (updated) {
+				var event = recordEvent(OmegaEvent.Type.PrioritizeIssue, {updater: socket.nickname, issue: markdownize(updated)});
+				projectSocket.emit('issue prioritized', {critical: updated.critical}, event);
+			}
+		});
 	});
 
 	function recordEvent(type, details) {

@@ -19,7 +19,7 @@ function getIssueFileFromProject(project) {
 	return home + project.slug + '.json';
 }
 
-issueDao.load = function (project) {
+issueDao.load = function (project, callback) {
 	var issueFile = getIssueFileFromProject(project);
 	console.log('Loading issues from ' + issueFile);
 	try {
@@ -28,19 +28,25 @@ issueDao.load = function (project) {
 	} catch (e) {
 		console.log("Issue file does not appear to exist yet, but that's okay. It'll get created with the first issue.", e);
 	}
-	return issues[project.slug] || [];
+	callback(null, issues[project.slug] || []);
 };
 
-issueDao.count = function (project) {
+issueDao.count = function (project, callback) {
 	var cached = issues[project.slug];
 	if (cached !== undefined) {
-		return cached.length;
+		callback(null, cached.length);
+	} else {
+		issueDao.load(project, function (err, issues) {
+			if (err) {
+				callback(err);
+			} else {
+				callback(null, issues.length);
+			}
+		});
 	}
-	var loaded = issueDao.load(project);
-	return loaded.length;
 };
 
-issueDao.add = function (description, name, project) {
+issueDao.add = function (description, name, project, callback) {
 	if (!issues[project.slug]) {
 		issues[project.slug] = [];
 	}
@@ -49,56 +55,56 @@ issueDao.add = function (description, name, project) {
 	var issue = new Issue(id, description, name);
 	issues[project.slug].push(issue);
 	this.write(project);
-	return issue;
+
+	callback(null, issue);
 };
 
 issueDao.find = function (id, project) {
 	return issues[project.slug][id - 1];
 };
 
-issueDao.addTag = function (id, tag, project) {
+issueDao.addTag = function (id, tag, project, callback) {
 	var issue = issueDao.find(id, project);
 	if (!issue) {
-		return;
+		callback(null, null);
+	} else {
+		issue.tags.push(tag);
+		issues[project.slug][issue.id - 1] = issue;
+		this.write(project);
+		callback(null, issue);
 	}
-
-	issue.tags.push(tag);
-	issues[project.slug][issue.id - 1] = issue;
-	this.write(project);
-	return issue;
 };
 
-issueDao.stripTags = function (id, project) {
+issueDao.stripTags = function (id, project, callback) {
 	var issue = issueDao.find(id, project);
 	if (!issue) {
-		return;
+		callback(null, null);
+	} else {
+		issue.tags = [];
+		issues[project.slug][issue.id - 1] = issue;
+		this.write(project);
+		callback(null, issue);
 	}
-
-	issue.tags = [];
-	issues[project.slug][issue.id - 1] = issue;
-	this.write(project);
-	return issue;
 };
 
-issueDao.update = function (id, props, project) {
+issueDao.update = function (id, props, project, callback) {
 	delete props['id']; // never change this
 
 	var issue = issueDao.find(id, project);
 	if (!issue) {
-		return;
-	}
-
-	for (var key in props) {
-		if (key === 'critical') {
-			issue[key] = !issue[key];
-		} else {
-			issue[key] = props[key];
+		callback(null, null);
+	} else {
+		for (var key in props) {
+			if (key === 'critical') {
+				issue[key] = !issue[key];
+			} else {
+				issue[key] = props[key];
+			}
 		}
+		issues[project.slug][issue.id - 1] = issue;
+		this.write(project); // TODO: only persist updated
+		callback(null, issue);
 	}
-
-	issues[project.slug][issue.id - 1] = issue;
-	this.write(project); // TODO: only persist updated
-	return issue;
 };
 
 issueDao.write = function (project) {
@@ -111,7 +117,8 @@ issueDao.write = function (project) {
 	});
 };
 
-issueDao.reset = function (project) {
+issueDao.reset = function (project, callback) {
 	issues[project.slug] = [];
 	this.write(project);
+	callback(null);
 };

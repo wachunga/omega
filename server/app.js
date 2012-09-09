@@ -1,8 +1,8 @@
 var express = require('express'),
 	_ = require('underscore'),
+	Q = require('q'),
 
 	historyDao = require('./lib/historyDao'),
-	issueDao = require('./lib/issueDao'),
 	tracker = require('./lib/tracker'),
 	Project = require('./lib/Project');
 
@@ -28,20 +28,26 @@ var port = process.env.app_port || argv.port;
 var password = process.env.admin_pass || argv.password;
 var www_public = '/../public';
 
-var db_dir = __dirname + '/../db/';
-if (process.env['NODE_ENV'] === 'nodester') {
-	db_dir = __dirname + '/../'; // override due to https://github.com/nodester/nodester/issues/313
-}
-issueDao.init(db_dir);
+var projectDao, issueDao;
 
 if (argv.redis) {
 	var redis = require('redis');
 	var client = redis.createClient();
+
 	var RedisProjectDao = require('./lib/RedisProjectDao');
-	var projectDao = new RedisProjectDao(client);
+	projectDao = new RedisProjectDao(client);
+	var RedisIssueDao = require('./lib/RedisIssueDao');
+	issueDao = new RedisIssueDao(client);
 } else {
-	var projectDao = require('./lib/projectDao');
+	var db_dir = __dirname + '/../db/';
+	if (process.env['NODE_ENV'] === 'nodester') {
+		db_dir = __dirname + '/../'; // override due to https://github.com/nodester/nodester/issues/313
+	}
+
+	projectDao = require('./lib/projectDao');
 	projectDao.init(db_dir);
+	issueDao = require('./lib/issueDao');
+	issueDao.init(db_dir);
 }
 
 var app = express.createServer();
@@ -147,7 +153,9 @@ app.get('/project/:slug/export', function (req, res) {
 	projectDao.find(req.params.slug, function (err, project) {
 		var filename = project.name + '.json';
 		res.setHeader('Content-disposition', 'attachment; filename=' + filename);
-		res.json(issueDao.load(project));
+		issueDao.load(project, function (err, issues) {
+			res.json(issues);
+		});
 	});
 });
 
@@ -156,14 +164,18 @@ var auth = express.basicAuth('admin', password);
 
 app.get('/admin', auth, function (req, res) {
 	projectDao.findAll(function (err, projects) {
-		_.each(projects, function (project) {
-			project.issueCount = issueDao.count(project);
+		Q.all(projects.map(function (project) {
+			return Q.ninvoke(issueDao, 'count', project).then(function (count) {
+				project.issueCount = count;
+				return project;
+			});
+		})).then(function (projects) {
+			res.render('admin.html', viewOptions({
+				projects: projects,
+				flash: req.flash(),
+				noindex: true
+			}));
 		});
-		res.render('admin.html', viewOptions({
-			projects: projects,
-			flash: req.flash(),
-			noindex: true
-		}));
 	});
 });
 
@@ -184,10 +196,11 @@ app.put('/project/:slug', auth, function (req, res) {
 
 app.delete('/project/:slug/issues', auth, function (req, res) {
 	projectDao.find(req.params.slug, function (err, project) {
-		issueDao.reset(project);
-		historyDao.reset(project);
-		req.flash('info', 'All issues in project \'' + project.name + '\' have been deleted.');
-		res.redirect('back');
+		issueDao.reset(project, function (err) {
+			historyDao.reset(project);
+			req.flash('info', 'All issues in project \'' + project.name + '\' have been deleted.');
+			res.redirect('back');
+		});
 	});
 });
 
@@ -201,6 +214,6 @@ function viewOptions(options) {
 	return _.extend({}, { version: version }, options);
 }
 
-tracker.init(app, projectDao);
+tracker.init(app, projectDao, issueDao);
 
 console.log('Ω v' + version + ' running on port ' + port);

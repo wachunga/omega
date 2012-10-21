@@ -5,17 +5,25 @@ define([
 	function IssueManager(socket) {
 		this.socket = socket;
 
-		this.allIssues = ko.observableArray();
+		this.openIssues = ko.observableArray();
+		this.closedIssues = ko.observableArray();
+		this.allIssues = ko.computed(function () {
+			return this.openIssues().concat(this.closedIssues());
+		}, this);
 		this.tagFilters = ko.observableArray();
-
 		this.showClosed = ko.observable(false);
+
+		this.displayedIssues = ko.computed(function () {
+			if (!this.showClosed()) {
+				return this.openIssues().sort(Issue.sort);
+			} else {
+				return this.allIssues().sort(Issue.sort);
+			}
+		}, this);
 		this.showClosed.subscribe(this.filterIssueList, this);
 
-		this.sortedIssues = ko.computed(function () {
-			return this.allIssues().sort(Issue.sort);
-		}, this);
 		this.filteredIssuesCount = ko.computed(function () {
-			return _.filter(this.sortedIssues(), function (issue) {
+			return _.filter(this.displayedIssues(), function (issue) {
 				return !issue.filtered();
 			}).length;
 		}, this);
@@ -27,17 +35,28 @@ define([
 
 		var that = this;
 		this.socket.on('issues', function (issues) {
-			that.allIssues(_.map(issues, function (issue) {
-				return new Issue(issue.id, issue);
-			}));
-			that.initTagFilters(that.allIssues());
-			that.filterIssueList();
+			var mapped = _.map(issues, function (issue) {
+			    return new Issue(issue.id, issue);
+			});
+			that.initTagFilters(mapped);
+			that.filterIssueList(mapped);
+
+			var open = [];
+			var closed = [];
+			_.each(mapped, function (issue) {
+				if (issue.closed()) {
+					return closed.push(issue);
+				}
+				open.push(issue);
+			});
+			that.openIssues(open);
+			that.closedIssues(closed);
 		});
 
 		this.socket.on('issue created', function (event) {
 			var newIssue = new Issue(event.details.issue.id, event.details.issue);
 			filterIssue(newIssue, that);
-			that.allIssues.push(newIssue);
+			that.openIssues.push(newIssue);
 		});
 		this.socket.on('issue assigned', function (event) {
 			var issue = that.findIssue(event.details.issue.id);
@@ -134,13 +153,15 @@ define([
 		this.filterIssueList();
 	};
 
-	IssueManager.prototype.filterIssueList = function () {
+	IssueManager.prototype.filterIssueList = function (issues) {
+		var issuesToFilter = _.isArray(issues) ? issues : this.displayedIssues();
+
 		var showClosed = this.showClosed();
 		var requiredTags = TagFilter.getOn(this.tagFilters());
 		var forbiddenTags = TagFilter.getOff(this.tagFilters());
 		var filterValue = getFilterInputValue();
 
-		_.each(this.sortedIssues(), function (issue) {
+		_.each(issuesToFilter, function (issue) {
 			issue.updateFiltered(showClosed, requiredTags, forbiddenTags, filterValue);
 		});
 	};

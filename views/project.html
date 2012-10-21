@@ -101,7 +101,7 @@
 	</div>
 	<p class="noneMessage hide" data-bind="fadeVisible: !loading() && !issueManager.allIssues().length">No issues. w00t!</p>
 	<p data-bind="fadeVisible: loading">loading&hellip;</p>
-	<ul class="issuesList unstyled hide" data-bind="fadeVisible: !loading(), foreach: { data: issueManager.sortedIssues }">
+	<ul class="issuesList unstyled hide" data-bind="fadeVisible: !loading(), foreach: { data: issueManager.displayedIssues }">
 		<li data-bind="attr: { id: id }, fadeVisible: !filtered(), css: { closed: closed, highlighted: id === $root.issueManager.highlightedIssue() }">
 			<a data-bind="attr: { href: '#' + id }, text: id" title="Permalink" class="issueId"></a>:
 			&nbsp;<span class="issue-priority" data-bind="css: { 'enabled': !$root.userManager.noUser(), 'issue-priority-critical': critical, 'issue-priority-normal': !critical() }, click: $root.togglePriority.bind($root)">★</span>

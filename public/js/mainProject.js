@@ -1,7 +1,7 @@
 require.config({
 	paths: {
 		'jquery': 'lib/jquery-1.7.1.min',
-		'ko': 'lib/knockout-2.0.0.min',
+		'ko': 'lib/knockout-2.1.0.min',
 		'underscore': 'lib/underscore-min',
 		'timeago': 'lib/jquery.timeago',
 		'tooltips': 'lib/tooltips'

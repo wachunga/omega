@@ -238,6 +238,8 @@ function ($, _, ko, timeago, tooltips, util, Issue, Notifier, UserManager, Messa
 		this.socket.socket.connect();
 	};
 
+	var headerOffset = 120;
+
 	// doesn't highlight if filtering issues, but not a big deal
 	ProjectView.prototype.checkHashForBookmark = function () {
 		var bookmarked = parseInt(window.location.hash.substring(1), 10);
@@ -248,7 +250,7 @@ function ($, _, ko, timeago, tooltips, util, Issue, Notifier, UserManager, Messa
 			var $target = $(window.location.hash);
 			if ($target.length) {
 				var pos = $target.offset();
-				window.scrollTo(pos.left, pos.top);
+				window.scrollTo(pos.left, pos.top - headerOffset);
 			}
 		} catch (e) {
 			if (!(e instanceof NoSuchIssueError)) {

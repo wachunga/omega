@@ -17,10 +17,10 @@
 	<a class="switchProject" href="/">back</a>
 	<div id="loggedInUser" class="hide" data-bind="fadeVisible: !loading() && userManager.current()">welcome, <strong data-bind="text: userManager.current"></strong> | <span class="notificationToggle tooltipped" data-bind="text: notifier.webNotifyEnabled() ? '⚑' : '⚐', click: notifier.requestNotificationPermission, attr: { 'data-original-title': notifier.statusMessage }"></span> | <a href="#" data-bind="click: userManager.logout">kthxbye</a></div>
 </header>
-<ul id="messages" data-bind="foreach: { data: messageList.messages, beforeRemove: function(elem) { $(elem).fadeOut() }, afterAdd: function(elem) { $(elem).hide().fadeIn('fast') }, afterRender: applyTimeago }">
+<ul id="messages" data-bind="foreach: { data: messageList.messages, beforeRemove: function(elem) { $(elem).fadeOut() }, afterAdd: function(elem) { $(elem).hide().fadeIn('fast') } }">
 	<li data-bind="css: { system: !speaker, 'has-details': !!date  }">
 		<span class="speaker" data-bind="text: speaker ? speaker + ': ' : ''"></span><span class="message" data-bind="html: message"></span>
-		<!-- ko if: date --><span class="details">(<time data-bind="attr: { datetime: date }"></time>)</span><!-- /ko -->
+		<!-- ko if: date --><span class="details">(<time data-bind="attr: { datetime: date }, timeago: true"></time>)</span><!-- /ko -->
 	</li>
 </ul>
 <div id="onlineUsers">
@@ -103,7 +103,7 @@
 	</div>
 	<p class="noneMessage hide" data-bind="fadeVisible: !loading() && !issueManager.allIssues().length">No issues. w00t!</p>
 	<p data-bind="fadeVisible: loading">loading&hellip;</p>
-	<ul class="issuesList unstyled hide" data-bind="fadeVisible: !loading(), foreach: { data: issueManager.sortedIssues, afterRender: applyTimeago }">
+	<ul class="issuesList unstyled hide" data-bind="fadeVisible: !loading(), foreach: { data: issueManager.sortedIssues }">
 		<li data-bind="attr: { id: id }, fadeVisible: !filtered(), css: { closed: closed, highlighted: id === $root.issueManager.highlightedIssue() }">
 			<a data-bind="attr: { href: '#' + id }, text: id" title="Permalink" class="issueId"></a>:
 			&nbsp;<span class="issue-priority" data-bind="css: { 'enabled': !$root.userManager.noUser(), 'issue-priority-critical': critical, 'issue-priority-normal': !critical() }, click: $root.togglePriority.bind($root)">★</span>
@@ -112,7 +112,7 @@
 			<!-- ko foreach: tags -->
 				<span class="label label-inverse" data-bind="text: $data"></span>
 			<!-- /ko -->
-			<span class="details">(created by <span data-bind="text: creator"></span> <time data-bind="attr: { datetime: createdDate }"></time><!-- ko if: closed -->; closed by <span data-bind="text: closer"></span> <time data-bind="attr: { datetime: closedDate }"></time><!-- /ko -->)</span>
+			<span class="details">(created by <span data-bind="text: creator"></span> <time data-bind="attr: { datetime: createdDate }, timeago: true"></time><!-- ko if: closed -->; closed by <span data-bind="text: closer"></span> <time data-bind="attr: { datetime: closedDate }, timeago: true"></time><!-- /ko -->)</span>
 		</li>
 	</ul>
 </div>

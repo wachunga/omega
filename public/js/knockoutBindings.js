@@ -1,4 +1,4 @@
-define(['ko'], function (ko) {
+define(['ko', 'jquery'], function (ko, $) {
 
 	ko.bindingHandlers.fadeVisible = {
 		init: function(element, valueAccessor) {
@@ -12,6 +12,14 @@ define(['ko'], function (ko) {
 			} else {
 				$(element).fadeOut('fast');
 			}
+		}
+	};
+
+	ko.bindingHandlers.timeago = {
+		init: function (element, valueAccessor) {
+			setTimeout(function () {
+				$(element).timeago();
+			}, 1);
 		}
 	};
 

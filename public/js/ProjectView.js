@@ -255,16 +255,6 @@ function ($, _, ko, timeago, tooltips, util, Issue, Notifier, UserManager, Messa
 				throw e;
 			}
 		}
-
-	};
-
-	ProjectView.prototype.applyTimeago = function (elements) {
-		_.each(elements, function (element) {
-			var $time = $(element).find("time");
-			if ($time && $time.length) {
-				$time.timeago();
-			}
-		});
 	};
 	
 	return ProjectView;

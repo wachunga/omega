@@ -2,7 +2,7 @@
   "name": "omega",
   "node": "0.6.17",
   "description": "A real-time issue tracker optimized for small teams",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "keywords": ["issue", "bug", "tracker", "minimal", "realtime", "socket", "chat", "team"],
   "author": "David Hirtle <wachunga@gmail.com>",
   "contributors": [

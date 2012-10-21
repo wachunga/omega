@@ -151,6 +151,9 @@ function ($, _, ko, timeago, tooltips, util, Issue, Notifier, UserManager, Messa
 				case 'help':
 				case '?':
 					this.helpOpen(!this.helpOpen());
+					if (this.helpOpen()) {
+						$("html, body").animate({ scrollTop: 0 }, "slow");
+					}
 					break;
 				case 'export':
 					window.location.href += '/export';
@@ -238,7 +241,7 @@ function ($, _, ko, timeago, tooltips, util, Issue, Notifier, UserManager, Messa
 		this.socket.socket.connect();
 	};
 
-	var headerOffset = 120;
+	var headerOffset = 110;
 
 	// doesn't highlight if filtering issues, but not a big deal
 	ProjectView.prototype.checkHashForBookmark = function () {

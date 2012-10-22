@@ -138,7 +138,7 @@ define([
 	};
 
 	function getFilterInputValue() {
-		return $("#issueFilter").val().trim();
+		return $.trim($("#issueFilter").val());
 	}
 
 	IssueManager.prototype.resetFilters = function () {

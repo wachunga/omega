@@ -2,13 +2,13 @@ define(['underscore', 'ko'], function (_, ko) {
 
 	var TagState = {
 		off: -1,
-		default: 0,
+		'default': 0,
 		on: 1
 	};
 
 	function TagFilter(label) {
 		this.label = label;
-		this.state = ko.observable(TagState.default);
+		this.state = ko.observable(TagState['default']);
 	}
 
 	TagFilter.prototype.getSymbol = function () {
@@ -23,7 +23,7 @@ define(['underscore', 'ko'], function (_, ko) {
 	};
 
 	TagFilter.prototype.isActive = function () {
-		return this.state() !== TagState.default;
+		return this.state() !== TagState['default'];
 	};
 
 	TagFilter.prototype.toggle = function () {
@@ -41,7 +41,7 @@ define(['underscore', 'ko'], function (_, ko) {
 
 	TagFilter.resetAll = function (tagFilters) {
 		_.each(tagFilters, function (tagFilter) {
-			tagFilter.state(TagState.default);
+			tagFilter.state(TagState['default']);
 		});
 	};
 

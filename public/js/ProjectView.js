@@ -71,7 +71,7 @@ function ($, _, ko, timeago, tooltips, util, Issue, Notifier, UserManager, Messa
 	};
 	
 	function isCommand(input) {
-		return input.trim().charAt(0) === "/";
+		return $.trim(input).charAt(0) === "/";
 	}
 
 	function ArgError(message) {
@@ -143,8 +143,8 @@ function ($, _, ko, timeago, tooltips, util, Issue, Notifier, UserManager, Messa
 
 		try {
 			var matches = input.match(/[:\/]([\S]+)(?:\s+(.*))?/);
-			var cmd = matches[1] && matches[1].trim();
-			var rest = matches[2] && matches[2].trim();
+			var cmd = matches[1] && $.trim(matches[1]);
+			var rest = matches[2] && $.trim(matches[2]);
 
 			var id;
 			switch (cmd.toLowerCase()) {

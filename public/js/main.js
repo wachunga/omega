@@ -19,7 +19,7 @@ require(['jquery', 'ko'], function ($, ko) {
 		var viewModel = {
 			error: ko.observable(),
 			submitForm: function (form) {
-				var name = $('#projectNameInput').val().trim();
+				var name = $.trim($('#projectNameInput').val());
 				if (!name || name.length < 3) {
 					this.error('Why so terse? You can do better.');
 					return false;

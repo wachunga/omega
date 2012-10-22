@@ -36,7 +36,7 @@ define(['jquery', 'ko', 'underscore', 'util'], function ($, ko, _, util) {
 	UserManager.prototype.attemptLogin = function () {
 		this.invalidName(false);
 		var name = this.$nameInput.val();
-		if (!name || name.trim().length < 3) { // TODO: disallow other chars?
+		if (!name || $.trim(name).length < 3) { // TODO: disallow other chars?
 			this.invalidName(true);
 			return;
 		}

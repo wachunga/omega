@@ -51,7 +51,7 @@ Usage
 
 Start the server:
 
-    omega [-port <port>] [-pass <password>]
+    omega [--port <port>] [--pass <password>]
 
 `<port>` - Where the server listens for connections. Defaults to 1337.
 

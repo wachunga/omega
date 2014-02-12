@@ -33,13 +33,15 @@ Features
 Installation
 ---
 
-Depending on your needs, you could create your project on <omegatracker.nodester.com>. But to have Ω all to yourself, there are a couple of options:
+Depending on your needs, you could create your project on the demo site. But to have Ω all to yourself, there are a couple of options:
 
 1. Install it on your own server
 
-    Install [node.js](http://nodejs.org) (which comes with npm) and run `npm install omega -g`.
+    1. Install [node.js](http://nodejs.org) (which comes with npm)
+    1. `git clone git@github.com:wachunga/omega.git`
+    1. `cd omega; npm install`
 
-2. Install it in the cloud via a PaaS like heroku, openshift, etc.
+2. Install it in the cloud via a PaaS like Heroku, OpenShift, etc.
 
 
 Usage
@@ -47,13 +49,17 @@ Usage
 
 Start the server:
 
-    omega [--port <port>] [--pass <password>]
+    npm start
+
+Or, to specify options:
+
+    node server [--port <port>] [--pass <password>]
 
 `<port>` - Where the server listens for connections. Defaults to 1337.
 
 `<password>` - Password required for accessing project admin section. Defaults to 'admin'. (Default username is also 'admin'.)
 
-Then just open a browser to http://localhost:1337 or wherever.
+Then just open a browser to `http://localhost:1337` or wherever.
 
 Tests
 ---

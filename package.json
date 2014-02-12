@@ -32,7 +32,6 @@
     "jshint": "0.5.x",
     "less": "1.3.x"
   },
-  "preferGlobal": true,
   "bin": "./server.js",
   "scripts": {
     "start": "node server.js"

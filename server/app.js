@@ -24,7 +24,7 @@ var argv = require('optimist')
 	.argv;
 
 var version = require('../package.json').version;
-var port = process.env.app_port || argv.port;
+var port = process.env.PORT || argv.port;
 var password = process.env.admin_pass || argv.password;
 var www_public = '/../public';
 

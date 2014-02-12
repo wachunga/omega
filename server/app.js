@@ -31,9 +31,7 @@ var www_public = '/../public';
 var projectDao, issueDao;
 
 if (argv.redis) {
-	var redis = require('redis');
-	var client = redis.createClient();
-
+	var client = process.env.REDISTOGO_URL ? require('redis-url').connect(process.env.REDISTOGO_URL) : require('redis').createClient();
 	var RedisProjectDao = require('./lib/RedisProjectDao');
 	projectDao = new RedisProjectDao(client);
 	var RedisIssueDao = require('./lib/RedisIssueDao');

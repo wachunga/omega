@@ -5,7 +5,12 @@ Traditional issue trackers emphasize metadata and workflow and tend to add consi
 
 Ω is not traditional. It facilitates squashing issues, not documenting their life stories. No administrivia.
 
-Initial version created during a Big Idea Day at [Pulse Energy](http://www.pulseenergy.com), where it is actively being used. [More details](http://hirtopolis.wordpress.com/2012/08/16/instant-issue-tracking/)
+Initial version created during a Big Idea Day at [Pulse Energy](http://www.pulseenergy.com). [More details](http://hirtopolis.wordpress.com/2012/08/16/instant-issue-tracking/)
+
+Demo
+---
+
+Our earlier host, Nodester, has caved. Heroku replacement coming soon.
 
 Features
 ---
@@ -34,16 +39,7 @@ Depending on your needs, you could create your project on <omegatracker.nodester
 
     Install [node.js](http://nodejs.org) (which comes with npm) and run `npm install omega -g`.
 
-2. Install it in the cloud via a PaaS like nodester, heroku, openshift, etc.
-
-    [Nodester](http://nodester.com/) is the easiest route, and it's free. Process is roughly as follows:
-    * request a coupon, install the CLI, etc
-    * `nodester app create myomega`
-    * `git clone git@github.com:wachunga/omega.git`
-    * `git remote set-url nodester git@nodester.com:/node/git/<your_details_here>.git`
-    * `git push nodester master`
-    * install required dependencies: `nodester npm install myomega`
-    * set the NODE_ENV: `curl -X PUT -u "<user>:<pass>" -d "appname=myomega&key=NODE_ENV&value=nodester" http://api.nodester.com/env`
+2. Install it in the cloud via a PaaS like heroku, openshift, etc.
 
 
 Usage
@@ -69,14 +65,14 @@ Contributors
 
 ```
  project: omega
- commits: 230
- files  : 102
- authors:
-   207  David Hirtle            90.0%
-    15  Neil Gentleman           6.5%
-     6  Drew Miller              2.6%
-     1  Farrin Reid              0.4%
-     1  Russell Porter           0.4%
+ commits: 254
+ files  : 105
+ authors: 
+   221  David Hirtle            87.0%
+    24  Neil Gentleman          9.4%
+     6  Drew Miller             2.4%
+     2  Russell Porter          0.8%
+     1  Farrin Reid             0.4%
 ```
 
 Bugs

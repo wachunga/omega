@@ -36,7 +36,7 @@ RedisProjectDao.prototype.create = function (name, unlisted, callback) {
 		callback(null, project);
 	}).fail(function (err) {
 		callback(err);
-	}).end();
+	}).done();
 };
 
 RedisProjectDao.prototype.update = function (slug, updatedProject, callback) {
@@ -85,7 +85,7 @@ RedisProjectDao.prototype.findAll = function (callback) {
 		}));
 	}).fail(function (err) {
 		callback(err);
-	}).end();
+	}).done();
 };
 
 module.exports = RedisProjectDao;

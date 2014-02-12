@@ -27,68 +27,55 @@ function load() {
 	}
 }
 
-projectDao.isValidName = function (name) {
-	return !_.contains(INVALID_NAMES, name);
-};
-
-projectDao.getSlug = function (name) {
-	return Project.slugify(name);
-};
-
-projectDao.create = function (name, unlisted) {
-	var project = new Project(name, unlisted);
-	projects[project.slug] = project;
-	console.log('Created new project', project);
-	this.write();
-	return project;
-};
-
-projectDao.write = function () {
+function write(callback) {
 	fs.writeFile(projectsFile, JSON.stringify(projects), function (err) {
 		if (err) {
 			console.log("Couldn't write projects file.");
-			throw err;
+		} else {
+			console.log('wrote projects');
 		}
+		callback(err);
 	});
-	console.log('wrote projects');
+}
+
+projectDao.isValidName = function (name) {
+	var slug = Project.slugify(name),
+		nameIsValid = !_.contains(INVALID_NAMES, name) && name.length > 3,
+		slugIsValid = !_.contains(INVALID_NAMES, slug) && slug.length > 3;
+	return nameIsValid && slugIsValid;
 };
 
-projectDao.update = function (slug, updatedProject) {
+projectDao.create = function (name, unlisted, callback) {
+	var project = new Project(name, unlisted);
+	if (projects[project.slug]) {
+		callback(new Error('project exists'), projects[project.slug]);
+	} else {
+		projects[project.slug] = project;
+		console.log('Created new project', project);
+		write(function (err) {
+			callback(err, project);
+		});
+	}
+};
+
+projectDao.update = function (slug, updatedProject, callback) {
 	var original = projects[slug];
 	if (!original) {
-		return false;
+		callback(new Error('project does not exist'));
 	}
-
 	if (updatedProject.deleted !== undefined) {
 		projects[slug].deleted = updatedProject.deleted;
 	}
 	if (updatedProject.unlisted !== undefined) {
 		projects[slug].unlisted = updatedProject.unlisted;
 	}
-	this.write();
-	return true;
+	write(callback);
 };
 
-projectDao.exists = function (name) {
-	return !!this.find(this.getSlug(name));
+projectDao.find = function (slug, callback) {
+	callback(null, projects[slug]);
 };
 
-projectDao.find = function (slug) {
-	return projects[slug];
-};
-
-projectDao.findAll = function () {
-	return _.values(projects);
-};
-
-projectDao.findListed = function () {
-	return _.filter(projects, function (project) {
-		return !project.unlisted && !project.deleted;
-	});
-};
-
-projectDao.findUnlisted = function () {
-	return _.filter(projects, function (project) {
-		return project.unlisted && !project.deleted;
-	});
+projectDao.findAll = function (callback) {
+	callback(null, _.values(projects));
 };

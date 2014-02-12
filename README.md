@@ -10,7 +10,7 @@ Initial version created during a Big Idea Day at [Pulse Energy](http://www.pulse
 Demo
 ---
 
-Our earlier host, Nodester, has caved. Heroku replacement coming soon.
+Give it a whirl at http://omegatracker.herokuapp.com. The redis database there is severely limited, but it should suffice as a demo.
 
 Features
 ---
@@ -42,6 +42,8 @@ Depending on your needs, you could create your project on the demo site. But to 
     1. `cd omega; npm install`
 
 2. Install it in the cloud via a PaaS like Heroku, OpenShift, etc.
+    
+    * For Heroku, just follow [these instructions](https://devcenter.heroku.com/articles/getting-started-with-nodejs).
 
 
 Usage
@@ -53,7 +55,9 @@ Start the server:
 
 Or, to specify options:
 
-    node server [--port <port>] [--pass <password>]
+    node server [--redis] [--port <port>] [--pass <password>]
+
+`<redis>` - use Redis for persistence instead of json on the file system.
 
 `<port>` - Where the server listens for connections. Defaults to 1337.
 

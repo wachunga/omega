@@ -92,6 +92,7 @@ app.get('/', function (req, res) {
 				}
 			}
 		});
+		_.sortBy(listed, function (p) { return p.name; });
 		res.render('index.html', viewOptions({
 			projects: listed,
 			unlisted: unlisted

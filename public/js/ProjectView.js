@@ -96,15 +96,15 @@ function ($, _, ko, timeago, tooltips, util, Issue, Notifier, UserManager, Messa
 	}
 
 	function eachID(id, this_, funcToCall, args) {
-		if (typeof args == 'undefined'){ 
-		       args = [];
+		if (typeof args == 'undefined') {
+			args = [];
 		}
 		var ids = id.split(',');
 		args.unshift(parseInt(id[0], 10));
 
 		_.each(ids, function(i){
-            args[0] = parseInt(i, 10);
-            requireArgument(args[0]);
+			args[0] = parseInt(i, 10);
+			requireArgument(args[0]);
 			funcToCall.apply(this_, args);
 		});
 	}
@@ -183,42 +183,37 @@ function ($, _, ko, timeago, tooltips, util, Issue, Notifier, UserManager, Messa
 				case 'close':
 				case 'resolve':
 				case 'done':
-                    requireArgument(rest);
+					requireArgument(rest);
 					id = rest.split(' ')[0];
 					eachID(id, this.issueManager, this.issueManager.closeIssue);
-
 					break;
 				case 'reopen':
-                    requireArgument(rest);
+					requireArgument(rest);
 					id = rest.split(' ')[0];
 					eachID(id, this.issueManager, this.issueManager.updateIssue, [{ closed: false }]);
-
 					break;
 				case 'unassign':
-                    requireArgument(rest);
+					requireArgument(rest);
 					id = rest.split(' ')[0];
 					eachID(id, this.issueManager, this.issueManager.assignIssue, ['nobody']);
-
 					break;
 				case 'assign':
 				case '@':
-                    requireArgument(rest);
+					requireArgument(rest);
 					//The first argument are the ids
 					id = rest.split(' ')[0];
 					//The rest are asignee
 					var assignee = rest.split(' ');
 					assignee.shift();
 					assignee = assignee.join(' ');
-
-                    if (assignee === ''){
-                        assignee = undefined;
-                    }
+					if (assignee === ''){
+						assignee = undefined;
+					}
 
 					eachID(id, this.issueManager, this.issueManager.assignIssue, [assignee]);
-
 					break;
 				case 'tag':
-                    requireArgument(rest); //check if no args
+					requireArgument(rest); //check if no args
 					//The first argument are the ids
 					id = rest.split(' ')[0];
 					//The rest are tag
@@ -228,23 +223,20 @@ function ($, _, ko, timeago, tooltips, util, Issue, Notifier, UserManager, Messa
 
 					requireArgument(id, tag);
 					eachID(id, this.issueManager, this.issueManager.tagIssue, [tag]);
-
 					break;
 				case 'untag':
-                    requireArgument(rest);
+					requireArgument(rest);
 					id = rest.split(' ')[0];
 					eachID(id, this.issueManager, this.issueManager.untagIssue);
-
 					break;
 				case 'critical':
 				case 'urgent':
 				case '!':
 				case '*':
 				case 'star':
-                    requireArgument(rest);
+					requireArgument(rest);
 					id = rest.split(' ')[0];
 					eachID(id, this.issueManager, this.issueManager.prioritizeIssue);
-
 					break;
 				case 'edit':
 				case 'update':

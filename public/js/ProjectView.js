@@ -94,6 +94,20 @@ function ($, _, ko, timeago, tooltips, util, Issue, Notifier, UserManager, Messa
 		var match = string.match(/(\d+)(?:\s+(.+))?/);
 		return match ? match[argToReturn] : null;
 	}
+
+	function eachID(id, this_, funcToCall, args) {
+		if (typeof args == 'undefined'){ 
+		       args = [];
+		}
+		var ids = id.split(',');
+		args.unshift(parseInt(id[0], 10));
+
+		_.each(ids, function(i){
+            args[0] = parseInt(i, 10);
+            requireArgument(args[0]);
+			funcToCall.apply(this_, args);
+		});
+	}
 	
 	ProjectView.prototype.notifyOfBadCommand = function () {
 		this.alert(flavour.badCommand() + ' Try /help.');
@@ -169,46 +183,68 @@ function ($, _, ko, timeago, tooltips, util, Issue, Notifier, UserManager, Messa
 				case 'close':
 				case 'resolve':
 				case 'done':
-					id = parseInt(rest, 10);
-					requireArgument(id);
-					this.issueManager.closeIssue(id);
+                    requireArgument(rest);
+					id = rest.split(' ')[0];
+					eachID(id, this.issueManager, this.issueManager.closeIssue);
+
 					break;
 				case 'reopen':
-					id = parseInt(rest, 10);
-					requireArgument(id);
-					this.issueManager.updateIssue(id, { closed: false });
+                    requireArgument(rest);
+					id = rest.split(' ')[0];
+					eachID(id, this.issueManager, this.issueManager.updateIssue, [{ closed: false }]);
+
 					break;
 				case 'unassign':
-					id = parseInt(rest, 10);
-					requireArgument(id);
-					this.issueManager.assignIssue(id, 'nobody');
+                    requireArgument(rest);
+					id = rest.split(' ')[0];
+					eachID(id, this.issueManager, this.issueManager.assignIssue, ['nobody']);
+
 					break;
 				case 'assign':
 				case '@':
-					id = parseInt(getArgument(rest, 1), 10);
-					var assignee = getArgument(rest, 2);
-					requireArgument(id);
-					this.issueManager.assignIssue(id, assignee);
+                    requireArgument(rest);
+					//The first argument are the ids
+					id = rest.split(' ')[0];
+					//The rest are asignee
+					var assignee = rest.split(' ');
+					assignee.shift();
+					assignee = assignee.join(' ');
+
+                    if (assignee === ''){
+                        assignee = undefined;
+                    }
+
+					eachID(id, this.issueManager, this.issueManager.assignIssue, [assignee]);
+
 					break;
 				case 'tag':
-					id = parseInt(getArgument(rest, 1), 10);
-					var tag = getArgument(rest, 2);
+                    requireArgument(rest); //check if no args
+					//The first argument are the ids
+					id = rest.split(' ')[0];
+					//The rest are tag
+					var tag = rest.split(' ');
+					tag.shift();
+					tag = tag.join(' ');
+
 					requireArgument(id, tag);
-					this.issueManager.tagIssue(id, tag);
+					eachID(id, this.issueManager, this.issueManager.tagIssue, [tag]);
+
 					break;
 				case 'untag':
-					id = parseInt(getArgument(rest, 1), 10);
-					requireArgument(id);
-					this.issueManager.untagIssue(id);
+                    requireArgument(rest);
+					id = rest.split(' ')[0];
+					eachID(id, this.issueManager, this.issueManager.untagIssue);
+
 					break;
 				case 'critical':
 				case 'urgent':
 				case '!':
 				case '*':
 				case 'star':
-					id = parseInt(getArgument(rest, 1), 10);
-					requireArgument(id);
-					this.issueManager.prioritizeIssue(id);
+                    requireArgument(rest);
+					id = rest.split(' ')[0];
+					eachID(id, this.issueManager, this.issueManager.prioritizeIssue);
+
 					break;
 				case 'edit':
 				case 'update':

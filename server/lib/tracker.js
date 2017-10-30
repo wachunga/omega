@@ -15,11 +15,7 @@ requirejs(['public/js/omegaEvent'], function (OmegaEvent) {
 
 tracker.init = function (app, projectDao, realIssueDao) {
 	var that = this;
-	that.io = sio.listen(app);
-	that.io.configure(function () {
-		// excluded websocket due to Chrome bug: https://github.com/LearnBoost/socket.io/issues/425
-		that.io.set('transports', ['htmlfile', 'xhr-polling', 'jsonp-polling']);
-	});
+	that.io = sio(app);
 
 	issueDao = realIssueDao;
 	projectDao.findAll(function (err, projects) {

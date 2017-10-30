@@ -38,10 +38,6 @@ if (argv.redis) {
 	issueDao = new RedisIssueDao(client);
 } else {
 	var db_dir = __dirname + '/../db/';
-	if (process.env['NODE_ENV'] === 'nodester') {
-		db_dir = __dirname + '/../'; // override due to https://github.com/nodester/nodester/issues/313
-	}
-
 	projectDao = require('./lib/projectDao');
 	projectDao.init(db_dir);
 	issueDao = require('./lib/issueDao');

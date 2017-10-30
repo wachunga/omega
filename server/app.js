@@ -1,6 +1,9 @@
 var express = require('express'),
 	_ = require('underscore'),
 	Q = require('q'),
+	http = require('http'),
+	partial = require('express-partials'),
+	flash = require('connect-flash'),
 
 	historyDao = require('./lib/historyDao'),
 	tracker = require('./lib/tracker'),
@@ -44,9 +47,9 @@ if (argv.redis) {
 	issueDao.init(db_dir);
 }
 
-var app = express.createServer();
+var app = express();
 
-app.configure('development', function () {
+if (app.get('env') === 'development') {
 	console.log('Starting development server');
 
 	var lessMiddleware = require('less-middleware');
@@ -55,23 +58,24 @@ app.configure('development', function () {
 		src: __dirname + '/server',
 		dest: __dirname + '/public'
 	}));
-});
+}
 
-app.configure(function () {
-	app.set('views', __dirname + '/../views');
-	app.register('.html', require('ejs')); // call our views html
+app.set('views', __dirname + '/../views');
+app.engine('.html', require('ejs').renderFile); // call our views html
 
-	app.use(express.logger());
-	app.use(express.cookieParser());
-	app.use(express.session({ secret: 'nyan cat' })); // for flash messages
-	app.use(express.static(__dirname + www_public));
+app.use(express.logger());
+app.use(express.cookieParser());
+app.use(express.session({ secret: 'nyan cat' })); // for flash messages
+app.use(express.static(__dirname + www_public));
+app.use(express.bodyParser());
+app.use(express.methodOverride());
+app.use(partial());
+app.use(flash());
+app.use(app.router);
 
-	app.use(express.bodyParser());
-	app.use(express.methodOverride());
-	app.use(app.router);
-});
-
-app.listen(port);
+var server = http.createServer(app);
+tracker.init(server, projectDao, issueDao);
+server.listen(port);
 
 // TODO: extract routes elsewhere
 
@@ -208,7 +212,5 @@ function buildAdminFlashMessage(req, project, action, success) {
 function viewOptions(options) {
 	return _.extend({}, { version: version }, options);
 }
-
-tracker.init(app, projectDao, issueDao);
 
 console.log('Ω v' + version + ' running on port ' + port);

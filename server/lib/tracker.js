@@ -13,9 +13,9 @@ var tracker = module.exports = {};
 
 requirejs(['public/js/omegaEvent'], function (OmegaEvent) {
 
-tracker.init = function (app, projectDao, realIssueDao) {
+tracker.init = function (server, projectDao, realIssueDao) {
 	var that = this;
-	that.io = sio(app);
+	that.io = sio(server);
 
 	issueDao = realIssueDao;
 	projectDao.findAll(function (err, projects) {

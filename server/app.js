@@ -9,6 +9,13 @@ var express = require('express'),
 	tracker = require('./lib/tracker'),
 	Project = require('./lib/Project');
 
+var methodOverride = require('method-override');
+var morgan = require('morgan');
+var bodyParser = require('body-parser');
+var cookieParser = require('cookie-parser');
+var cookieSession = require('cookie-session');
+var basicAuth = require('basic-auth-connect');
+
 // command line parameters
 var argv = require('optimist')
 	.options('port', {
@@ -63,15 +70,21 @@ if (app.get('env') === 'development') {
 app.set('views', __dirname + '/../views');
 app.engine('.html', require('ejs').renderFile); // call our views html
 
-app.use(express.logger());
-app.use(express.cookieParser());
-app.use(express.session({ secret: 'nyan cat' })); // for flash messages
+app.use(morgan('combined'));
+app.use(cookieParser());
+app.use(cookieSession({ secret: 'nyan cat' })); // for flash messages
 app.use(express.static(__dirname + www_public));
-app.use(express.bodyParser());
-app.use(express.methodOverride());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(methodOverride(function (req, res) {
+	if (req.body && typeof req.body === 'object' && '_method' in req.body) {
+		// look in urlencoded POST bodies and delete it
+		var method = req.body._method;
+		delete req.body._method;
+		return method;
+	}
+}));
 app.use(partial());
 app.use(flash());
-app.use(app.router);
 
 var server = http.createServer(app);
 tracker.init(server, projectDao, issueDao);
@@ -159,7 +172,7 @@ app.get('/project/:slug/export', function (req, res) {
 });
 
 
-var auth = express.basicAuth('admin', password);
+var auth = basicAuth('admin', password);
 
 app.get('/admin', auth, function (req, res) {
 	projectDao.findAll(function (err, projects) {

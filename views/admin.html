@@ -1,15 +1,15 @@
 	<title>Admin - Omega Issue Tracker</title>
-	<script>var data = <%-: projects | json %>;</script>
+	<script>var data = <%- JSON.stringify(projects) %>;</script>
 	<script data-main="js/mainAdmin" src="js/require.js"></script>
 </head>
 <body>
 <div class="container">
 
 <% if (flash.error && flash.error.length) { %>
-<div class="alert alert-error alert-fading alert-closable"><%-: flash.error | join %></div>
+<div class="alert alert-error alert-fading alert-closable"><%- flash.error.join(', ') %></div>
 <% } %>
 <% if (flash.info && flash.info.length) { %>
-<div class="alert alert-success alert-fading alert-closable"><%-: flash.info | join %></div>
+<div class="alert alert-success alert-fading alert-closable"><%- flash.info.join(', ') %></div>
 <% } %>
 <header class="main-header">
 	<h1 class="omega">Ω</h1>

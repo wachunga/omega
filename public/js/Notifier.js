@@ -1,6 +1,5 @@
 define(['ko', 'underscore', 'omegaEvent', 'util'], function (ko, _, OmegaEvent, util) {
 
-	var NOTIFICATION_ALLOWED = 0; // unintuitive, but correct
 	var NOTIFICATION_DURATION = 4000;
 	var NOTIFICATION_PREF_OFF = "OmegaIssueTracker.notificationsOff";
 
@@ -25,15 +24,17 @@ define(['ko', 'underscore', 'omegaEvent', 'util'], function (ko, _, OmegaEvent, 
 
 	Notifier.prototype.notify = function (event) {
 		var type = OmegaEvent.Type[event.type];
-		if (!window.webkitNotifications || !this.webNotifyEnabled() || getUserFromEvent(event) === this.currentUser() || !type.notifies()) {
+		if (!window.Notification || !this.webNotifyEnabled() || getUserFromEvent(event) === this.currentUser() || !type.notifies()) {
 			return;
 		}
 
 		var title = _.template(type.notificationTitle, event.details);
 		var body = util.stripHtml(_.template(type.notificationBody, event.details));
-		var popup = window.webkitNotifications.createNotification("/favicon.ico", title, body);
-		popup.show();
-		setInterval(function () { popup.cancel(); }, NOTIFICATION_DURATION);
+		var popup = new Notification(title, {
+			icon: "/favicon.ico",
+			body: body,
+		});
+		setInterval(function () { popup.close(); }, NOTIFICATION_DURATION);
 	};
 
 	function getUserFromEvent(event) {
@@ -50,7 +51,7 @@ define(['ko', 'underscore', 'omegaEvent', 'util'], function (ko, _, OmegaEvent, 
 	}
 
 	function requestNotificationPermission() {
-		if (!window.webkitNotifications) {
+		if (!window.Notification) {
 			alert('Your browser doesn\'t support web notifications. Try Chrome or something.');
 			return;
 		}
@@ -64,18 +65,18 @@ define(['ko', 'underscore', 'omegaEvent', 'util'], function (ko, _, OmegaEvent, 
 		window.localStorage.removeItem(NOTIFICATION_PREF_OFF);
 
 		// otherwise, ask user to grant permission
-		if (window.webkitNotifications.checkPermission() === NOTIFICATION_ALLOWED) {
+		if (window.Notification.permission === "granted") {
 			this.webNotifyEnabled(checkWebNotificationEnabled());
 		} else {
 			var that = this;
-			window.webkitNotifications.requestPermission(function () {
-				that.webNotifyEnabled(checkWebNotificationEnabled());
+			window.Notification.requestPermission().then(function (permission) {
+				that.webNotifyEnabled(permission === "granted");
 			});
 		}
 	}
 
 	function checkWebNotificationEnabled() {
-		return !window.localStorage[NOTIFICATION_PREF_OFF] && window.webkitNotifications && window.webkitNotifications.checkPermission() === NOTIFICATION_ALLOWED;
+		return window.Notification && window.Notification.permission === "granted" && !window.localStorage[NOTIFICATION_PREF_OFF];
 	}
 
 	return Notifier;
